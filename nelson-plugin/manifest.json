@@ -1,0 +1,26 @@
+{
+   "manifest_version": 2,
+   "name": "Nelson",
+   "version": "0.2014.1.17",
+   "background": {
+       "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","nelson.js"],
+       "persistent": true
+   },
+   "permissions": [
+       "webRequest",
+       "<all_urls>",
+       "webRequestBlocking",
+       "tabs"
+    ],
+    "content_scripts": [
+    {
+    	"js": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js", "content.js"],
+    	"matches": ["<all_urls>"],
+    	"css": ["style.css"]
+    }
+  	],
+    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+    "minimum_chrome_version": "26",
+    "options_page": "options.html",
+    "web_accessible_resources": ["images/icon128.png","images/icon128flipped.png","style.css","js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map"]
+}
