@@ -1,6 +1,6 @@
 #mLogo {width: 50px; display: none; top: 0; z-index: 99; position: relative;}
 #nelsonContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px;}
-#archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px; width: height:40px; width: 525px; background-color: #ccc; z-index: 98; text-align: left;
+#archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px; width: height:40px; width: 625px; background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold
 }
 #mdts {margin-left: 1.0em;}

@@ -2,6 +2,7 @@
 var iconUrl = chrome.extension.getURL("images/icon128.png"); 
 var iconUrlFlipped = chrome.extension.getURL("images/icon128flipped.png"); 
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
+var numberOfTimemaps = 0;
 
 $("body").append("<div id=\"nelsonContainer\"></div>");
 $("#nelsonContainer").append("<div id=\"archiveOptions\">Fetching Mementos...</div>");
@@ -50,12 +51,12 @@ $(document).ready(function(){
 
 function showArchiveOptions(){
 	$("#archiveOptions").animate({
-		marginLeft: "-500px",
+		marginLeft: "-600px",
 		opacity: "1.0"
 	},500,null);
 }
-echoCurrentURI();
-function echoCurrentURI(uri,alreadyAcquiredTimemaps){
+getMementos();
+function getMementos(uri,alreadyAcquiredTimemaps){
 	console.log("Fetching current");
 	var timemaploc = proxy + window.location;
 	if(uri){
@@ -65,25 +66,22 @@ function echoCurrentURI(uri,alreadyAcquiredTimemaps){
 		url: timemaploc,
 		type: "GET"
 	}).done(function(data,textStatus,xhr){
-		//console.log("SUCCESS!");
-		console.log(data);
-		//console.log(textStatus);
-		//console.log(xhr);
 		if(xhr.status == 200){
 			var othertimemaps = data.match(/<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g);
-
-			if(othertimemaps && othertimemaps.length > 0 && othertimemaps[0] != proxy + window.location){ //the timemap contained references to other timemaps
+			numberOfTimemaps++;
+			if(uri && // URI passed in is a condition for pagination, else we'll assume the user just wants the first page
+				othertimemaps && othertimemaps.length > 0 && othertimemaps[0] != proxy + window.location){ //the timemap contained references to other timemaps
 				var timemapURI = othertimemaps[0].substring(1,othertimemaps[0].indexOf(">"));
 				
-				
-				console.log("Going to timemap "+timemapURI);
+				$("#timemapCount").text(numberOfTimemaps);
+				console.log("Fetching timemap "+timemapURI);
 				//should run a filter function here instead of naive equality
 				if(!alreadyAcquiredTimemaps){
-					return echoCurrentURI(timemapURI,data);
+					return getMementos(timemapURI,data);
 				}else {
-					return echoCurrentURI(timemapURI,alreadyAcquiredTimemaps+data);
+					return getMementos(timemapURI,alreadyAcquiredTimemaps+data);
 				}
-			}else if(!uri && !alreadyAcquiredTimemaps){ //only the initial timemap exists
+			}else if(!alreadyAcquiredTimemaps){ //only the initial timemap exists
 				alreadyAcquiredTimemaps = data;
 			}
 			
@@ -95,11 +93,18 @@ function echoCurrentURI(uri,alreadyAcquiredTimemaps){
 				selectBox += "\t<option>"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
 			});
 			selectBox += "</select>";
+			var fetchMoreButton = "<input type=\"button\" value=\"Fetch All\" id=\"fetchAllMementosButton\" />";
 			
-			$("#archiveOptions").html(matches.length+" mementos available." +
-				selectBox
+			var numberOfMementos = matches.length;
+			if(othertimemaps){numberOfMementos += "+";}
+			
+			$("#archiveOptions").html("<span id=\"info\">"+numberOfMementos+" mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> timemaps" + 
+				selectBox +
+				fetchMoreButton
 			);
+			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementos(proxy + window.location);});
 			logoInFocus = true;
+			numberOfTimemaps = 1;
 		}
 	}).error(function(e){
 		console.log("ERROR");
