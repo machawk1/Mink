@@ -17,7 +17,12 @@
     ],
     "content_scripts": [
     {
-    	"js": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js", "content.js"],
+    	"js": [
+    		"js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js", 
+    		"jQuery-Scoped/jquery.scoped.js",
+    		"bootstrap/css/bootstrap.min.css",
+    		"bootstrap/js/bootstrap.min.js",
+    		"content.js"],
     	"matches": ["<all_urls>"],
     	"css": ["style.css"]
     }
@@ -25,5 +30,9 @@
     "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
     "minimum_chrome_version": "30",
     "options_page": "options.html",
-    "web_accessible_resources": ["images/icon128.png","images/icon128flipped.png","style.css","js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map"]
+    "web_accessible_resources": [
+    	"images/icon128.png","images/icon128flipped.png","style.css",
+    	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
+    	"bootstrap/css/bootstrap.min.css"
+    ]
 }

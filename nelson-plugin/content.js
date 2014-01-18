@@ -1,6 +1,8 @@
 //alert($("body").html());
 var iconUrl = chrome.extension.getURL("images/icon128.png"); 
 var iconUrlFlipped = chrome.extension.getURL("images/icon128flipped.png"); 
+//PENDING, Issue #6, not possible w/o Chrome Canary: ar bootstrapCSS = chrome.extension.getURL("bootstrap/css/bootstrap.min.css");
+
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
 var numberOfTimemaps = 0;
 
@@ -9,7 +11,10 @@ var mementosURIsWithinTimemapsRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=
 var mementosInTimemapBasedOnRelAttributeRegex = /;rel=\".*memento.*\"/g;
 var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
 
+//PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
+
 $("body").append("<div id=\"nelsonContainer\"></div>");
+//PENDING, Issue #6, not possible w/o Chrome Canary: $("#nelsonContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
 $("#nelsonContainer").append("<div id=\"archiveOptions\"></div>");
 $("#nelsonContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 
