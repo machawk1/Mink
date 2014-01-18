@@ -20,7 +20,8 @@ $("#nelsonContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 
 
 var shrinking = true;
-var logoInFocus = false;
+var logoInFocus = false; //used as a conditional for when to stop spinning the logo
+var hideLogo = false;
 setTimeout(flip,1000);
 
 function flip(){
@@ -30,7 +31,7 @@ function flip(){
 	
 	if(logoInFocus && w == "0px" && $("#mLogo").attr("src") == iconUrl){
 		console.log("Stopping the rotation on front of logo!");
-		
+		if(hideLogo){$("#mLogo").fadeOut();hideLogo = false;}
 		return;
 	}
 	
@@ -107,13 +108,17 @@ function getDropdownOfMementosBasedOnJSON(jsonStr,activeSelectionDatetime){
 
 function displayUIBasedOnContext(){
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
-		console.log("Response!");
-		console.log(JSON.stringify(response.value));
-		if(!response || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
+		if(response == null || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
 			console.log("XZ");
 			$("#archiveOptions").text("Fetching Mementos...");
 			getMementos();
-		}else if(response && response.value != null && (window.location+"").indexOf(response.value) > -1){ //ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
+		}else if(response && response.value != null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
+				( ((window.location+"").indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
+				  ((window.location+"").replace("www.","").indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
+				  ((window.location+"").indexOf(response.value.replace("www.","")) > -1) ||
+				  ((window.location+"").replace("www.","").indexOf(response.value.replace("www.","")) > -1)
+				)
+			){ 
 			console.log("Y"+window.location+" "+response.value);
 			logoInFocus = true;
 			
@@ -127,19 +132,11 @@ function displayUIBasedOnContext(){
 
 				window.location = $("#mdts").val();dfgdf
 			});
-			setViewMementoButtonInteractivityBasedOnMementoDropdown(); 
-			
-			
-			
-			console.log("START");
-			console.log(response.mementos);
-			console.log(JSON.parse(response.mementos));
-			console.log("DONE");
-			
+			setViewMementoButtonInteractivityBasedOnMementoDropdown(); 			
 		}else {
 			console.log("There is no else, only if");
 			//ugh, we don't want to be here, let's nuke the localStorage
-			clearHistory();
+			clearHistory(); 
 			displayUIBasedOnContext();
 		}
 	  });
@@ -232,6 +229,14 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 		}
 	}).error(function(e){
 		console.log("ERROR");
+		
+		//check if we're currently viewing an archive
+		
+		// hide the Memento logo
+		hideLogo = true; logoInFocus = true;
 		console.log(e);
 	});
 }
+
+
+
