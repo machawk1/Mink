@@ -5,7 +5,7 @@ var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
 var numberOfTimemaps = 0;
 
 $("body").append("<div id=\"nelsonContainer\"></div>");
-$("#nelsonContainer").append("<div id=\"archiveOptions\">Fetching Mementos...</div>");
+$("#nelsonContainer").append("<div id=\"archiveOptions\"></div>");
 $("#nelsonContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 
 
@@ -55,7 +55,44 @@ function showArchiveOptions(){
 		opacity: "1.0"
 	},500,null);
 }
-getMementos();
+
+function addToHistory(uri){
+	chrome.runtime.sendMessage({method: "store", value: ""+uri}, function(response) {});
+}
+
+function clearHistory(){
+	chrome.runtime.sendMessage({method: "nukeFromOrbit", value: "It's the only way to be sure"}, function(response) {});
+}
+
+//chrome.storage.local.get(["history"],function(historyVal){
+//	console.log("X"+JSON.stringify(historyVal)+" "+window.location);
+//	if(!historyVal.history || historyVal.history == window.location){
+
+function displayUIBasedOnContext(){
+	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
+		console.log("Response!");
+		console.log(JSON.stringify(response.value));
+		if(!response || response.value == window.location || response.value == null){
+			console.log("XZ");
+			$("#archiveOptions").text("Fetching Mementos...");
+			getMementos();
+		}else if(response && response.value != null && (window.location+"").indexOf(response.value) > -1){// && window.location.indexOf(response.value > -1)){
+			console.log("Y"+window.location+" "+response.value);
+			logoInFocus = true;
+			$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
+			$("#liveWeb").click(function(){
+				window.location = response.value;
+			});
+		}else {
+			console.log("There is no else, only if");
+			//ugh, we don't want to be here, let's nuke the localStorage
+			clearHistory();
+			displayUIBasedOnContext();
+		}
+	  });
+}
+displayUIBasedOnContext();
+//});
 function getMementos(uri,alreadyAcquiredTimemaps){
 	console.log("Fetching current");
 	var timemaploc = proxy + window.location;
@@ -67,6 +104,7 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 		type: "GET"
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
+			console.log(data);
 			var othertimemaps = data.match(/<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g);
 			numberOfTimemaps++;
 			if(uri && // URI passed in is a condition for pagination, else we'll assume the user just wants the first page
@@ -85,24 +123,50 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 				alreadyAcquiredTimemaps = data;
 			}
 			
-			var matches = alreadyAcquiredTimemaps.match(/rel=\".*memento.*\"/g);
+			var matches = alreadyAcquiredTimemaps.match(/<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\".*memento.*\"/g);
+			var relmatches = alreadyAcquiredTimemaps.match(/;rel=\".*memento.*\"/g);
+
 			var dtMatches = alreadyAcquiredTimemaps.match(/datetime=\"(.*)\"/g);
 
-			var selectBox = "<select id=\"mdts\">";
+			var mementoURIs = [];
+			$(matches).each(function(i,v){
+				mementoURIs.push(v.substring(1,v.indexOf(">")));
+			});
+			
+			console.log("rel matches count = "+relmatches.length+"    uris = "+mementoURIs.length);
+			var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+			
 			$(dtMatches).each(function(i,v){
-				selectBox += "\t<option>"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
+				selectBox += "\t<option value=\""+mementoURIs[i]+"\">"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
 			});
 			selectBox += "</select>";
+			var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
 			var fetchMoreButton = "<input type=\"button\" value=\"Fetch All\" id=\"fetchAllMementosButton\" />";
 			
-			var numberOfMementos = matches.length;
+			var numberOfMementos = relmatches.length;
 			if(othertimemaps){numberOfMementos += "+";}
 			
 			$("#archiveOptions").html("<span id=\"info\">"+numberOfMementos+" mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> timemaps" + 
 				selectBox +
+				viewMementoButton +
 				fetchMoreButton
 			);
 			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementos(proxy + window.location);});
+			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
+			
+			$("#viewMementoButton").click(function(){
+				addToHistory(window.location);
+				window.location = $("#mdts").val();
+			});
+			
+			$("#mdts").change(function(){
+				if($(this)[0].selectedIndex == 0){
+					$("#viewMementoButton").attr("disabled","disabled");
+				}else {
+					$("#viewMementoButton").removeAttr("disabled");
+				}
+			});
+			
 			logoInFocus = true;
 			numberOfTimemaps = 1;
 		}
@@ -110,17 +174,4 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 		console.log("ERROR");
 		console.log(e);
 	});
-	//console.log("X"+window.location);
 }
-
-chrome.extension.onRequest.addListener(
-    function(request, sender, sendResponse) {
-       /* if(request.method == "getText"){
-            sendResponse({data: document.all[0].innerText, method: "getText"}); //same as innerText
-        }
-        
-        if(request.method == "forwardTo"){
-        	window.location = request.forwardToUrl;
-        }*/
-    }
-);
