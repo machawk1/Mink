@@ -61,8 +61,10 @@ function showArchiveOptions(){
 	},500,null);
 }
 
-function addToHistory(uri){
-	chrome.runtime.sendMessage({method: "store", value: ""+uri, mementos: jsonizedMementos}, function(response) {});
+function addToHistory(uri_r,memento_datetime,mementos){
+	var mementosToStore = mementos;
+	if(!mementosToStore){mementosToStore = jsonizedMementos;}
+	chrome.runtime.sendMessage({method: "store", value: ""+uri_r, memento_datetime: memento_datetime, mementos: mementosToStore}, function(response) {});
 }
 
 function clearHistory(){
@@ -79,9 +81,24 @@ function setViewMementoButtonInteractivityBasedOnMementoDropdown(){
 	});
 }
 
-//chrome.storage.local.get(["history"],function(historyVal){
-//	console.log("X"+JSON.stringify(historyVal)+" "+window.location);
-//	if(!historyVal.history || historyVal.history == window.location){
+// - show mementos UI from JSON, logic similar to live web drop down display
+function getDropdownOfMementosBasedOnJSON(jsonStr,activeSelectionDatetime){
+	var mementoObjects = JSON.parse(jsonStr); // format: [{'uri':(uri),'datetime':(datetime),...]
+	var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+	$(mementoObjects).each(function(i,v){
+		var selectedString = "";	//set which option is selected based on the select box text, NOT the value. Can probably be better done with selectors
+		if($(v).attr("datetime") == activeSelectionDatetime){selectedString = "selected";}
+		
+		selectBox += "\t<option value=\""+$(v).attr("uri")+"\" "+selectedString+">"+$(v).attr("datetime")+"</option>\r\n";
+	});
+	selectBox += "</select>";
+	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
+	
+	console.log("activeSelectioNDatetime = "+activeSelectionDatetime);
+	//$("#mdts option[value='"+activeSelectionDatetime+"']").attr("selected", "selected");
+	var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
+	return selectBox + viewMementoButton;
+}
 
 function displayUIBasedOnContext(){
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
@@ -99,24 +116,11 @@ function displayUIBasedOnContext(){
 			$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
 			$("#liveWeb").click(function(){window.location = response.value;});
 			
-			// - show mementos UI from JSON, logic similar to live web drop down display
-			function getDropdownOfMementosBasedOnJSON(jsonStr){
-				var mementoObjects = JSON.parse(jsonStr);// format: [{'uri':(uri),'datetime':(datetime),...]
-				var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
-				$(mementoObjects).each(function(i,v){
-					selectBox += "\t<option value=\""+$(v).attr("uri")+"\">"+$(v).attr("datetime")+"</option>\r\n";
-				});
-				selectBox += "</select>";
-				delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
-				
-				var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
-				return selectBox + viewMementoButton;
-			}
-			
-			
-			$("#archiveOptions").append(getDropdownOfMementosBasedOnJSON(response.mementos));
+			$("#archiveOptions").append(getDropdownOfMementosBasedOnJSON(response.mementos,response.memento_datetime));
 			$("#viewMementoButton").click(function(){ //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
-				window.location = $("#mdts").val();
+				addToHistory(response.value,$("#mdts option:selected").text(),response.mementos); //Save the Memento-Datetime of option chosen to localStorage
+
+				window.location = $("#mdts").val();dfgdf
 			});
 			setViewMementoButtonInteractivityBasedOnMementoDropdown(); 
 			
@@ -209,7 +213,7 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
 			
 			$("#viewMementoButton").click(function(){
-				addToHistory(window.location);
+				addToHistory(window.location,$("#mdts option:selected").text()); //save the URI-R and Memento-Datetime of option chosen to localStorage
 				window.location = $("#mdts").val();
 			});
 			
