@@ -57,7 +57,7 @@ function showArchiveOptions(){
 }
 
 function addToHistory(uri){
-	chrome.runtime.sendMessage({method: "store", value: ""+uri}, function(response) {});
+	chrome.runtime.sendMessage({method: "store", value: ""+uri, mementos: jsonizedMementos}, function(response) {});
 }
 
 function clearHistory(){
@@ -80,6 +80,7 @@ function displayUIBasedOnContext(){
 			console.log("Y"+window.location+" "+response.value);
 			logoInFocus = true;
 			$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
+			console.log(jsonizedMementos);
 			$("#liveWeb").click(function(){
 				window.location = response.value;
 			});
@@ -93,6 +94,8 @@ function displayUIBasedOnContext(){
 }
 displayUIBasedOnContext();
 //});
+var jsonizedMementos = "[";
+
 function getMementos(uri,alreadyAcquiredTimemaps){
 	console.log("Fetching current");
 	var timemaploc = proxy + window.location;
@@ -135,10 +138,14 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 			
 			console.log("rel matches count = "+relmatches.length+"    uris = "+mementoURIs.length);
 			var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
-			
+
 			$(dtMatches).each(function(i,v){
 				selectBox += "\t<option value=\""+mementoURIs[i]+"\">"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
+				jsonizedMementos += "\"uri\": \""+mementoURIs[i]+"\", \"datetime\": \""+v.substring(10,dtMatches[0].length-1)+"\"},";
 			});
+			jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
+			jsonizedMementos+= "]"; //make it valid JSON
+			
 			selectBox += "</select>";
 			var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
 			var fetchMoreButton = "<input type=\"button\" value=\"Fetch All\" id=\"fetchAllMementosButton\" />";
