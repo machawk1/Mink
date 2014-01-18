@@ -69,6 +69,16 @@ function clearHistory(){
 	chrome.runtime.sendMessage({method: "nukeFromOrbit", value: "It's the only way to be sure"}, function(response) {});
 }
 
+function setViewMementoButtonInteractivityBasedOnMementoDropdown(){
+	$("#mdts").change(function(){
+		if($(this)[0].selectedIndex == 0){
+			$("#viewMementoButton").attr("disabled","disabled");
+		}else {
+			$("#viewMementoButton").removeAttr("disabled");
+		}
+	});
+}
+
 //chrome.storage.local.get(["history"],function(historyVal){
 //	console.log("X"+JSON.stringify(historyVal)+" "+window.location);
 //	if(!historyVal.history || historyVal.history == window.location){
@@ -98,10 +108,17 @@ function displayUIBasedOnContext(){
 				});
 				selectBox += "</select>";
 				delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
-				return selectBox;
+				
+				var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
+				return selectBox + viewMementoButton;
 			}
+			
+			
 			$("#archiveOptions").append(getDropdownOfMementosBasedOnJSON(response.mementos));
-			//var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
+			$("#viewMementoButton").click(function(){ //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
+				window.location = $("#mdts").val();
+			});
+			setViewMementoButtonInteractivityBasedOnMementoDropdown(); 
 			
 			
 			
@@ -199,14 +216,7 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 			$("#helpButton").click(function(){
 				alert("More information will be provided here about the recursive memento acquisition and parsing");
 			});
-			
-			$("#mdts").change(function(){
-				if($(this)[0].selectedIndex == 0){
-					$("#viewMementoButton").attr("disabled","disabled");
-				}else {
-					$("#viewMementoButton").removeAttr("disabled");
-				}
-			});
+			setViewMementoButtonInteractivityBasedOnMementoDropdown();
 			
 			logoInFocus = true;
 			numberOfTimemaps = 1;
