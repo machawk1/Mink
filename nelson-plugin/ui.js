@@ -21,7 +21,7 @@ function setMementoButtonInteractivityBasedOnMementoDropdown(){
 function showArchiveOptions(){
 	console.log("Showing archive options");
 	$("#archiveOptions").animate({
-		marginLeft: "-600px",
+		marginLeft: "-700px",
 		opacity: "1.0"
 	},500,null);
 }
