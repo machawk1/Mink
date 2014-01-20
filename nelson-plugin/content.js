@@ -27,39 +27,44 @@ $(document).ready(function(){
 	});
 });
 
-function addToHistory(uri_r,memento_datetime,mementos){
+function addToHistory(uri_r,memento_datetime,mementos,callback){
 	var mementosToStore = mementos;
 	if(!mementosToStore){mementosToStore = jsonizedMementos;}
-	chrome.runtime.sendMessage({method: "store", value: ""+uri_r, memento_datetime: memento_datetime, mementos: mementosToStore}, function(response) {});
+	chrome.runtime.sendMessage({method: "store", value: ""+uri_r, memento_datetime: memento_datetime, mementos: mementosToStore}, function(response) {
+		if(callback){
+			callback();
+		}
+	});
 }
 
 function clearHistory(){
 	chrome.runtime.sendMessage({method: "nukeFromOrbit", value: "It's the only way to be sure"}, function(response) {});
 }
 
-// - show mementos UI from JSON, logic similar to live web drop down display
-function getDropdownOfMementosBasedOnJSON(jsonStr,activeSelectionDatetime){
-	var mementoObjects = JSON.parse(jsonStr); // format: [{'uri':(uri),'datetime':(datetime),...]
-	var dropdownOptions, selectedIndex = 0;
-	$(mementoObjects).each(function(i,v){
-		var selectedString = "";	//set which option is selected based on the select box text, NOT the value. Can probably be better done with selectors
-		if($(v).attr("datetime") == activeSelectionDatetime){
-			selectedString = "selected";
-			selectedIndex = i;
+
+/** When viewing a memento, handles the UI and navigation change of jumping to another memento
+ *  @param index A value representative of the location of the new memento on the list, 1 = next, -1 = prev, 0/null = selected in UI
+ */
+function viewDifferentMemento(index){
+	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
+		if(index == null || index == 0){
+			addToHistory(response.value,$("#mdts option:selected").text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
+				function(){window.location = $("#mdts").val();}
+			);
+		}else if(index == 1){ //next Memento
+			var nextMemento = $("#mdts option:nth-child("+(parseInt($("#mdts").attr("alt"))+2)+")");
+			addToHistory(response.value,nextMemento.text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
+				function(){window.location = nextMemento.val();}
+			);
+		}else if(index == -1){ //prev Memento
+			var prevMemento = $("#mdts option:nth-child("+(parseInt($("#mdts").attr("alt")))+")");
+			addToHistory(response.value,prevMemento.text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
+				function(){window.location = prevMemento.val();}
+			);		
+		}else {
+			console.log("Bad index value in viewDifferentMemento, "+index);
 		}
-		
-		dropdownOptions += "\t<option value=\""+$(v).attr("uri")+"\" "+selectedString+">"+$(v).attr("datetime")+"</option>\r\n";
 	});
-	var selectBox = "<select id=\"mdts\" alt=\""+(selectedIndex + 1)+"\"><option>Select a Memento to view</option>" +
-					dropdownOptions +
-					"</select>";
-	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
-	delete dropdownOptions;
-	
-	console.log("activeSelectioNDatetime = "+activeSelectionDatetime);
-	//$("#mdts option[value='"+activeSelectionDatetime+"']").attr("selected", "selected");
-	var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
-	return selectBox + viewMementoButton;
 }
 
 function displayUIBasedOnContext(){
@@ -82,13 +87,10 @@ function displayUIBasedOnContext(){
 			$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
 			$("#liveWeb").click(function(){window.location = response.value;});
 			
-			$("#archiveOptions").append(getDropdownOfMementosBasedOnJSON(response.mementos,response.memento_datetime));
-			$("#viewMementoButton").click(function(){ //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
-				addToHistory(response.value,$("#mdts option:selected").text(),response.mementos); //Save the Memento-Datetime of option chosen to localStorage
-
-				window.location = $("#mdts").val();dfgdf
-			});
-			setViewMementoButtonInteractivityBasedOnMementoDropdown(); 			
+			$("#archiveOptions").append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
+			$("#viewMementoButton").click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
+		
+			setMementoButtonInteractivityBasedOnMementoDropdown(); 		
 		}else {
 			console.log("There is no else, only if");
 			//ugh, we don't want to be here, let's nuke the localStorage
@@ -183,14 +185,18 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
 			
 			$("#viewMementoButton").click(function(){
-				addToHistory(window.location,$("#mdts option:selected").text()); //save the URI-R and Memento-Datetime of option chosen to localStorage
-				window.location = $("#mdts").val();
+				addToHistory(window.location,$("#mdts option:selected").text(),null,//save the URI-R and Memento-Datetime of option chosen to localStorage
+					function(){
+						window.location = $("#mdts").val();
+					}
+				); 
+				
 			});
 			
 			$("#helpButton").click(function(){
 				alert("More information will be provided here about the recursive memento acquisition and parsing");
 			});
-			setViewMementoButtonInteractivityBasedOnMementoDropdown();
+			setMementoButtonInteractivityBasedOnMementoDropdown();
 			
 			//This is insufficient to making the Nelson logo clickable on http://web.archive.org/web/20140115131022/http://www.yahoo.com/
 			$("#mLogo").click(function(){showArchiveOptions();}); //if viewing an already archived page, for some reason this wasn't attached
