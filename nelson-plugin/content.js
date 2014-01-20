@@ -1,6 +1,5 @@
 //alert($("body").html());
-var iconUrl = chrome.extension.getURL("images/icon128.png"); 
-var iconUrlFlipped = chrome.extension.getURL("images/icon128flipped.png"); 
+
 //PENDING, Issue #6, not possible w/o Chrome Canary: ar bootstrapCSS = chrome.extension.getURL("bootstrap/css/bootstrap.min.css");
 
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
@@ -19,53 +18,14 @@ $("#nelsonContainer").append("<div id=\"archiveOptions\"></div>");
 $("#nelsonContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 
 
-var shrinking = true;
-var logoInFocus = false; //used as a conditional for when to stop spinning the logo
-var hideLogo = false;
-setTimeout(flip,1000);
 
-function flip(){
-	$("#mLogo").fadeIn();
-	var w = "0px";
-	if(shrinking){w = "50px"; }
-	
-	if(logoInFocus && w == "0px" && $("#mLogo").attr("src") == iconUrl){
-		console.log("Stopping the rotation on front of logo!");
-		if(hideLogo){$("#mLogo").fadeOut();hideLogo = false;}
-		return;
-	}
-	
-	shrinking = !shrinking;
-	$("#mLogo").animate({
-		width: w,
-		height: "50px"
-	},800,
-		function(){
-			if($("#mLogo").css("width") == "0px"){
-				if($("#mLogo").attr("src") == iconUrl){
-					$("#mLogo").attr("src",iconUrlFlipped);
-				}else {
-					$("#mLogo").attr("src",iconUrl);
-				}
-			}
-			flip();
-		}
-	);
-}
+setTimeout(flip,1000);
 
 $(document).ready(function(){
 	$("#mLogo").click(function(){
 		showArchiveOptions();
-		//logoInFocus = true;
 	});
 });
-
-function showArchiveOptions(){
-	$("#archiveOptions").animate({
-		marginLeft: "-600px",
-		opacity: "1.0"
-	},500,null);
-}
 
 function addToHistory(uri_r,memento_datetime,mementos){
 	var mementosToStore = mementos;
@@ -77,28 +37,24 @@ function clearHistory(){
 	chrome.runtime.sendMessage({method: "nukeFromOrbit", value: "It's the only way to be sure"}, function(response) {});
 }
 
-function setViewMementoButtonInteractivityBasedOnMementoDropdown(){
-	$("#mdts").change(function(){
-		if($(this)[0].selectedIndex == 0){
-			$("#viewMementoButton").attr("disabled","disabled");
-		}else {
-			$("#viewMementoButton").removeAttr("disabled");
-		}
-	});
-}
-
 // - show mementos UI from JSON, logic similar to live web drop down display
 function getDropdownOfMementosBasedOnJSON(jsonStr,activeSelectionDatetime){
 	var mementoObjects = JSON.parse(jsonStr); // format: [{'uri':(uri),'datetime':(datetime),...]
-	var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+	var dropdownOptions, selectedIndex = 0;
 	$(mementoObjects).each(function(i,v){
 		var selectedString = "";	//set which option is selected based on the select box text, NOT the value. Can probably be better done with selectors
-		if($(v).attr("datetime") == activeSelectionDatetime){selectedString = "selected";}
+		if($(v).attr("datetime") == activeSelectionDatetime){
+			selectedString = "selected";
+			selectedIndex = i;
+		}
 		
-		selectBox += "\t<option value=\""+$(v).attr("uri")+"\" "+selectedString+">"+$(v).attr("datetime")+"</option>\r\n";
+		dropdownOptions += "\t<option value=\""+$(v).attr("uri")+"\" "+selectedString+">"+$(v).attr("datetime")+"</option>\r\n";
 	});
-	selectBox += "</select>";
+	var selectBox = "<select id=\"mdts\" alt=\""+(selectedIndex + 1)+"\"><option>Select a Memento to view</option>" +
+					dropdownOptions +
+					"</select>";
 	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
+	delete dropdownOptions;
 	
 	console.log("activeSelectioNDatetime = "+activeSelectionDatetime);
 	//$("#mdts option[value='"+activeSelectionDatetime+"']").attr("selected", "selected");
@@ -142,10 +98,19 @@ function displayUIBasedOnContext(){
 	  });
 }
 displayUIBasedOnContext();
-//});
+
 var jsonizedMementos = "[";
 
-function getMementos(uri,alreadyAcquiredTimemaps){
+/**
+ * Acquire all mementos from a timegate with either the current window URI
+ *  or the URI of a value passed in
+ * @param uri The target URI-R, if null then use window location
+ * @param alreadyAcquiredTimemaps When function is called recursively, the 
+ *         previously acquired timemaps are passed in this argument
+ * @param stopAtOneTimemap A boolean to specify whether additional pagination
+ *         references should be followed and parsed before data is returned
+ */
+function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	var timemaploc = proxy + window.location;
 	if(uri){
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
@@ -157,12 +122,15 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 		type: "GET"
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
-			console.log(data);
+			//console.log(data);
 			
 			var othertimemaps = data.match(embeddedTimemapRegex);
 			numberOfTimemaps++;
 			if(uri && // URI passed in is a condition for pagination, else we'll assume the user just wants the first page
-				othertimemaps && othertimemaps.length > 0 && othertimemaps[0] != proxy + window.location){ //the timemap contained references to other timemaps
+				othertimemaps && othertimemaps.length > 0 && 
+				othertimemaps[0] != proxy + window.location && //the timemap contained references to other timemaps
+				stopAtOneTimemap 
+				){ 
 				var timemapURI = othertimemaps[0].substring(1,othertimemaps[0].indexOf(">"));
 				
 				$("#timemapCount").text(numberOfTimemaps);
@@ -224,6 +192,9 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 			});
 			setViewMementoButtonInteractivityBasedOnMementoDropdown();
 			
+			//This is insufficient to making the Nelson logo clickable on http://web.archive.org/web/20140115131022/http://www.yahoo.com/
+			$("#mLogo").click(function(){showArchiveOptions();}); //if viewing an already archived page, for some reason this wasn't attached
+			
 			logoInFocus = true;
 			numberOfTimemaps = 1;
 		}
@@ -231,7 +202,16 @@ function getMementos(uri,alreadyAcquiredTimemaps){
 		console.log("ERROR");
 		
 		//check if we're currently viewing an archive
-		
+		console.log("Are we viewing the archive? Basis 1: two http[s]*?://");
+		var schemeOccurances = (window.location+"").match(/http[s]*:\/\//g);
+		if(schemeOccurances.length > 1){ //we likely have two URIs in window.location
+			console.log("  It appears we are viewing the archive based on multiple instances of http[s]*:// in window.location");
+			// - Attempt to extract the URI-R
+			var URI_M = (window.location+"").substr((window.location+"").indexOf("http",6)); //exclude the initial scheme, let's figure out where the URI-M starts
+			URI_M = URI_M.replace("http://","http://"); //cross-protocol interaction is a no-no
+			return getMementos(proxy + URI_M,null,true); 
+		}
+
 		// hide the Memento logo
 		hideLogo = true; logoInFocus = true;
 		console.log(e);

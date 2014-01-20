@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Nelson",
    "description": "On-the-fly web archive integration while browsing",
-   "version": "0.2014.1.18",
+   "version": "0.2014.1.20",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","nelson.js"],
        "persistent": true
@@ -22,7 +22,7 @@
     		"jQuery-Scoped/jquery.scoped.js",
     		"bootstrap/css/bootstrap.min.css",
     		"bootstrap/js/bootstrap.min.js",
-    		"content.js"],
+    		"ui.js","content.js"],
     	"matches": ["<all_urls>"],
     	"css": ["style.css"]
     }
