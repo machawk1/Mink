@@ -111,6 +111,7 @@ function displayDatepicker(){
 	
 	var yearbuckets = [];
 	var completeCSV = "year,month,datetime,uri,src";
+	var tsv = "";
 	$("#mdts option").each(function(i,v){
 		if(i==0){return;} // The first entry in the list is not a date but a directive
 		
@@ -126,9 +127,12 @@ function displayDatepicker(){
 			yearbuckets[year] = [];
 			yearbuckets[year].push(new Memento($(v).val(),$(v).text()));
 		}
+		
+		tsv += year+" "+month+"\t"+$(v).val()+"\r\n";
 	});
 	
 	var yearList = "<ul>\r\n";
+	
 	for(var key in Object.keys(yearbuckets)){
 		console.log(Object.keys(yearbuckets)[key]+" has "+yearbuckets[Object.keys(yearbuckets)[key]].length+" mementos");
 		console.log(Object.keys(yearbuckets)[key]+","+yearbuckets[Object.keys(yearbuckets)[key]].length);
@@ -141,32 +145,27 @@ function displayDatepicker(){
 	
 
 	$("#datepickerOptions").append(daterangepicker);
-	$("#datepickerOptions").append(yearList);
+	//$("#datepickerOptions").append(yearList);
 
 	$('#reservationtime').daterangepicker({
 		timePicker: true,
-		format: 'MM/DD/YYYY h:mm A'
+		format: 'MM/DD/YYYY h:mm A',
+		timePickerIncrement: 1
 	});
+	
 
+	
+     $("#datepickerOptions").append(getHighchartsData());
+     console.log(tsv);
+     $("#tsv").text(tsv);
+    
+     
+	doThatHighchartsThingYouDo();
+     
         
     
 	//$("body").append("<span id=\"csvdata\">"+csv+"</span>");
 	//renderChart();
 	//$("#datepickerContainer").css("bottom",$("#datepickerContainer").css("bottom")+$("#datepickerContainer").css("height"));
 }
-
-function dptest(){
-
-	var daterangepicker = "<input type=\"text\" style=\"width: 300px\" name=\"reservation\" id=\"reservationtime\" class=\"form-control\" value=\"08/01/2013 1:00 PM - 08/01/2013 1:30 PM\"  class=\"span4\"/>";
-	console.log("dptest();");
-
-
-	$('#reservationtime').daterangepicker({
-		timePicker: true,
-		timePickerIncrement: 30,
-		format: 'MM/DD/YYYY h:mm A'
-	});
-
-}
-
 

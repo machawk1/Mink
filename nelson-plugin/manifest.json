@@ -27,7 +27,9 @@
     		"bootstrap/js/bootstrap.min.js",
 
     		"d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
-
+    		"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/data.js","Highcharts-3.0.9/js/modules/drilldown.js",
+			"highchartsdata.js","doThatHighchartsThingYouDo.js",
+			
     		"ui.js","content.js"],
     	"matches": ["<all_urls>"],
     	"css": ["style.css",
@@ -42,6 +44,7 @@
     "web_accessible_resources": [
     	"images/icon128.png","images/icon128flipped.png","style.css",
     	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
+    	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"bootstrap/css/bootstrap.min.css",
     		"font-awesome-4.0.3/css/font-awesome-modified.css",
     		"font-awesome-4.0.3/fonts/fontawesome-webfont.eot",
