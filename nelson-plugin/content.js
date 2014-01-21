@@ -12,6 +12,7 @@ var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
 
 //PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
 
+
 $("body").append("<div id=\"nelsonContainer\"></div>");
 //PENDING, Issue #6, not possible w/o Chrome Canary: $("#nelsonContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
 $("#nelsonContainer").append("<div id=\"archiveOptions\"></div>");
@@ -25,6 +26,7 @@ $(document).ready(function(){
 	$("#mLogo").click(function(){
 		showArchiveOptions();
 	});
+	
 });
 
 function addToHistory(uri_r,memento_datetime,mementos,callback){
@@ -67,10 +69,9 @@ function viewDifferentMemento(index){
 	});
 }
 
-function displayUIBasedOnContext(){
+function displayUIBasedOnContext(){	
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
 		if(response == null || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
-			console.log("XZ");
 			$("#archiveOptions").text("Fetching Mementos...");
 			getMementos();
 		}else if(response && response.value != null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
@@ -127,12 +128,18 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			//console.log(data);
 			
 			var othertimemaps = data.match(embeddedTimemapRegex);
+
 			numberOfTimemaps++;
 			if(uri && // URI passed in is a condition for pagination, else we'll assume the user just wants the first page
 				othertimemaps && othertimemaps.length > 0 && 
 				othertimemaps[0] != proxy + window.location && //the timemap contained references to other timemaps
-				stopAtOneTimemap 
+				!stopAtOneTimemap &&
+				
+				// ************ ARTIFICIAL LIMIT IMPOSED FOR TESTING
+				numberOfTimemaps < 4
+				// ************ 
 				){ 
+					
 				var timemapURI = othertimemaps[0].substring(1,othertimemaps[0].indexOf(">"));
 				
 				$("#timemapCount").text(numberOfTimemaps);
@@ -145,6 +152,9 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				}
 			}else if(!alreadyAcquiredTimemaps){ //only the initial timemap exists
 				alreadyAcquiredTimemaps = data;
+				console.log("In elseif;");
+			}else {
+				console.log("in else");
 			}
 						
 			var matches = alreadyAcquiredTimemaps.match(mementosURIsWithinTimemapsRegex);
@@ -158,8 +168,9 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			});
 			
 			console.log("rel matches count = "+relmatches.length+"    uris = "+mementoURIs.length); //these values should be the same, else there's a parsing problem
-			var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
 
+			var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+			
 			$(dtMatches).each(function(i,v){
 				selectBox += "\t<option value=\""+mementoURIs[i]+"\">"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
 				jsonizedMementos += "{\"uri\": \""+mementoURIs[i]+"\", \"datetime\": \""+v.substring(10,dtMatches[0].length-1)+"\"},";
@@ -169,7 +180,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			
 			selectBox += "</select>";
 			var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
-			var fetchMoreButton = "<input type=\"button\" value=\"Fetch All\" id=\"fetchAllMementosButton\" />";
+			var fetchMoreButton = "<span id=\"furtherFetchUI\"><label for=\"fetchAllMementosButton\" id=\"fetchLabel\">Fetch: </label>( <input type=\"button\" value=\"All\" id=\"fetchAllMementosButton\" />,<input type=\"button\" value=\"&amp;  Filter\" id=\"fetchAndFilterMementosButton\" /> )</span>";
 			var helpButton = "<input type=\"button\" value=\"?\" id=\"helpButton\" />";
 			
 			var numberOfMementos = relmatches.length;
@@ -181,7 +192,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				fetchMoreButton +
 				helpButton
 			);
-			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementos(proxy + window.location);});
+			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementos(proxy + window.location,data);});
 			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
 			
 			$("#viewMementoButton").click(function(){
@@ -196,11 +207,29 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			$("#helpButton").click(function(){
 				alert("More information will be provided here about the recursive memento acquisition and parsing");
 			});
+			
+			if(dtMatches.length > 1002){
+				//replace dropdown with a button to access a better UI is there are many mementos
+				var dateUIButton = "<input type=\"button\" value=\"Select a Memento\" id=\"dateUIButton\" />";
+				$("#mdts").after(dateUIButton);
+				$("#mdts").fadeOut();
+				$("#dateUIButton").click(displayDatepicker);
+			}
+			
 			setMementoButtonInteractivityBasedOnMementoDropdown();
 			
 			//This is insufficient to making the Nelson logo clickable on http://web.archive.org/web/20140115131022/http://www.yahoo.com/
 			$("#mLogo").click(function(){showArchiveOptions();}); //if viewing an already archived page, for some reason this wasn't attached
 			
+			if(numberOfTimemaps > 1){
+				chrome.runtime.sendMessage({
+					method: "notify", 
+					title: "TimeMap fetching complete.",
+					body: dtMatches.length+" mementos returned."
+				}, function(response) {});
+			}
+			
+			//reset state variables
 			logoInFocus = true;
 			numberOfTimemaps = 1;
 		}
@@ -224,5 +253,8 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	});
 }
 
-
+function Memento(uri,datetime){
+	this.uri = uri;
+	this.datetime = datetime;
+}
 

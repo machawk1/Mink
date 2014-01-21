@@ -13,5 +13,17 @@ chrome.runtime.onMessage.addListener(
       sendResponse({value: localStorage.getItem('nelsonURI'),mementos: localStorage.getItem('mementos'), memento_datetime: localStorage.getItem('memento_datetime')});
     }else if(request.method == "nukeFromOrbit"){
     	localStorage.removeItem('nelsonURI');
+    }else if(request.method == "notify"){
+		var notify = chrome.notifications.create(
+			'id1',{   
+				type:"basic",
+				title:request.title,
+				message:request.body,
+				iconUrl: "images/icon128.png"
+			},function() {} 
+		 );
+    
     }
   });
+  
+

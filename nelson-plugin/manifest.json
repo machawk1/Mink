@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Nelson",
    "description": "On-the-fly web archive integration while browsing",
-   "version": "0.2014.1.20",
+   "version": "0.2014.1.21",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","nelson.js"],
        "persistent": true
@@ -13,18 +13,27 @@
        "webRequestBlocking",
        "tabs",
        "storage",
-       "cookies"
+       "cookies",
+       "notifications"
     ],
     "content_scripts": [
     {
     	"js": [
     		"js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js", 
     		"jQuery-Scoped/jquery.scoped.js",
-    		"bootstrap/css/bootstrap.min.css",
+    		"moment-with-langs.min.js",
+    		
+    		"bootstrap-daterangepicker/daterangepicker.js",
     		"bootstrap/js/bootstrap.min.js",
+
+    		"d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
+
     		"ui.js","content.js"],
     	"matches": ["<all_urls>"],
-    	"css": ["style.css"]
+    	"css": ["style.css",
+    		"bootstrap/css/bootstrap.min.css","bootstrap-daterangepicker/daterangepicker-bs3.css",
+    		"font-awesome-4.0.3/css/font-awesome-modified.css"
+    		]
     }
   	],
     "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
@@ -33,6 +42,12 @@
     "web_accessible_resources": [
     	"images/icon128.png","images/icon128flipped.png","style.css",
     	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
-    	"bootstrap/css/bootstrap.min.css"
+    	"bootstrap/css/bootstrap.min.css",
+    		"font-awesome-4.0.3/css/font-awesome-modified.css",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.eot",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.svg",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.ttf",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.woff",
+    		"font-awesome-4.0.3/fonts/fontAwesome.otf"
     ]
 }
