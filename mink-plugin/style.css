@@ -1,4 +1,4 @@
-#mLogo {width: 50px; display: none; top: 0; z-index: 999999; position: relative;}
+#mLogo {width: 50px; display: none; top: 0; z-index: 999998; position: relative;}
 #nelsonContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999;}
 #archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px;
@@ -14,7 +14,12 @@
 	font-weight: bold; border-radius: 4px; 
 }
 #datepickerOptions ul {list-style-type: none;}
-
+#countOverLogo {position: absolute; left: 0; top: 0; width: 100px; height: 50px; display: block; text-align: center; padding-top: 12.5%; color: red; font-weight: bold; z-index: 999999;
+	text-shadow: 0 0 5px #fff; font-family: Arial; font-size: 24px; 
+   text-shadow: 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black;
+   opacity: 0.8; display: none;
+	}
+#countOverLogo:hover {cursor: pointer;}
 
 
 

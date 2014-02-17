@@ -27,6 +27,21 @@ function showArchiveOptions(){
 }
 
 /**
+ * After the query for the memento list via the URI's timemap, show a numerical count atop the logo
+ */
+function displayMementoCountAtopLogo(){
+	//numberOfMementos
+	var count = $("#numberOfMementos").text();
+	$("#mLogo").after("<span id=\"countOverLogo\">"+count+"</span>");
+	$("#countOverLogo").click(
+		function(){
+			showArchiveOptions();
+		}
+	);
+	$("#countOverLogo").fadeIn();
+}
+
+/**
  * Animate the memento logo by modifying the image width on a timer until logoInFocus is set
  */
 function flip(){
@@ -39,6 +54,9 @@ function flip(){
 		console.log("Stopping the rotation on front of logo!");
 		$("#mLogo").css("opacity","1.0");
 		if(hideLogo){$("#mLogo").fadeOut();hideLogo = false;}
+		else {
+			displayMementoCountAtopLogo();
+		}
 		return;
 	}
 	

@@ -185,7 +185,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			var numberOfMementos = relmatches.length;
 			if(othertimemaps){numberOfMementos += "+";}
 			
-			$("#archiveOptions").html("<span id=\"info\">"+numberOfMementos+" mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> timemaps" + 
+			$("#archiveOptions").html("<span id=\"info\"><span id=\"numberOfMementos\">"+numberOfMementos+"</span> mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> timemaps" + 
 				selectBox +
 				viewMementoButton +
 				fetchMoreButton +
