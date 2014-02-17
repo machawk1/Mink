@@ -1,0 +1,55 @@
+{
+   "manifest_version": 2,
+   "name": "Mink",
+   "description": "On-the-fly web archive integration while browsing",
+   "version": "0.2014.2.17",
+   "background": {
+       "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
+       "persistent": true
+   },
+   "permissions": [
+       "webRequest",
+       "<all_urls>",
+       "webRequestBlocking",
+       "tabs",
+       "storage",
+       "cookies",
+       "notifications"
+    ],
+    "content_scripts": [
+    {
+    	"js": [
+    		"js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js", 
+    		"jQuery-Scoped/jquery.scoped.js",
+    		"moment-with-langs.min.js",
+    		
+    		"bootstrap-daterangepicker/daterangepicker.js",
+    		"bootstrap/js/bootstrap.min.js",
+
+    		"d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
+    		"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/data.js","Highcharts-3.0.9/js/modules/drilldown.js",
+			"highchartsdata.js","doThatHighchartsThingYouDo.js",
+			
+    		"ui.js","content.js"],
+    	"matches": ["<all_urls>"],
+    	"css": ["style.css",
+    		"font-awesome-4.0.3/css/font-awesome-modified.css"
+    		]
+    }
+  	],
+    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+    "minimum_chrome_version": "30",
+    "options_page": "options.html",
+    "web_accessible_resources": [
+    	"images/icon128.png","images/icon128flipped.png","style.css",
+    	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
+    	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
+    	"bootstrap/css/bootstrap.min.css",
+    		"font-awesome-4.0.3/css/font-awesome-modified.css",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.eot",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.svg",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.ttf",
+    		"font-awesome-4.0.3/fonts/fontawesome-webfont.woff",
+    		"font-awesome-4.0.3/fonts/fontAwesome.otf"
+    ]
+}

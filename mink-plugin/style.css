@@ -1,0 +1,35 @@
+#mLogo {width: 50px; display: none; top: 0; z-index: 999999; position: relative;}
+#nelsonContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999;}
+#archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
+	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px;
+}
+#mdts, #dateUIButton, #helpButton {margin-left: 1.0em;}
+#prevMementoButton,#fetchLabel {margin-left: 1.5em;}
+
+#datepickerContainer {position: absolute; top: 5px; left: 40%; text-align: center; width: 100px; z-index: 10000; background-color: white;}
+#datepickerOptions {position: absolute; top: 0px left: 0px; margin-top: 0px; width: 725px; min-height: 50%;  background-color: #ccc; z-index: 98; text-align: left;
+	padding: 5px; 
+	background: linear-gradient(to down, #999999, rgba(187,187,187,0.75)); 
+	
+	font-weight: bold; border-radius: 4px; 
+}
+#datepickerOptions ul {list-style-type: none;}
+
+
+
+
+/* D3 style */
+.bar {fill: steelblue;}
+
+.axis text {font: 10px sans-serif;}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.x.axis path {display: none;}
+
+/* - initially hide viz */
+#csvdata {display: none;}
