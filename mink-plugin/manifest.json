@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Mink",
    "description": "On-the-fly web archive integration while browsing",
-   "version": "0.2014.2.17",
+   "version": "0.2014.2.21",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
        "persistent": true
