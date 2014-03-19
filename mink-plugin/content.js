@@ -12,10 +12,10 @@ var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
 
 //PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
 
-$("body").append("<div id=\"nelsonContainer\"></div>");
-//PENDING, Issue #6, not possible w/o Chrome Canary: $("#nelsonContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
-$("#nelsonContainer").append("<div id=\"archiveOptions\"></div>");
-$("#nelsonContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
+$("body").append("<div id=\"minkContainer\"></div>");
+//PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
+$("#minkContainer").append("<div id=\"archiveOptions\"></div>");
+$("#minkContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 
 
 
@@ -179,7 +179,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			
 			selectBox += "</select>";
 			var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
-			var fetchMoreButton = "<span id=\"furtherFetchUI\"><label for=\"fetchAllMementosButton\" id=\"fetchLabel\">Fetch: </label>( <input type=\"button\" value=\"All\" id=\"fetchAllMementosButton\" />,<input type=\"button\" value=\"&amp;  Filter\" id=\"fetchAndFilterMementosButton\" /> )</span>";
+			var fetchMoreButton = "<span id=\"furtherFetchUI\"><input type=\"button\" value=\"Fetch All\" id=\"fetchAllMementosButton\" /><input type=\"button\" value=\"Archive Now!\" id=\"archiveNow\" /></span>";
 			var helpButton = "<input type=\"button\" value=\"?\" id=\"helpButton\" />";
 			
 			var numberOfMementos = relmatches.length;
@@ -187,7 +187,12 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			
 			var correctTMPlural = "timemap";
 			if(numberOfTimemaps > 1){correctTMPlural += "s";}
-			$("#archiveOptions").html("<span id=\"info\"><span id=\"numberOfMementos\">"+numberOfMementos+"</span> mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> " + correctTMPlural + 
+			$("#archiveOptions").html("<div id=\"largerNumberButtons\"><p>List By:</p>"+
+				"<button class=\"largeNumberOfMementoOption activeButton\" id=\"largeNumberOfMementoOption1\"><span>&#9673;</span>Dropdown</button>"+
+				"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption2\"><span>&#9678;</span>Drill Down</button>"+
+				"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption3\"><span>&#9678;</span>Foo Method</button>"+
+				"</div>"+
+				"<span id=\"info\"><span id=\"numberOfMementos\">"+numberOfMementos+"</span> mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> " + correctTMPlural + 
 				selectBox +
 				viewMementoButton +
 				fetchMoreButton +
@@ -209,6 +214,11 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				alert("More information will be provided here about the recursive memento acquisition and parsing");
 			});
 			
+			$("#archiveNow").click(function(){
+				$("#archiveOptions").html("");
+				addArchiveNowButtons();
+			});
+			
 			if(dtMatches.length > 1002){
 				//replace dropdown with a button to access a better UI is there are many mementos
 				var dateUIButton = "<input type=\"button\" value=\"Select a Memento\" id=\"dateUIButton\" />";
@@ -219,15 +229,16 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			
 			setMementoButtonInteractivityBasedOnMementoDropdown();
 			
-			//This is insufficient to making the Nelson logo clickable on http://web.archive.org/web/20140115131022/http://www.yahoo.com/
+			//This is insufficient to making the Mink logo clickable on http://web.archive.org/web/20140115131022/http://www.yahoo.com/
 			$("#mLogo").click(function(){showArchiveOptions();}); //if viewing an already archived page, for some reason this wasn't attached
 			
 			if(numberOfTimemaps > 1){
 				chrome.runtime.sendMessage({
 					method: "notify", 
 					title: "TimeMap fetching complete.",
-					body: dtMatches.length+" mementos returned."
+					body: dtMatches.length+"+ mementos returned."
 				}, function(response) {});
+				$("#countOverLogo").text(dtMatches.length+"+");
 			}
 			
 			//reset state variables
@@ -250,6 +261,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 
 		// hide the Memento logo
 		hideLogo = true; logoInFocus = true;
+		
 		console.log(e);
 	});
 }

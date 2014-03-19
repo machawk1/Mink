@@ -42,6 +42,88 @@ function displayMementoCountAtopLogo(){
 }
 
 /**
+ * If no mementos are returned on a query to the archives, provide the buttons
+ * that fire off a request to crawl the page to the archives
+ */
+function addArchiveNowButtons(addText){
+	if(!addText){addText = "";}
+	$("#archiveOptions").html(
+			"<div id=\"archiveNowOptions\">"+
+			addText + "Archive now? " +
+			"<button id=\"archiveNow_archivedotorg\">Archive.org</button>"+
+			"<button id=\"archiveNow_archivedotis\">Archive.is</button>"+
+			"<button id=\"archiveNow_webcite\"     >WebCite</button>"+
+			"<button id=\"archiveNow_permadotcc\"  >Perma.cc</button>"+
+			"<button id=\"archiveNow_all\"         >All</button>"+
+			"<button id=\"archiveNow_org\"         >Other...</button>"+
+			"</div>"
+			
+		);
+	
+	$("#archiveNow_archivedotorg").click(function(){
+		$.ajax({
+			method: 'GET',
+			url: "https://web.archive.org/save/"+document.URL
+		})
+		.done(function(a,b,c){
+			//console.log(a);
+			if(b == "success"){
+				chrome.runtime.sendMessage({
+					method: "notify", 
+					title: "Mink",
+					body: "Archive.org Successfully Preserved page.\r\nSelect again to view."
+				}, function(response) {});
+				$("#archiveNow_archivedotorg").addClass("archiveNowSuccess");
+				$("#archiveNow_archivedotorg").html("View on Archive.org");
+				var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
+				var archiveURI = "http://web.archive.org"+parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
+				console.log(archiveURI);
+				$("#archiveNow_archivedotorg").attr("title",archiveURI);
+				$(".archiveNowSuccess").click(function(){
+					window.open($(this).attr("title"));
+				});
+			}else {
+				console.log(b);
+				
+			}
+			//console.log(c);
+		});
+	});
+	
+	$("#archiveNow_archivedotis").click(function(){
+		$.ajax({
+			method: 'POST',
+			url: "http://archive.is/submit/",
+			data: { coo: '', url: document.URL}
+		})
+		.done(function(a,b,c){
+			console.log(a);
+			if(b == "success"){
+				chrome.runtime.sendMessage({
+					method: "notify", 
+					title: "Mink",
+					body: "Archive.is Successfully Preserved page.\r\nSelect again to view."
+				}, function(response) {});
+				$("#archiveNow_archivedotis").addClass("archiveNowSuccess");
+				$("#archiveNow_archivedotis").html("View on Archive.is");
+				var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.is\/.*\"/g);
+				var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
+				console.log(archiveURI);
+				$("#archiveNow_archivedotis").attr("title",archiveURI);
+				$(".archiveNowSuccess").click(function(){
+					window.open($(this).attr("title"));
+				});
+			}else {
+				console.log(b);
+				
+			}
+			//console.log(c);
+		});
+	});
+	
+}
+
+/**
  * Animate the memento logo by modifying the image width on a timer until logoInFocus is set
  */
 function flip(){
@@ -53,8 +135,19 @@ function flip(){
 	if(logoInFocus && w == "0px" && $("#mLogo").attr("src") == iconUrl){
 		console.log("Stopping the rotation on front of logo!");
 		$("#mLogo").css("opacity","1.0");
-		if(hideLogo){$("#mLogo").fadeOut();hideLogo = false;}
-		else {
+		if(hideLogo){
+			$("#mLogo").attr("src",chrome.extension.getURL("images/icon128_error.png")); 
+			addArchiveNowButtons("0 mementos found. ");
+			chrome.runtime.sendMessage({
+					method: "notify", 
+					title: "Mink",
+					body: "Page not found in the archives\r\nSelect exclamation icon to archive now!"
+			}, function(response) {});
+		
+			
+			//$("#mLogo").fadeOut();
+			//hideLogo = false;
+		}else {
 			displayMementoCountAtopLogo();
 		}
 		return;

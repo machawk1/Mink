@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Mink",
    "description": "On-the-fly web archive integration while browsing",
-   "version": "0.2014.2.21",
+   "version": "0.2014.3.19",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
        "persistent": true
@@ -41,7 +41,7 @@
     "minimum_chrome_version": "30",
     "options_page": "options.html",
     "web_accessible_resources": [
-    	"images/icon128.png","images/icon128flipped.png","style.css",
+    	"images/icon128.png","images/icon128flipped.png","images/icon128_error.png","style.css",
     	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
     	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"bootstrap/css/bootstrap.min.css",
