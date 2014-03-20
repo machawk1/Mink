@@ -1,0 +1,11 @@
+[
+	{ "id": "111", "name": "Colossus", "parent": false },
+	{ "id": "112", "name": "Cyclope", "parent": true },
+	{ "id": "113", "name": "Diablo", "parent": false },
+	{ "id": "114", "name": "Wolferine", "parent": true },
+	{ "id": "115", "name": "Malicia", "parent": false },
+	{ "id": "116", "name": "Magneto", "parent": true },
+	{ "id": "117", "name": "Dent de sabre", "parent": false },
+	{ "id": "118", "name": "Le crapaud", "parent": true },
+	{ "id": "119", "name": "Dazzler", "parent": false }
+]

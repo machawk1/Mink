@@ -1,0 +1,160 @@
+body
+{
+	margin: 0;
+	padding: 0;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	background-image: url('./images/navy_blue.png');
+	background-color: #2f2f2f;
+	text-align: center;
+}
+
+a
+{
+	text-decoration: none;
+}
+
+a.github img
+{
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: 0;
+}
+
+div.miller
+{
+	width: 100%;
+	background-image: url('images/otis_redding.png');
+}
+
+div.miller span, div.miller .pane li
+{
+	font-size: 10px;
+	font-weight: bold;
+	color: #666;
+}
+
+div.miller span:hover, div.miller .pane li:hover
+{
+	color: #333;
+}
+
+div.miller .path
+{
+	background-image: url('images/toolbar.png');
+	background-repeat: repeat-x;
+	border-bottom: solid 1px #999;
+}
+
+div.miller .toolbar
+{
+	background-image: url('images/toolbar.png');
+	background-repeat: repeat-x;
+	border-top: solid 1px #999;
+}
+
+#header
+{
+	background: #000;
+	text-align: center;
+	border-bottom: solid 5px #08c;
+	margin-bottom: 3em;
+}
+
+#header h1
+{
+	font-size: 1.5em;
+	width: 710px;
+	color: #f5f5f5;
+	margin: auto;
+	padding: 1em;
+	text-align: left;
+}
+
+#header h1 a
+{
+	color: inherit;
+}
+
+#content
+{
+	width: 710px;
+	margin: auto;
+	text-align: left;
+}
+
+#help
+{
+	font-size: 0.8em;
+	font-weight: normal;
+	line-height: 1em;
+	padding: 1em 2em;
+	color: #aaa;
+	background-color: rgb(26, 26, 26);
+	border-radius: 5px;
+	box-shadow: rgba(0, 0, 0, 0.0898438) 0px 0px 1px 0px inset;
+}
+
+#help a
+{
+	color: #08c;
+	font-weight: bold;
+}
+
+#help ul li
+{
+	line-height: 1.5em;
+}
+
+#footer
+{
+	margin-top: 3em;
+	border-top: solid 1px #333;
+	background-color: #2f2f2f;
+	text-align: center;
+}
+
+#footer div
+{
+	color: #868686;
+	width: 710px;
+	margin: 0 auto;
+	padding: 0 0 2em 0;
+	text-align: left;
+	background-image: url('images/footer.png');
+	background-repeat: repeat-y;
+}
+
+#footer h2
+{
+	color: #ccc;
+	padding: 20px 0 0 1em;
+	font-size: 1.1em;
+}
+
+#footer p
+{
+	line-height: 1.6em;
+	padding-left: 20px;
+	font-size: 0.7em;
+}
+
+#footer a
+{
+	color: #ccc;
+}
+
+#footer ul li
+{
+	font-size: 0.7em;
+	line-height: 1.6em;
+}
+
+#footer p a.mageekguy
+{
+	background-image: url('images/mageekguy.png');
+	background-repeat: no-repeat;
+	background-position: 0 100%;
+	padding-left: 16px;
+	padding-top: 32px;
+}

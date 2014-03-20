@@ -45,8 +45,8 @@
 
 #info {position: relative; z-index: 2;}
 
-#largerNumberButtons {position: absolute; z-index: 1; top: -25px; left: 196px; background-color: #ccc;border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-#largerNumberButtons>p {float: left;  border-bottom: 1px double #999; padding: 0 5px 0 5px; font-size: 12px; padding-top: 3px;}
+#largerNumberButtons {position: absolute; z-index: 1; top: -25px; left: 125px; background-color: #ccc; border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px double #999;}
+#largerNumberButtons>p {float: left;  padding: 0 5px 0 5px; font-size: 12px; padding-top: 3px;}
 .largeNumberOfMementoOption { padding: 3px 5px; font-weight: bold; display: block; border: 1px solid black; border-radius: 10px; background-color: white; line-height: 1.2em; box-shadow: 0px 2px 5px #888888; outline: 0; float: left;}
 .largeNumberOfMementoOption span {color: #999;}
 .activeButton span {color: black;}
@@ -54,4 +54,12 @@
 .largeNumberOfMementoOption:hover,
 .largeNumberOfMementoOption:hover span,
 .activeButton:hover span {background-color: #0000ff; color: white; cursor: pointer;}
+.largeNumberOfMementoOption[disabled='disabled']:hover,
+.largeNumberOfMementoOption[disabled='disabled']:hover span {cursor: not-allowed; background-color: white; color: #999;}
 .largeNumberOfMementoOption:active {background-color: #000099;}
+
+#drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; position: absolute; z-index: 1; left: 125px; background-color: white; font-family: Arial, sans-serif;}
+#drilldownBox ul {list-style-type: none; width: 150px; float: left;}
+#drilldownBox ul li {list-style-type: none;padding: none; margin: none;}
+#drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
+#drilldownBox ul li.selectedOption {background-color: #ddddff;}

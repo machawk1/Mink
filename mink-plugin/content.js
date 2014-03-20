@@ -119,6 +119,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	}
 	
 	console.log("About to fire off Ajax request for "+timemaploc);
+	var jsonizedMementos = "[";
 	$.ajax({
 		url: timemaploc,
 		type: "GET"
@@ -132,10 +133,10 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			if(uri && // URI passed in is a condition for pagination, else we'll assume the user just wants the first page
 				othertimemaps && othertimemaps.length > 0 && 
 				othertimemaps[0] != proxy + window.location && //the timemap contained references to other timemaps
-				!stopAtOneTimemap &&
+				!stopAtOneTimemap //&&
 				
 				// ************ ARTIFICIAL LIMIT IMPOSED FOR TESTING
-				numberOfTimemaps < 4
+				//numberOfTimemaps < 4
 				// ************ 
 				){ 
 					
@@ -167,7 +168,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			});
 			
 			console.log("rel matches count = "+relmatches.length+"    uris = "+mementoURIs.length); //these values should be the same, else there's a parsing problem
-
+			//console.log(dtMatches);
 			var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
 			
 			$(dtMatches).each(function(i,v){
@@ -187,17 +188,206 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			
 			var correctTMPlural = "timemap";
 			if(numberOfTimemaps > 1){correctTMPlural += "s";}
-			$("#archiveOptions").html("<div id=\"largerNumberButtons\"><p>List By:</p>"+
+			$("#archiveOptions").html("<div id=\"largerNumberButtons\"><p>List Mementos By:</p>"+
 				"<button class=\"largeNumberOfMementoOption activeButton\" id=\"largeNumberOfMementoOption1\"><span>&#9673;</span>Dropdown</button>"+
 				"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption2\"><span>&#9678;</span>Drill Down</button>"+
 				"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption3\"><span>&#9678;</span>Foo Method</button>"+
 				"</div>"+
+				"<div id=\"drilldownBox\"></div>" +
 				"<span id=\"info\"><span id=\"numberOfMementos\">"+numberOfMementos+"</span> mementos available in <span id=\"timemapCount\">"+numberOfTimemaps+"</span> " + correctTMPlural + 
 				selectBox +
 				viewMementoButton +
 				fetchMoreButton +
 				helpButton
 			);
+			$(".largeNumberOfMementoOption").click(function(){
+				var activeButtonId = "#"+$(this).attr("id");
+				console.log(activeButtonId);
+				$(".largeNumberOfMementoOption").removeClass("activeButton");
+				$(".largeNumberOfMementoOption span").text("◎");
+				$(activeButtonId+" span").text("◉");
+				$(activeButtonId).addClass("activeButton");
+				
+				if(activeButtonId == "#largeNumberOfMementoOption2"){showMementoCountsByYear();}
+				else {destroyMementoCountsByYear();}
+			});
+
+			
+			function destroyMementoCountsByYear(){
+				$("#drilldownBox").css("display","none");
+			}
+			
+			var years = {};
+			function showMementoCountsByYear(){
+				if($("#drilldownBox").css("display") == "none"){ //if the expensive operation was done once, just resurrect the data from before
+					$("#drilldownBox").css("display","block");
+					return;
+				}
+				years = null;
+				years = {};
+				//console.log(jsonizedMementos);
+
+				var mems;
+				try {
+					mems = JSON.parse(jsonizedMementos);
+				}catch(e){
+					console.log(e);
+					//console.log(jsonizedMementos);
+				}
+				console.log(mems);
+				
+				$(mems).each(function(){ //exclude garbage option select values
+					
+					var dt = moment($(this)[0].datetime);
+
+					if(!years[dt.year()]){years[dt.year()] = [];}
+					//console.log($(this)[0]);
+					years[dt.year()].push(new Memento($(this)[0].uri,$(this)[0].datetime));
+				});
+				
+
+				//var millerJSONString = "[";
+				var memCountList = "<ul id=\"years\">";
+				for(var year in years){
+					//console.log(years[year].length);
+					//millerJSONString += "{\"id\":\""+year+"\", \"name\":\""+year+"\", \"parent\":false},";
+					var mString = "mementos";
+					if(years[year].length == 1){mString = mString.slice(0,-1);}
+					memCountList += "<li>"+year+": "+years[year].length+" "+mString+"</li>\r\n"
+					//$("#drilldownBox").append("<li>"+year+": "+years[year].length+" mementos</li>");
+				}
+				//millerJSONString = millerJSONString.slice(0,-1)+"]";
+				memCountList += "</ul>";
+				$("#drilldownBox").append(memCountList);
+				$("#drilldownBox ul#years li").click(function(){
+					$("#month,#day,#time").remove();
+					$("#drilldownBox ul#years li").removeClass("selectedOption");
+					$(this).addClass("selectedOption");
+					showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(":")));
+				});
+				//console.log(millerJSONString);
+				//console.log(jsonizedMementos);
+				/*$("#drilldownBox").miller({
+					url: function(id){
+						//return JSON.parse(millerJSONString);
+						var lns = JSON.parse(millerJSONString);
+						data = lns[0]['parent'];
+					}	
+				});*/
+				
+				
+				//adjust positional offset of year display box based on contents
+				adjustDrilldownPositionalOffset();
+			};
+			
+			function adjustDrilldownPositionalOffset(){
+				var h = $("#drilldownBox").css("height").substr(0,$("#drilldownBox").css("height").indexOf("px"));
+				$("#drilldownBox").css("top",((h*-1)-30)+"px");
+			}
+			
+			var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+			
+			function showMementoCountsByMonths(year){
+				$("#months,#day,#time").remove();
+				console.log("showing mementos for months in "+year);
+				var memCountList = "<ul id=\"months\">";
+				var months = {}
+				for(memento in years[year]){
+					var monthName = monthNames[moment(years[year][memento].datetime).month()];
+					if(!months[monthName]){
+						months[monthName] = [];
+					}
+					months[monthName].push(years[year][memento]);
+				}
+				console.log(months);
+				for(month in months){
+					var mString = "mementos";
+					if(months[month].length == 1){mString = mString.slice(0,-1);}
+					memCountList += "<li>"+month+": "+months[month].length+" "+mString+"</li>\r\n";
+				}
+				
+				memCountList += "</ul>";
+				$("#drilldownBox").append(memCountList);	
+				
+				$("#drilldownBox ul#months li").click(function(){
+					$("#day,#time").remove();
+					$("#drilldownBox ul#months li").removeClass("selectedOption");
+					$(this).addClass("selectedOption");
+					console.log($(this).text().substr(0,$(this).text().indexOf(":")));
+					showMementoCountsByDays(months[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+				});
+				
+				adjustDrilldownPositionalOffset();		
+			}
+			
+			function showMementoCountsByDays(mementos){
+				console.log(mementos);
+				var days = {};
+				var dayNames = ["NA","1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th",
+								"11th","12th","13th","14th","15th","16th","17th","18th","19th","20th",
+								"21st","22nd","23rd","24th","25th","26th","27th","28th","29th","30th","31st"];
+				
+				for(memento in mementos){
+					var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
+					if(!days[dayNumber]){
+						days[dayNumber] = [];
+					}
+					days[dayNumber].push(mementos[memento]);
+				}
+				var memCountList = "<ul id=\"day\">";
+				for(day in days){
+					var mString = "mementos";
+					if(days[day].length == 1){mString = mString.slice(0,-1);}
+					memCountList += "<li>"+day+": "+days[day].length+" "+mString+"</li>\r\n";
+				}
+				
+				memCountList += "</ul>";
+				$("#drilldownBox").append(memCountList);
+				$("#drilldownBox ul#day li").click(function(){
+					$("#time").remove();
+					$("#drilldownBox ul#day li").removeClass("selectedOption");
+					$(this).addClass("selectedOption");
+
+					showMementoCountsByTime(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+				});
+				
+				adjustDrilldownPositionalOffset();		
+			}
+
+			function showMementoCountsByTime(mementos){
+				var times = {};
+				var uris = {};
+				for(memento in mementos){
+					var mom = moment(mementos[memento].datetime);
+					var time = mom.format("HH:mm:ss:SSS");
+					
+					console.log(mementos[memento]);
+					if(!times[time]){
+						times[time] = [];
+						uris[time] = [];
+					}
+					times[time].push(mementos[memento]);
+					uris[time] = mementos[memento].uri;
+				}
+				var memCountList = "<ul id=\"time\">";
+				for(time in times){
+					var mString = "mementos";
+					if(times[time].length == 1){mString = mString.slice(0,-1);}
+					memCountList += "<li title=\""+uris[time]+"\">"+time+"</li>\r\n";//: "+times[time].length+" "+mString+"</li>\r\n";
+				}
+				
+				memCountList += "</ul>";
+				$("#drilldownBox").append(memCountList);
+				$("#drilldownBox ul#time li").click(function(){
+					console.log($(this).attr("title"));
+					window.location = $(this).attr("title");
+					//console.log(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+				});
+				
+				adjustDrilldownPositionalOffset();	
+			}			
+			
+			
 			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementos(proxy + window.location,data);});
 			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
 			
@@ -222,7 +412,9 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			if(dtMatches.length > 1002){
 				//replace dropdown with a button to access a better UI is there are many mementos
 				var dateUIButton = "<input type=\"button\" value=\"Select a Memento\" id=\"dateUIButton\" />";
-				$("#mdts").after(dateUIButton);
+				$( "#largeNumberOfMementoOption2" ).trigger( "click" );
+				$( "#largeNumberOfMementoOption1" ).attr("disabled","disabled");
+				//$("#mdts").after(dateUIButton);
 				$("#mdts").fadeOut();
 				$("#dateUIButton").click(displayDatepicker);
 			}

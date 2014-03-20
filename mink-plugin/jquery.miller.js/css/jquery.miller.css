@@ -1,0 +1,172 @@
+.miller
+{
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	position: relative;
+	border: solid 1px #ddd;
+	border-radius: 4px;
+	padding: 0;
+	margin-bottom: 20px;
+	width: 600px;
+	height: 169px;
+	background: #f5f5f5;
+	outline: 0;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.miller div.columns
+{
+	position: absolute;
+	width: 100%;
+	height: 129px;
+	left: 0;
+	top: 20px;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+}
+
+.miller div.path
+{
+	position: absolute;
+	border-bottom: solid 1px #ddd;
+	margin: 0;
+	left: 0;
+	top: 0;
+	background: #fff;
+	width: 100%;
+	height: 20px;
+	font-size: 0.6em;
+	line-height: 20px;
+	overflow: auto;
+	z-index: 9999;
+}
+
+.miller div.path span
+{
+	margin-left: 0.5em;
+	padding-left: 1.5em;
+	padding-right: 0.5em;
+	background-image: url('../images/chevron-black.png');
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.miller div.toolbar
+{
+	position: absolute;
+	border-top: solid 1px #ddd;
+	margin: 0;
+	left: 0;
+	bottom: 0;
+	background: #fff;
+	width: 100%;
+	height: 20px;
+	font-size: 0.6em;
+	line-height: 20px;
+	overflow: auto;
+	z-index: 9999;
+}
+
+.miller div.toolbar span
+{
+	padding-left: 1em;
+	padding-right: 1em;
+	cursor: pointer;
+}
+
+.miller div.columns ul
+{
+	box-shadow: #aaa 4px 0 8px 0px;
+	position: absolute;
+	border-right: solid 1px #ddd;
+	padding: 0;
+	margin: 0;
+	background: #fcfcfc;
+	overflow: auto;
+	width: 100px;
+	height: 100%;
+}
+
+.miller li
+{
+	border: solid 1px #fff;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	list-style-type: none;
+	cursor: pointer;
+	height: 25px;
+	line-height: 25px;
+}
+
+.miller li.parent
+{
+	background-image: url('../images/chevron-black.png');
+	background-repeat: no-repeat;
+	background-position: 100% 50%;
+}
+
+.miller li.parentLoading
+{
+	color: #fff;
+	background: #08c;
+	background-image: url('../images/loader.gif');
+	background-repeat: no-repeat;
+	background-position: 100% 50%;
+}
+
+.miller li.parentSelected
+{
+	color: #fff;
+	background: #08c;
+	background-image: url('../images/chevron-white.png');
+	background-repeat: no-repeat;
+	background-position: 100% 50%;
+}
+
+.miller li.selected
+{
+	color: #fff;
+	background: #08c;
+}
+
+.miller div.grip
+{
+	cursor: col-resize;
+	position: absolute;
+	width: 2px;
+	height: 100%;
+	background-image: url('../images/grip.png');
+	background-color: #000;
+	background-repeat: repeat-y;
+	background-position: 0 0;
+}
+
+.miller ul.pane
+{
+	background: #fff;
+}
+
+.miller ul.pane li
+{
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: normal;
+	letter-spacing: normal;
+	line-height: 20px;
+	text-align: center;
+	vertical-align: middle;
+	border: none;
+}
+
+.miller ul.pane li
+{
+	width: 100%;
+}
