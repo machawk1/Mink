@@ -1,5 +1,3 @@
-//alert($("body").html());
-
 //PENDING, Issue #6, not possible w/o Chrome Canary: ar bootstrapCSS = chrome.extension.getURL("bootstrap/css/bootstrap.min.css");
 
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";

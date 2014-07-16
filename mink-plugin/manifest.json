@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Mink",
    "description": "On-the-fly web archive integration while browsing",
-   "version": "0.2014.3.20",
+   "version": "0.2014.7.16",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
        "persistent": true
@@ -28,7 +28,7 @@
     		"bootstrap/js/bootstrap.min.js",
 
     		"d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
-    		"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/data.js","Highcharts-3.0.9/js/modules/drilldown.js",
+    		"Highcharts-4.0.3/js/highcharts.js","Highcharts-4.0.3/js/modules/data.js","Highcharts-4.0.3/js/modules/drilldown.js",
 			"highchartsdata.js","doThatHighchartsThingYouDo.js",
 			
     		"ui.js","content.js"],
