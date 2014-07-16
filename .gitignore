@@ -10,7 +10,7 @@ eclipse
 lib
 log
 logs
-modules
+#modules
 precompiled
 project/project
 project/target
