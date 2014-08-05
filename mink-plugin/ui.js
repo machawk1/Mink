@@ -51,7 +51,7 @@ function addArchiveNowButtons(addText){
 			"<div id=\"archiveNowOptions\">"+
 			addText + "Archive now? " +
 			"<button id=\"archiveNow_archivedotorg\">Archive.org</button>"+
-			"<button id=\"archiveNow_archivedotis\">Archive.is</button>"+
+			"<button id=\"archiveNow_archivedottoday\">Archive.today</button>"+
 			"<button id=\"archiveNow_webcite\"     >WebCite</button>"+
 			"<button id=\"archiveNow_permadotcc\"  >Perma.cc</button>"+
 			"<button id=\"archiveNow_all\"         >All</button>"+
@@ -90,10 +90,10 @@ function addArchiveNowButtons(addText){
 		});
 	});
 	
-	$("#archiveNow_archivedotis").click(function(){
+	$("#archiveNow_archivedottoday").click(function(){
 		$.ajax({
 			method: 'POST',
-			url: "http://archive.is/submit/",
+			url: "http://archive.today/submit/",
 			data: { coo: '', url: document.URL}
 		})
 		.done(function(a,b,c){
@@ -102,14 +102,14 @@ function addArchiveNowButtons(addText){
 				chrome.runtime.sendMessage({
 					method: "notify", 
 					title: "Mink",
-					body: "Archive.is Successfully Preserved page.\r\nSelect again to view."
+					body: "Archive.today Successfully Preserved page.\r\nSelect again to view."
 				}, function(response) {});
-				$("#archiveNow_archivedotis").addClass("archiveNowSuccess");
-				$("#archiveNow_archivedotis").html("View on Archive.is");
-				var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.is\/.*\"/g);
+				$("#archiveNow_archivedottoday").addClass("archiveNowSuccess");
+				$("#archiveNow_archivedottoday").html("View on Archive.today");
+				var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.today\/.*\"/g);
 				var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
 				console.log(archiveURI);
-				$("#archiveNow_archivedotis").attr("title",archiveURI);
+				$("#archiveNow_archivedottoday").attr("title",archiveURI);
 				$(".archiveNowSuccess").click(function(){
 					window.open($(this).attr("title"));
 				});

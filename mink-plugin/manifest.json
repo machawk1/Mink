@@ -1,12 +1,13 @@
 {
    "manifest_version": 2,
    "name": "Mink",
-   "description": "On-the-fly web archive integration while browsing",
-   "version": "0.2014.7.16",
+   "version": "0.2014.8.5",
+   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
        "persistent": true
    },
+   "icons": { "128": "images/minkLogo_128.png"},
    "permissions": [
        "webRequest",
        "<all_urls>",
