@@ -3,13 +3,21 @@
    "name": "Mink",
    "version": "0.2014.8.15",
    "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
-   "homepage_url": "http://matkelly.com/mink/",
+   "homepage_url": "http://matkelly.com/mink",
    "author": "Mat Kelly <me@matkelly.com",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
        "persistent": true
    },
    "icons": { "128": "images/minkLogo_128.png"},
+   "browser_action": {
+   	"default_icon": {
+    	"19": "images/mLogo19.png",
+    	"38": "images/mLogo38.png"
+    },
+    "default_title": "Mink",
+    "default_popup": "popup.html"	
+   },
    "permissions": [
        "webRequest",
        "<all_urls>",
@@ -44,10 +52,10 @@
     }
   	],
     "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
-    "minimum_chrome_version": "30",
+    "minimum_chrome_version": "36",
     "options_page": "options.html",
     "web_accessible_resources": [
-    	"images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
+    	"images/icon-on-19.png","images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
     	"images/archives/ia.png",
     	"style.css",
     	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
