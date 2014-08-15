@@ -1,8 +1,10 @@
 {
    "manifest_version": 2,
    "name": "Mink",
-   "version": "0.2014.8.5",
+   "version": "0.2014.8.15",
    "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
+   "homepage_url": "http://matkelly.com/mink/",
+   "author": "Mat Kelly <me@matkelly.com",
    "background": {
        "scripts": ["js/jquery-2.0.3.min.map","js/jquery-2.0.3.min.js","mink.js"],
        "persistent": true
@@ -45,7 +47,9 @@
     "minimum_chrome_version": "30",
     "options_page": "options.html",
     "web_accessible_resources": [
-    	"images/icon128.png","images/icon128flipped.png","images/icon128_error.png","style.css",
+    	"images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
+    	"images/archives/ia.png",
+    	"style.css",
     	"js/jquery-2.0.3.min.js","js/jquery-2.0.3.min.map","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
     	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",

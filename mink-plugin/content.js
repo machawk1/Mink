@@ -169,8 +169,21 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			//console.log(dtMatches);
 			var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
 			
+			
+			
+			var iaSrc = chrome.extension.getURL("images/archives/ia.png"); 
+			
 			$(dtMatches).each(function(i,v){
-				selectBox += "\t<option value=\""+mementoURIs[i]+"\">"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
+				var archiveImage = "";
+				if(mementoURIs[i].indexOf("web.archive.org") > -1){
+					archiveImage = "ia";
+				}else if(mementoURIs[i].indexOf("archive-it.org") > -1){
+					archiveImage = "ait";
+				}else {
+					archiveImage = "ice";
+				}
+				
+				selectBox += "\t<option style=\"\" class=\""+archiveImage+"\" value=\""+mementoURIs[i]+"\">"+v.substring(10,dtMatches[0].length-1)+"</option>\r\n";
 				jsonizedMementos += "{\"uri\": \""+mementoURIs[i]+"\", \"datetime\": \""+v.substring(10,dtMatches[0].length-1)+"\"},";
 			});
 			jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)

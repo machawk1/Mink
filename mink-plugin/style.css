@@ -1,5 +1,5 @@
 #mLogo {width: 50px; display: none; top: 0; z-index: 999998; position: relative;}
-#minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999;}
+#minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999; font-size: 12px;}
 #archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px;
 }
@@ -63,3 +63,6 @@
 #drilldownBox ul li {list-style-type: none;padding: none; margin: none;}
 #drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
 #drilldownBox ul li.selectedOption {background-color: #ddddff;}
+
+/* This isn't working, the image ought to be pulled from the extension, not the current page */
+option.ia {background-image: url('images/archives/ia.png');}
