@@ -279,4 +279,3 @@ function displayDatepicker(){
 	//renderChart();
 	//$("#datepickerContainer").css("bottom",$("#datepickerContainer").css("bottom")+$("#datepickerContainer").css("height"));
 }
-

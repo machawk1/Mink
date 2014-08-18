@@ -97,7 +97,17 @@ function displayUIBasedOnContext(){
 		}
 	  });
 }
-displayUIBasedOnContext();
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if(request.method == "displayUI"){
+		console.log(request.timegate);
+		console.log(request.timemap);
+		console.log(request.uri);
+		console.log("-----");
+	}
+	//displayUIBasedOnContext();
+});
+
 
 var jsonizedMementos = "[";
 
@@ -448,8 +458,16 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			logoInFocus = true;
 			numberOfTimemaps = 1;
 		}
+		else if(xhr.status == 404){
+			console.log("404 received");
+			return;
+		}
 	}).error(function(e){
 		console.log("ERROR");
+
+		if(e.status == 404){
+			return; //prevent infinite loop. This is probably not the correct way to handle it
+		}
 		
 		//check if we're currently viewing an archive
 		console.log("Are we viewing the archive? Basis 1: two http[s]*?://");
