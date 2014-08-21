@@ -76,14 +76,13 @@ function displayUIBasedOnContext(){
 				  ((window.location+"").replace("www.","").indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
 				  ((window.location+"").indexOf(response.value.replace("www.","")) > -1) ||
 				  ((window.location+"").replace("www.","").indexOf(response.value.replace("www.","")) > -1)
-				)
+				) 																	// There were memento HTTP headers
 			){ 
 			console.log("Y"+window.location+" "+response.value);
 			logoInFocus = true;
 			
 			//Display UI For When Browsing An Archive Page
-			$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
-			$("#liveWeb").click(function(){window.location = response.value;});
+			displayReturnToLiveWebButton();
 			
 			$("#archiveOptions").append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
 			$("#viewMementoButton").click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
@@ -96,6 +95,12 @@ function displayUIBasedOnContext(){
 			displayUIBasedOnContext();
 		}
 	  });
+}
+
+function displayReturnToLiveWebButton(){
+		//Display UI For When Browsing An Archive Page
+		$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
+		$("#liveWeb").click(function(){window.location = response.value;});
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
