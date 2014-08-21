@@ -30,14 +30,6 @@ chrome.runtime.onMessage.addListener(
 
 
 
-function showUIFromThisScript(){
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-		console.log("TEST");
-
-		console.log(tabs[0].id);
-		chrome.tabs.sendMessage(tabs[0].id,{method: "displayUI"}, function(response) {});
-	});
-}
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var url = deets.url;
@@ -48,10 +40,6 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	for(var headerI=0; headerI<headers.length; headerI++){
 		if(headers[headerI].name == "Memento-Datetime"){
 			mementoDateTimeHeader = headers[headerI].value;
-			//displayReturnToLiveWeb(liveWebURI);
-			console.log(mementoDateTimeHeader);
-			//showUIFromThisScript();
-			//break;
 		}else if(headers[headerI].name == "Link"){
 			linkHeader = headers[headerI].value;
 		}
