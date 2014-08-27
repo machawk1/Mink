@@ -279,3 +279,206 @@ function displayDatepicker(){
 	//renderChart();
 	//$("#datepickerContainer").css("bottom",$("#datepickerContainer").css("bottom")+$("#datepickerContainer").css("height"));
 }
+
+
+
+
+function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
+	var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
+	var fetchMoreButton = "<span id=\"furtherFetchUI\"><input type=\"button\" value=\"Fetch All\" id=\"fetchAllMementosButton\" /><input type=\"button\" value=\"Archive Now!\" id=\"archiveNow\" /></span>";
+	var helpButton = "<input type=\"button\" value=\"?\" id=\"helpButton\" />";
+
+	$("#archiveOptions").html("<div id=\"largerNumberButtons\"><p>List Mementos By:</p>"+
+		"<button class=\"largeNumberOfMementoOption activeButton\" id=\"largeNumberOfMementoOption1\"><span>&#9673;</span>Dropdown</button>"+
+		"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption2\"><span>&#9678;</span>Drill Down</button>"+
+		"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption3\"><span>&#9678;</span>Foo Method</button>"+
+		"</div>"+
+		"<div id=\"drilldownBox\"></div>" +
+		"<span id=\"info\"><span id=\"numberOfMementos\">"+nMementos+"</span> mementos available in <span id=\"timemapCount\">"+nTimemaps+"</span> " + tmVerbiage + 
+		select +
+		viewMementoButton +
+		fetchMoreButton +
+		helpButton
+	);
+	$(".largeNumberOfMementoOption").click(function(){
+		var activeButtonId = "#"+$(this).attr("id");
+
+		$(".largeNumberOfMementoOption").removeClass("activeButton");
+		$(".largeNumberOfMementoOption span").text("◎");
+		$(activeButtonId+" span").text("◉");
+		$(activeButtonId).addClass("activeButton");
+	
+		if(activeButtonId == "#largeNumberOfMementoOption2"){showMementoCountsByYear();}
+		else {destroyMementoCountsByYear();}
+	});
+
+}
+
+function destroyMementoCountsByYear(){
+	$("#drilldownBox").css("display","none");
+}
+
+function showMementoCountsByYear(){
+	if($("#drilldownBox").css("display") == "none"){ //if the expensive operation was done once, just resurrect the data from before
+		$("#drilldownBox").css("display","block");
+		return;
+	}
+	years = null;
+	years = {};
+
+	var mems;
+	console.log(jsonizedMementos);
+	try {
+		mems = JSON.parse(jsonizedMementos);
+	}catch(e){
+		console.log(e);
+	}
+	console.log(mems);
+	
+	$(mems).each(function(){ //exclude garbage option select values
+		
+		var dt = moment($(this)[0].datetime);
+		
+		if(!years[dt.year()]){years[dt.year()] = [];}
+
+		var m = new Memento();
+		m.uri = $(this)[0].uri;
+		m.datetime = $(this)[0].datetime;
+		years[dt.year()].push(m);
+	});
+	
+	var memCountList = "<ul id=\"years\">";
+	for(var year in years){
+		var mString = "mementos";
+		if(years[year].length == 1){mString = mString.slice(0,-1);}
+		memCountList += "<li>"+year+": "+years[year].length+" "+mString+"</li>\r\n"
+	}
+
+	memCountList += "</ul>";
+	$("#drilldownBox").append(memCountList);
+	$("#drilldownBox ul#years li").click(function(){
+		$("#month,#day,#time").remove();
+		$("#drilldownBox ul#years li").removeClass("selectedOption");
+		$(this).addClass("selectedOption");
+		showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(":")));
+	});
+	
+	//adjust positional offset of year display box based on contents
+	adjustDrilldownPositionalOffset();
+};
+
+
+function adjustDrilldownPositionalOffset(){
+	var h = $("#drilldownBox").css("height").substr(0,$("#drilldownBox").css("height").indexOf("px"));
+	$("#drilldownBox").css("top",((h*-1)-30)+"px");
+}
+
+
+var years = {};
+
+
+
+var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function showMementoCountsByMonths(year){
+	$("#months,#day,#time").remove();
+	//console.log("showing mementos for months in "+year);
+	var memCountList = "<ul id=\"months\">";
+	var months = {}
+	//console.log("X");
+	//console.log(years[year]);
+	for(memento in years[year]){
+		
+		var monthName = monthNames[moment(years[year][memento].datetime).month()];
+		if(!months[monthName]){
+			months[monthName] = [];
+		}
+		months[monthName].push(years[year][memento]);
+	}
+	console.log("MONTHS:");
+	console.log(months);
+	for(month in months){
+		var mString = "mementos";
+		if(months[month].length == 1){mString = mString.slice(0,-1);}
+		memCountList += "<li>"+month+": "+months[month].length+" "+mString+"</li>\r\n";
+	}
+	
+	memCountList += "</ul>";
+	$("#drilldownBox").append(memCountList);	
+	
+	$("#drilldownBox ul#months li").click(function(){
+		$("#day,#time").remove();
+		$("#drilldownBox ul#months li").removeClass("selectedOption");
+		$(this).addClass("selectedOption");
+		console.log($(this).text().substr(0,$(this).text().indexOf(":")));
+		showMementoCountsByDays(months[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+	});
+	
+	adjustDrilldownPositionalOffset();		
+}
+
+function showMementoCountsByDays(mementos){
+	var days = {};
+	var dayNames = ["NA","1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th",
+					"11th","12th","13th","14th","15th","16th","17th","18th","19th","20th",
+					"21st","22nd","23rd","24th","25th","26th","27th","28th","29th","30th","31st"];
+	
+	for(memento in mementos){
+		var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
+		if(!days[dayNumber]){
+			days[dayNumber] = [];
+		}
+		days[dayNumber].push(mementos[memento]);
+	}
+	var memCountList = "<ul id=\"day\">";
+	for(day in days){
+		var mString = "mementos";
+		if(days[day].length == 1){mString = mString.slice(0,-1);}
+		memCountList += "<li>"+day+": "+days[day].length+" "+mString+"</li>\r\n";
+	}
+	
+	memCountList += "</ul>";
+	$("#drilldownBox").append(memCountList);
+	$("#drilldownBox ul#day li").click(function(){
+		$("#time").remove();
+		$("#drilldownBox ul#day li").removeClass("selectedOption");
+		$(this).addClass("selectedOption");
+
+		showMementoCountsByTime(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+	});
+	
+	adjustDrilldownPositionalOffset();		
+}
+
+function showMementoCountsByTime(mementos){
+	var times = {};
+	var uris = {};
+	for(memento in mementos){
+		var mom = moment(mementos[memento].datetime);
+		var time = mom.format("HH:mm:ss:SSS");
+		
+		console.log(mementos[memento]);
+		if(!times[time]){
+			times[time] = [];
+			uris[time] = [];
+		}
+		times[time].push(mementos[memento]);
+		uris[time] = mementos[memento].uri;
+	}
+	var memCountList = "<ul id=\"time\">";
+	for(time in times){
+		var mString = "mementos";
+		if(times[time].length == 1){mString = mString.slice(0,-1);}
+		memCountList += "<li title=\""+uris[time]+"\">"+time+"</li>\r\n";//: "+times[time].length+" "+mString+"</li>\r\n";
+	}
+	
+	memCountList += "</ul>";
+	$("#drilldownBox").append(memCountList);
+	$("#drilldownBox ul#time li").click(function(){
+		console.log($(this).attr("title"));
+		window.location = $(this).attr("title");
+		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+	});
+	
+	adjustDrilldownPositionalOffset();	
+}		

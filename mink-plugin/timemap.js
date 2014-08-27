@@ -67,6 +67,9 @@ function Memento(fromStr){
 	this.last = false;
 	this.next = null;
 	this.prev = null;
+	
+	if(!fromStr){return;}
+	
 	this.uri = this.str.substring(this.str.indexOf("<")+1,this.str.indexOf(">"));
 	this.datetime = this.str.substr(this.str.indexOf("datetime")); //abbreviation to just include datetime string and on
 	this.datetime = this.datetime.substr(this.datetime.indexOf("\"")).replace(/"/g,"").trim();
