@@ -20,6 +20,7 @@ $("#minkContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 setTimeout(flip,1000);
 
 $(document).ready(function(){
+	console.log("Document ready!");
 	$("#mLogo").click(function(){
 		showArchiveOptions();
 	});
@@ -96,6 +97,11 @@ function displayUIBasedOnContext(){
 		}
 	  });
 }
+console.log("Local Storage: ");
+console.log(localStorage);
+console.log("URL :"+document.URL);
+chrome.storage.local.get(null,function(keys){console.log(keys);});
+//displayUIBasedOnContext();
 
 function displayReturnToLiveWebButton(){
 		//Display UI For When Browsing An Archive Page
@@ -104,13 +110,14 @@ function displayReturnToLiveWebButton(){
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	console.log("in listener");
 	if(request.method == "displayUI"){
 		console.log(request.timegate);
 		console.log(request.timemap);
 		console.log(request.uri);
 		console.log("-----");
 	}
-	//displayUIBasedOnContext();
+	displayUIBasedOnContext();
 });
 
 
@@ -126,6 +133,7 @@ var jsonizedMementos = "[";
  *         references should be followed and parsed before data is returned
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
+	console.log("In getMementos");
 	var timemaploc = proxy + window.location;
 	if(uri){
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps

@@ -29,11 +29,9 @@ chrome.runtime.onMessage.addListener(
 );
 
 
-
-
 chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var url = deets.url;
-	var timemap, timegate, url;
+	var timemap, timegate, original, url;
 
 	var headers = deets.responseHeaders;
 	var mementoDateTimeHeader, linkHeader;
@@ -44,7 +42,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 			linkHeader = headers[headerI].value;
 		}
 	}
-	
+			
 	if(linkHeader){
 		console.log(url+" has a link header");
 		//parse out timegate
@@ -53,23 +51,24 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		var mementoUrlExpression = /<[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?>/gi;
 		var murlregex = new RegExp(mementoUrlExpression); //regex to get a memento URI
 		
-		var mementoRelTimegateExpression = /rel=".*timegate.*"/gi;
+		var mementoRelTimegateExpression = /rel=.*timegate.*/gi;
 		var mtimegateregex = new RegExp(mementoRelTimegateExpression); //regex to get timegate
 		
-		var mementoRelTimemapExpression = /rel=".*timemap.*"/gi;
+		var mementoRelTimemapExpression = /rel=.*timemap.*/gi;
 		var mtimemapregex = new RegExp(mementoRelTimemapExpression); //regex to get timemap
 		
-		var mementoRelOriginalExpression = /rel=".*original.*"/gi;
+		var mementoRelOriginalExpression = /rel=.*original.*/gi;
 		var moriginalregex = new RegExp(mementoRelOriginalExpression); //regex to get original	
-		
+
 		for(var lhe=0; lhe<linkHeaderEntries.length; lhe++){
-			
 			var partsOfEntry = linkHeaderEntries[lhe].split(";");
-			
+		
 			for(var partOfEntry=0; partOfEntry<partsOfEntry.length; partOfEntry++){
 				if(partsOfEntry[partOfEntry].match(murlregex)){
 					url = partsOfEntry[partOfEntry];
-				}else if(partsOfEntry[partOfEntry].match(mtimegateregex)){
+				}
+
+				if(partsOfEntry[partOfEntry].match(mtimegateregex)){
 					timegate = url;
 				}else if(partsOfEntry[partOfEntry].match(mtimemapregex)){	
 					timemap = url;
@@ -95,24 +94,18 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		var mementoMetadataObject = {};
 		if(timemap){	timemap = sanitizeMementoURI(timemap); mementoMetadataObject.timemap = timemap;}
 		if(timegate){	timegate = sanitizeMementoURI(timegate); mementoMetadataObject.timegate = timegate;}
-		if(original){	original = sanitizeMementoURI(original); mementoMetadataObject.original = original;}
+		if(original){	original = sanitizeMementoURI(original); mementoMetadataObject.original = original;;}
 		
-		saveObjectToLocalStorage(mementoMetadataObject);
-			
-	
-	
-		
-		//store the values retrieved into localstorage for later retrieval and retrieval from content.js
-		// P.S. Messaging to the content script won't work here, as the page hasn't loaded
-		function saveObjectToLocalStorage(obj){
-			console.log("Storing discovered metadata about the memento:");
-			for(var a in obj){
-				console.log(" "+a+" "+obj[a]);
-				localStorage.setItem(a,obj[a]);
-			}
+		if(!timemap && !timegate && !original){
+			console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
+			console.log(linkHeaderEntries);
 		}
-
 		
+
+		chrome.storage.local.set(mementoMetadataObject);
+
+	}else {	//e.g., http://matkelly.com
+		console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");		
 	}
 },
 {urls: ["<all_urls>"],types: ["main_frame"]},["responseHeaders"]);
