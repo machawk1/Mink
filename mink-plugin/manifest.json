@@ -6,7 +6,7 @@
    "homepage_url": "http://matkelly.com/mink",
    "author": "Mat Kelly <me@matkelly.com",
    "background": {
-       "scripts": ["js/jquery-2.1.1.min.js","mink.js"],
+       "scripts": ["js/jquery-2.1.1.min.js","timemap.js","mink.js"],
        "persistent": true
    },
    "icons": { "128": "images/minkLogo_128.png"},
@@ -34,7 +34,7 @@
     		"Highcharts-4.0.3/js/highcharts.js","Highcharts-4.0.3/js/modules/data.js","Highcharts-4.0.3/js/modules/drilldown.js",
 			"highchartsdata.js","doThatHighchartsThingYouDo.js",
 			
-    		"ui.js","content.js"],
+    		"ui.js","content.js","timemap.js"],
     	"matches": ["<all_urls>"],
     	"css": ["style.css",
     		"font-awesome-4.0.3/css/font-awesome-modified.css",

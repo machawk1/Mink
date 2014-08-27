@@ -79,7 +79,6 @@ function displayUIBasedOnContext(){
 				  ((window.location+"").replace("www.","").indexOf(response.value.replace("www.","")) > -1)
 				) 																	// There were memento HTTP headers
 			){ 
-			console.log("Y"+window.location+" "+response.value);
 			logoInFocus = true;
 			
 			//Display UI For When Browsing An Archive Page
@@ -139,18 +138,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function queryTimeGateToGetTimeMap(tgURI){
-	console.log(tgURI);
-	console.log("X");
 	$.ajax({
 		url: tgURI,
 		type: "HEAD"
 	}).done(function(data,textStatus,xhr){
-		if(xhr.status == 200){}
-		console.log(xhr.status);
-		console.log(xhr);
-		console.log(xhr.getResponseHeader("Link"));
-		console.log(data);
-		console.log(textStatus);
+		if(xhr.status == 200){
+			var linkHeaderStr = xhr.getResponseHeader("Link");
+			var tm = new Timemap(linkHeaderStr);
+			
+		}
 	});
 	
 }
