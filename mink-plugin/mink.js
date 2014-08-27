@@ -105,7 +105,8 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		chrome.storage.local.set(mementoMetadataObject);
 
 	}else {	//e.g., http://matkelly.com
-		console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");		
+		console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");	
+		chrome.storage.local.clear();
 	}
 },
 {urls: ["<all_urls>"],types: ["main_frame"]},["responseHeaders"]);

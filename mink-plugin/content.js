@@ -100,7 +100,10 @@ function displayUIBasedOnContext(){
 console.log("Local Storage: ");
 console.log(localStorage);
 console.log("URL :"+document.URL);
-chrome.storage.local.get(null,function(keys){console.log(keys);});
+chrome.storage.local.get(null,function(keys){
+	console.log("Here's the data from the link headers");
+	console.log(keys);
+});
 //displayUIBasedOnContext();
 
 function displayReturnToLiveWebButton(){
