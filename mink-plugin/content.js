@@ -97,14 +97,28 @@ function displayUIBasedOnContext(){
 		}
 	  });
 }
-console.log("Local Storage: ");
-console.log(localStorage);
-console.log("URL :"+document.URL);
+
+displayUIBasedOnContext();
+
+/*
 chrome.storage.local.get(null,function(keys){
-	console.log("Here's the data from the link headers");
-	console.log(keys);
-});
-//displayUIBasedOnContext();
+	if(isEmpty(keys)){ 	//no link headers in the request. :(
+		displayUIBasedOnContext();
+	}else {				//we have link headers!
+		console.log(keys);
+		console.log("TODO, change the timegate/map to that which was specified in the link headers.");
+	}
+});*/
+
+function isEmpty(o){ //returns if empty object is passed in
+    for(var i in o){
+        if(o.hasOwnProperty(i)){
+            return false;
+        }
+    }
+    return true;
+}
+
 
 function displayReturnToLiveWebButton(){
 		//Display UI For When Browsing An Archive Page
@@ -124,9 +138,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 
+function queryTimeGateToGetTimeMap(tgURI){
+	console.log(tgURI);
+	console.log("X");
+	$.ajax({
+		url: tgURI,
+		type: "HEAD"
+	}).done(function(data,textStatus,xhr){
+		if(xhr.status == 200){}
+		console.log(xhr.status);
+		console.log(xhr);
+		console.log(xhr.getResponseHeader("Link"));
+		console.log(data);
+		console.log(textStatus);
+	});
+	
+}
+
 var jsonizedMementos = "[";
 
 /**
+ * TODO: update this old description since it is now a wrapper/router
  * Acquire all mementos from a timegate with either the current window URI
  *  or the URI of a value passed in
  * @param uri The target URI-R, if null then use window location
@@ -137,7 +169,29 @@ var jsonizedMementos = "[";
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	console.log("In getMementos");
-	var timemaploc = proxy + window.location;
+	chrome.storage.local.get(null,function(keys){
+		if(isEmpty(keys)){ 	//no link headers in the request. :(
+			console.log("No link header");
+			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
+		}else {				//we have link headers!
+			console.log(keys);
+			if(keys.timemap){
+				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
+			}else if(keys.timegate){
+				queryTimeGateToGetTimeMap(keys.timegate);
+				return;
+			}
+			console.log("TODO, change the timegate/map to that which was specified in the link headers.");
+		}
+	});
+}
+	
+
+function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
+	if(!timemaploc){ //use the aggregator
+		timemaploc = proxy + window.location;
+	}
+	
 	if(uri){
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
@@ -170,9 +224,9 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				console.log("Fetching timemap "+timemapURI);
 				//should run a filter function here instead of naive equality
 				if(!alreadyAcquiredTimemaps){
-					return getMementos(timemapURI,data);
+					return getMementosWithTimemap(timemapURI,data);
 				}else {
-					return getMementos(timemapURI,alreadyAcquiredTimemaps+data);
+					return getMementosWithTimemap(timemapURI,alreadyAcquiredTimemaps+data);
 				}
 			}else if(!alreadyAcquiredTimemaps){ //only the initial timemap exists
 				alreadyAcquiredTimemaps = data;
@@ -425,7 +479,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			}			
 			
 			
-			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementos(proxy + window.location,data);});
+			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementosWithTimemap(proxy + window.location,data);});
 			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
 			
 			$("#viewMementoButton").click(function(){
@@ -493,7 +547,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			// - Attempt to extract the URI-R
 			var URI_M = (window.location+"").substr((window.location+"").indexOf("http",6)); //exclude the initial scheme, let's figure out where the URI-M starts
 			URI_M = URI_M.replace("http://","http://"); //cross-protocol interaction is a no-no
-			return getMementos(proxy + URI_M,null,true); 
+			return getMementosWithTimemap(proxy + URI_M,null,true); 
 		}
 
 		// hide the Memento logo
