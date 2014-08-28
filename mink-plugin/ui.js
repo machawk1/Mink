@@ -378,7 +378,9 @@ var years = {};
 
 
 
-var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+//var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var monthNames = ["Jan ","Feb ","Mar ","Apr ","May ","June","July","Aug ","Sept ","Oct ","Nov ","Dec "];
+
 
 function showMementoCountsByMonths(year){
 	$("#months,#day,#time").remove();
