@@ -49,6 +49,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		var tm = new Timemap(linkHeaderAsString);
 		
 		chrome.storage.local.set(tm);
+		console.log("Retained HTTP Link header data to local storage. TODO: re-read this value in the content script and perform UI display logic using saved data.");
 
 	}else {	//e.g., http://matkelly.com
 		console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");	

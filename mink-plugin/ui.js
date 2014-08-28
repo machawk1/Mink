@@ -143,10 +143,6 @@ function flip(){
 					title: "Mink",
 					body: "Page not found in the archives\r\nSelect exclamation icon to archive now!"
 			}, function(response) {});
-		
-			
-			//$("#mLogo").fadeOut();
-			//hideLogo = false;
 		}else {
 			displayMementoCountAtopLogo();
 		}

@@ -24,8 +24,13 @@ $(document).ready(function(){
 	$("#mLogo").click(function(){
 		showArchiveOptions();
 	});
+	displayUIBasedOnContext();
+
 	
 });
+
+var jsonizedMementos = "[";
+var jsonizedMementos;
 
 function addToHistory(uri_r,memento_datetime,mementos,callback){
 	var mementosToStore = mementos;
@@ -97,7 +102,6 @@ function displayUIBasedOnContext(){
 	  });
 }
 
-displayUIBasedOnContext();
 
 /*
 chrome.storage.local.get(null,function(keys){
@@ -137,22 +141,68 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 
-function queryTimeGateToGetTimeMap(tgURI){
+function queryTimegate(tgURI){
 	console.log(tgURI);
 	$.ajax({
 		url: tgURI,
 		type: "HEAD"
 	}).done(function(data,textStatus,xhr){
+		console.log("DONE!");
 		if(xhr.status == 200){
+			
 			var linkHeaderStr = xhr.getResponseHeader("Link");
 			var tm = new Timemap(linkHeaderStr);
+			console.log("We have the ultimate timemap");
+			console.log("From the timegate: "+(tm.timegate ? "TimeGate, ":"")+(tm.timemap ? " TimeMap, ":"")+"and "+tm.mementos.length +" mementos"); 
+			console.log(tm);
+			if(tm.timemap){
+				createTimemapFromURI(tm.timemap); //TODO prevent crawler trap/infinite querying
+			}
+			//console.log(tm.mementos);
+			
 			
 		}	
 	});
 	
 }
 
-var jsonizedMementos = "[";
+function createTimemapFromURI(uri,callback){
+	$.ajax({
+		url: uri,
+		type: "GET" /* The payload is in the response body, not the head */
+	}).done(function(data,textStatus,xhr){
+		console.log("Done fetching Timemap from URI!");
+		if(xhr.status == 200){
+			//console.log(data);
+			var tm = new Timemap(data);
+			console.log(tm);
+			if(tm.mementos.length > 0){
+				logoInFocus = true; //stop rotating the logo, we have a list of mementos
+				chrome.runtime.sendMessage({
+					method: "notify", 
+					title: "TimeMap fetching complete.",
+					body: tm.mementos.length+"+ mementos returned."
+				}, function(response) {});
+				displayMementoCountAtopLogo();
+				
+				var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+				jsonizedMementos = "[";
+				$(tm.mementos).each(function(i,m){
+					selectBox += "\t<option value=\""+m.uri+"\">"+m.datetime+"</option>\r\n";
+					jsonizedMementos += "{\"uri\": \""+m.uri+"\", \"datetime\": \""+m.datetime+"\"},";
+				});
+				selectBox += "</select>";
+				jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
+				jsonizedMementos+= "]"; //make it valid JSON
+				
+				addInterfaceComponents(tm.mementos.length,1,"",selectBox)
+				//$("#countOverLogo").text(":)");//tm.mementos.length
+				
+			}
+			
+		}	
+	});
+}
 
 /**
  * TODO: update this old description since it is now a wrapper/router
@@ -171,11 +221,16 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			console.log("No link header");
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
+			console.log("Some links header values were stored before. Here we'll parse and re-use them.");
 			console.log(keys);
 			if(keys.timemap){
 				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
+				console.log("We have a timemap, let's do more! The timemap:");
+				console.log(keys.timemap);
+				createTimemapFromURI(keys.timemap);
 			}else if(keys.timegate){
-				queryTimeGateToGetTimeMap(keys.timegate);
+				console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
+				queryTimegate(keys.timegate);
 				return;
 			}
 			console.log("TODO, change the timegate/map to that which was specified in the link headers.");
@@ -183,7 +238,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	});
 }
 	
-var jsonizedMementos;
+
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	if(!timemaploc){ //use the aggregator
 		timemaploc = proxy + window.location;
