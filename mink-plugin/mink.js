@@ -44,10 +44,20 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 			linkHeaderAsString = headers[headerI].value;
 		}
 	}
+	
+	if(mementoDateTimeHeader){
+		console.log("You're viewing something in the archive! TODO: Show simpler interface.");
+		var m = new Memento();
+		//m.uri = document.URL; // this won't work from mink.js and needs to be set elsewhere.
+		m.datetime = mementoDateTimeHeader;
+		chrome.storage.local.clear(); 
+		chrome.storage.local.set(m);
+		return;	//if we ever want to show the standard interface regardless of the memento-datetime header, disable this
+	}
 			
 	if(linkHeaderAsString){
 		var tm = new Timemap(linkHeaderAsString);
-		
+		chrome.storage.local.clear(); 
 		chrome.storage.local.set(tm);
 		console.log("Retained HTTP Link header data to local storage. TODO: re-read this value in the content script and perform UI display logic using saved data.");
 

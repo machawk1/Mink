@@ -102,17 +102,6 @@ function displayUIBasedOnContext(){
 	  });
 }
 
-
-/*
-chrome.storage.local.get(null,function(keys){
-	if(isEmpty(keys)){ 	//no link headers in the request. :(
-		displayUIBasedOnContext();
-	}else {				//we have link headers!
-		console.log(keys);
-		console.log("TODO, change the timegate/map to that which was specified in the link headers.");
-	}
-});*/
-
 function isEmpty(o){ //returns if empty object is passed in
     for(var i in o){
         if(o.hasOwnProperty(i)){
@@ -232,8 +221,14 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
 				queryTimegate(keys.timegate);
 				return;
+			}else if(keys.datetime){ //isAmemento
+				console.log("We are a memento!");
+				logoInFocus = true;
+			
+				//Display UI For When Browsing An Archive Page
+				displayReturnToLiveWebButton();
 			}
-			console.log("TODO, change the timegate/map to that which was specified in the link headers.");
+			//console.log("TODO, change the timegate/map to that which was specified in the link headers.");
 		}
 	});
 }
