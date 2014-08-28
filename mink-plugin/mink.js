@@ -44,26 +44,26 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 			linkHeaderAsString = headers[headerI].value;
 		}
 	}
-	
-	if(mementoDateTimeHeader){
-		console.log("You're viewing something in the archive! TODO: Show simpler interface.");
-		var m = new Memento();
-		//m.uri = document.URL; // this won't work from mink.js and needs to be set elsewhere.
-		m.datetime = mementoDateTimeHeader;
-		chrome.storage.local.clear(); 
-		chrome.storage.local.set(m);
-		return;	//if we ever want to show the standard interface regardless of the memento-datetime header, disable this
-	}
-			
+				
 	if(linkHeaderAsString){
 		var tm = new Timemap(linkHeaderAsString);
 		chrome.storage.local.clear(); 
+		if(mementoDateTimeHeader){ 
+			tm.datetime = mementoDateTimeHeader;
+		}
 		chrome.storage.local.set(tm);
-		console.log("Retained HTTP Link header data to local storage. TODO: re-read this value in the content script and perform UI display logic using saved data.");
-
+		if(mementoDateTimeHeader){ 
+			console.log("You're viewing something in the archive! TODO: Show simpler interface.");
+			//var m = new Memento();
+			//m.datetime = mementoDateTimeHeader; 
+			//chrome.storage.local.set(m);
+			return;	//if we ever want to show the standard interface regardless of the memento-datetime header, disable this
+		}
 	}else {	//e.g., http://matkelly.com
 		console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");	
 		chrome.storage.local.clear(); //get rid of previous timemaps, timegates, etc.
 	}
+	
+	
 },
 {urls: ["<all_urls>"],types: ["main_frame"]},["responseHeaders"]);

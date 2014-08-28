@@ -112,10 +112,10 @@ function isEmpty(o){ //returns if empty object is passed in
 }
 
 
-function displayReturnToLiveWebButton(){
+function displayReturnToLiveWebButton(uri){
 		//Display UI For When Browsing An Archive Page
 		$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
-		$("#liveWeb").click(function(){window.location = response.value;});
+		$("#liveWeb").click(function(){window.location = (uri ? uri : response.value);});
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -212,7 +212,13 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 		}else {				//we have link headers!
 			console.log("Some links header values were stored before. Here we'll parse and re-use them.");
 			console.log(keys);
-			if(keys.timemap){
+			if(keys.datetime){ //isAmemento
+				console.log("We are a memento!");
+				logoInFocus = true;
+			
+				//Display UI For When Browsing An Archive Page
+				displayReturnToLiveWebButton(keys.original);
+			}else if(keys.timemap){
 				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
 				console.log("We have a timemap, let's do more! The timemap:");
 				console.log(keys.timemap);
@@ -221,12 +227,6 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
 				queryTimegate(keys.timegate);
 				return;
-			}else if(keys.datetime){ //isAmemento
-				console.log("We are a memento!");
-				logoInFocus = true;
-			
-				//Display UI For When Browsing An Archive Page
-				displayReturnToLiveWebButton();
 			}
 			//console.log("TODO, change the timegate/map to that which was specified in the link headers.");
 		}
