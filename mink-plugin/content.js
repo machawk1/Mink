@@ -68,6 +68,7 @@ function viewDifferentMemento(index){
 			);		
 		}else {
 			console.log("Bad index value in viewDifferentMemento, "+index);
+			console.log(index);
 		}
 	});
 }
@@ -184,7 +185,9 @@ function createTimemapFromURI(uri,callback){
 				jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
 				jsonizedMementos+= "]"; //make it valid JSON
 				
-				addInterfaceComponents(tm.mementos.length,1,"",selectBox)
+				addInterfaceComponents(tm.mementos.length,1," FIXMEs",selectBox);
+				$("#viewMementoButton").click(function(){viewDifferentMemento();});
+				setMementoButtonInteractivityBasedOnMementoDropdown();
 				//$("#countOverLogo").text(":)");//tm.mementos.length
 				
 			}

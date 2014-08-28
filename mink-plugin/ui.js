@@ -199,7 +199,6 @@ function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
 	var nextMementoDisabledValue = "";
 	var disabledValue = "disabled=\"disabled\"";
 	
-	console.log("si"+selectedIndex);
 	if(selectedIndex == 0){previousMementoDisabledValue = disabledValue;}
 	if(selectedIndex == mementoObjects.length -1){nextMementoDisabledValue = disabledValue;} 
 	
