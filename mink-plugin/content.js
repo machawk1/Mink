@@ -73,10 +73,14 @@ function viewDifferentMemento(index){
 	});
 }
 
+function ceaseQuery(){ //stop everything (AND DANCE!)
+	alert("Halting execution");
+}
+
 function displayUIBasedOnContext(){	
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
 		if(response == null || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
-			$("#archiveOptions").text("Fetching Mementos...");
+			$("#archiveOptions").html("Fetching Mementos...<button onclick=\"ceaseQuery();\" style=\"margin-left: 1.0em;\">Halt and Catch Fire</button>");
 			getMementos();
 		}else if(response && response.value != null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
 				( ((window.location+"").indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
@@ -360,7 +364,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			setMementoButtonInteractivityBasedOnMementoDropdown();
 			
 			//This is insufficient to making the Mink logo clickable on http://web.archive.org/web/20140115131022/http://www.yahoo.com/
-			$("#mLogo").click(function(){showArchiveOptions();}); //if viewing an already archived page, for some reason this wasn't attached
+			$("#mLogo").click(function(){
+				showArchiveOptions();
+			}); //if viewing an already archived page, for some reason this wasn't attached
 			
 			if(numberOfTimemaps > 1){
 				chrome.runtime.sendMessage({
@@ -383,7 +389,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		console.log("ERROR");
 
 		if(e.status == 404){
-			return; //prevent infinite loop. This is probably not the correct way to handle it
+			console.log("404");
+			//return; //prevent infinite loop. This is probably not the correct way to handle it
 		}
 		
 		//check if we're currently viewing an archive
