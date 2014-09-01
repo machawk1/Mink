@@ -346,7 +346,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			});
 			
 			$("#helpButton").click(function(){
-				alert("More information will be provided here about the recursive memento acquisition and parsing");
+				//alert("More information will be provided here about the recursive memento acquisition and parsing");
+				window.open("http://matkelly.com/mink");
 			});
 			
 			$("#archiveNow").click(function(){
