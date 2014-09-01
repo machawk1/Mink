@@ -189,7 +189,7 @@ function createTimemapFromURI(uri,callback){
 				jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
 				jsonizedMementos+= "]"; //make it valid JSON
 				
-				addInterfaceComponents(tm.mementos.length,1," FIXMEs",selectBox);
+				addInterfaceComponents(tm.mementos.length,1," thumbnails",selectBox);
 				$("#viewMementoButton").click(function(){viewDifferentMemento();});
 				setMementoButtonInteractivityBasedOnMementoDropdown();
 				//$("#countOverLogo").text(":)");//tm.mementos.length
@@ -268,6 +268,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				var timemapURI = othertimemaps[0].substring(1,othertimemaps[0].indexOf(">"));
 				
 				$("#timemapCount").text(numberOfTimemaps);
+				if(numberOfTimemaps > 1){
+					$("#timemapPlurality").text("timemaps"); //fix the plurality while fetching more timemaps
+				}
 				console.log("Fetching timemap "+timemapURI);
 				//should run a filter function here instead of naive equality
 				if(!alreadyAcquiredTimemaps){
