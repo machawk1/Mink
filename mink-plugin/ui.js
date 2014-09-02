@@ -296,7 +296,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	$("#archiveOptions").html("<div id=\"largerNumberButtons\"><p>List Mementos By:</p>"+
 		"<button class=\"largeNumberOfMementoOption activeButton\" id=\"largeNumberOfMementoOption1\"><span>&#9673;</span>Dropdown</button>"+
 		"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption2\"><span>&#9678;</span>Drill Down</button>"+
-		"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption3\"><span>&#9678;</span>Foo Method</button>"+
+		//"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption3\"><span>&#9678;</span>Foo Method</button>"+
 		"</div>"+
 		"<div id=\"drilldownBox\" style=\"display: none;\"></div>" +
 		"<span id=\"info\"><span id=\"numberOfMementos\">"+nMementos+"</span> mementos available in <span id=\"timemapCount\">"+nTimemaps+"</span> " + "<span id=\"timemapPlurality\">" + tmVerbiage + "</span>" +  
@@ -324,7 +324,9 @@ function destroyMementoCountsByYear(){
 }
 
 function showMementoCountsByYear(){
-	if($("#drilldownBox").css("display") == "none"){ //if the expensive operation was done once, just resurrect the data from before
+	//if the expensive operation was done once, just resurrect the data from before
+	// Also, if nothing has been done (due to few mementos), do it now
+	if($("#drilldownBox").css("display") == "none" && $("#drilldownBox").html() != ""){ 
 		$("#drilldownBox").css("display","block");
 		return;
 	}
@@ -370,6 +372,9 @@ function showMementoCountsByYear(){
 	
 	//adjust positional offset of year display box based on contents
 	adjustDrilldownPositionalOffset();
+	
+	//ensure that the new display is visible (it won't be without this for few mementos)
+	$("#drilldownBox").css("display","block");
 };
 
 
