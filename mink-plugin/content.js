@@ -15,9 +15,9 @@ $("body").append("<div id=\"minkContainer\"></div>");
 $("#minkContainer").append("<style type=\"text/css\" scoped=\"scoped\">\r\n"+
 	"#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n"+
 	"#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n"+
-	"#minkContainer input[type=button]:hover {cursor: pointer; }"+
+	"#minkContainer input[type=button]:enabled:hover {cursor: pointer; background-color: #ccc; }"+
 	"#minkContainer input[type=button]:disabled:hover {cursor: not-allowed; }"+
-	"#minkContainer input[type=button]:disabled {opacity: 0.25;}"+
+	"#minkContainer input[type=button]:disabled {opacity: 0.25; }"+
 "</style>");
 //$.scoped();
 $("#minkContainer").append("<div id=\"archiveOptions\"></div>");

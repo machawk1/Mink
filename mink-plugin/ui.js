@@ -62,8 +62,8 @@ function addArchiveNowButtons(addText){
 			addText + "Archive now? " +
 			"<button id=\"archiveNow_archivedotorg\">Archive.org</button>"+
 			"<button id=\"archiveNow_archivedottoday\">Archive.today</button>"+
-			"<button id=\"archiveNow_webcite\"     >WebCite</button>"+
-			"<button id=\"archiveNow_permadotcc\"  >Perma.cc</button>"+
+			"<button id=\"archiveNow_webcite\"     disabled=\"disabled\">WebCite</button>"+
+			"<button id=\"archiveNow_permadotcc\"  disabled=\"disabled\">Perma.cc</button>"+
 			"<button id=\"archiveNow_all\"         >All</button>"+
 			"<button id=\"archiveNow_org\"         >Other...</button>"+
 			"</div>"
