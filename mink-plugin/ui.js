@@ -27,12 +27,12 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 		},500,null);
 		console.log($("#archiveOptions").css("marginLeft"));		
 	}else { //open the drawer
-		console.log("Showing archive options");
+		if(debug){console.log("Showing archive options");}
 		$("#archiveOptions").animate({
 			marginLeft: "-700px",
 			opacity: "1.0"
 		},500,null);
-		console.log($("#archiveOptions").css("marginLeft"));
+		if(debug){console.log($("#archiveOptions").css("marginLeft"));}
 	}
 }
 
@@ -130,6 +130,13 @@ function addArchiveNowButtons(addText){
 			//console.log(c);
 		});
 	});
+
+	$("#archiveNow_all").click(function(){
+		$("#archiveNow_archivedotorg").trigger("click");
+		$("#archiveNow_archivedottoday").trigger("click");	
+		$(this).html("View All");
+		$(this).addClass("archiveNowSuccess");
+	});
 	
 }
 
@@ -143,7 +150,7 @@ function flip(){
 	if(shrinking){w = "50px"; }
 	
 	if(logoInFocus && w == "0px" && $("#mLogo").attr("src") == iconUrl){
-		console.log("Stopping the rotation on front of logo!");
+		if(debug){console.log("Stopping the rotation on front of logo!");}
 		$("#mLogo").css("opacity","1.0");
 		if(hideLogo){
 			$("#mLogo").attr("src",chrome.extension.getURL("images/icon128_error.png")); 
@@ -201,7 +208,7 @@ function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
 	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
 	delete dropdownOptions;
 	
-	console.log("activeSelectioNDatetime = "+activeSelectionDatetime);
+	if(debug){console.log("activeSelectioNDatetime = "+activeSelectionDatetime);}
 	
 	var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
 	
@@ -250,8 +257,10 @@ function displayDatepicker(){
 	var yearList = "<ul>\r\n";
 	
 	for(var key in Object.keys(yearbuckets)){
-		console.log(Object.keys(yearbuckets)[key]+" has "+yearbuckets[Object.keys(yearbuckets)[key]].length+" mementos");
-		console.log(Object.keys(yearbuckets)[key]+","+yearbuckets[Object.keys(yearbuckets)[key]].length);
+		if(debug){
+			console.log(Object.keys(yearbuckets)[key]+" has "+yearbuckets[Object.keys(yearbuckets)[key]].length+" mementos");
+			console.log(Object.keys(yearbuckets)[key]+","+yearbuckets[Object.keys(yearbuckets)[key]].length);
+		}
 		yearList += "\t<li>"+Object.keys(yearbuckets)[key]+": "+yearbuckets[Object.keys(yearbuckets)[key]].length+"</li>\r\n";
 		//csv += "\r\n"+Object.keys(yearbuckets)[key]+","+yearbuckets[Object.keys(yearbuckets)[key]].length;
 	}
@@ -272,7 +281,7 @@ function displayDatepicker(){
 
 	
      $("#datepickerOptions").append(getHighchartsData());
-     console.log(tsv);
+     if(debug){console.log(tsv);}
      $("#tsv").text(tsv);
     
      
@@ -334,13 +343,13 @@ function showMementoCountsByYear(){
 	years = {};
 
 	var mems;
-	console.log(jsonizedMementos);
+	if(debug){console.log(jsonizedMementos);}
 	try {
 		mems = JSON.parse(jsonizedMementos);
 	}catch(e){
 		console.log(e);
 	}
-	console.log(mems);
+	if(debug){console.log(mems);}
 	
 	$(mems).each(function(){ //exclude garbage option select values
 		

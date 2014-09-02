@@ -1,5 +1,5 @@
 function Timemap(fromString){
-	console.log("In timemap");
+	if(debug){console.log("In timemap");}
 	var timemap, timegate, original, url;
 	this.str = fromString;
 	

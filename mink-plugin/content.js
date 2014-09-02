@@ -1,4 +1,4 @@
-//PENDING, Issue #6, not possible w/o Chrome Canary: ar bootstrapCSS = chrome.extension.getURL("bootstrap/css/bootstrap.min.css");
+var debug = false;
 
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
 var numberOfTimemaps = 0;
@@ -28,7 +28,7 @@ $("#minkContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 setTimeout(flip,1000);
 
 $(document).ready(function(){
-	console.log("Document ready!");
+	if(debug){console.log("Document ready!");}
 	$("#mLogo").click(function(){
 		showArchiveOptions();
 		
@@ -108,7 +108,7 @@ function displayUIBasedOnContext(){
 		
 			setMementoButtonInteractivityBasedOnMementoDropdown(); 		
 		}else {
-			console.log("There is no else, only if");
+			if(debug){console.log("There is no else, only if");}
 			//ugh, we don't want to be here, let's nuke the localStorage
 			clearHistory(); 
 			displayUIBasedOnContext();
@@ -220,27 +220,34 @@ function createTimemapFromURI(uri,callback){
  *         references should be followed and parsed before data is returned
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
-	console.log("In getMementos");
+	if(debug){console.log("In getMementos");}
 	chrome.storage.local.get(null,function(keys){
 		if(isEmpty(keys)){ 	//no link headers in the request. :(
-			console.log("No link header");
+			if(debug){console.log("No link header");}
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
-			console.log("Some links header values were stored before. Here we'll parse and re-use them.");
-			console.log(keys);
+			if(debug){
+				console.log("Some links header values were stored before. Here we'll parse and re-use them.");
+				console.log(keys);
+			}
+			
 			if(keys.datetime){ //isAmemento
-				console.log("We are a memento!");
+				if(debug){console.log("We are a memento!");}
 				logoInFocus = true;
 			
 				//Display UI For When Browsing An Archive Page
 				displayReturnToLiveWebButton(keys.original);
 			}else if(keys.timemap){
 				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
-				console.log("We have a timemap, let's do more! The timemap:");
-				console.log(keys.timemap);
+				if(debug){
+					console.log("We have a timemap, let's do more! The timemap:");
+					console.log(keys.timemap);
+				}
 				createTimemapFromURI(keys.timemap);
 			}else if(keys.timegate){
-				console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
+				if(debug){
+					console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
+				}
 				queryTimegate(keys.timegate);
 				return;
 			}
@@ -259,7 +266,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
 	
-	console.log("About to fire off Ajax request for "+timemaploc);
+	if(debug){console.log("About to fire off Ajax request for "+timemaploc);}
 	jsonizedMementos = "[";
 	$.ajax({
 		url: timemaploc,
@@ -289,9 +296,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				}
 			}else if(!alreadyAcquiredTimemaps){ //only the initial timemap exists
 				alreadyAcquiredTimemaps = data;
-				console.log("In elseif;");
 			}else {
-				console.log("in else");
+				if(debug){console.log("in else, how'd that happen?");}
 			}
 						
 			var matches = alreadyAcquiredTimemaps.match(mementosURIsWithinTimemapsRegex);
@@ -304,7 +310,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				mementoURIs.push(v.substring(1,v.indexOf(">")));
 			});
 			
-			console.log("rel matches count = "+relmatches.length+"    uris = "+mementoURIs.length); //these values should be the same, else there's a parsing problem
+			if(debug){console.log("rel matches count = "+relmatches.length+"    uris = "+mementoURIs.length);} //these values should be the same, else there's a parsing problem
 
 			
 			var iaSrc = chrome.extension.getURL("images/archives/ia.png"); 

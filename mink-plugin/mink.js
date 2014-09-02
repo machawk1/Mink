@@ -1,6 +1,8 @@
+var debug = false;
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-  	console.log("hitting in mink.js");
+  	if(debug){console.log("hitting in mink.js");}
     if(request.method == "store"){
 		console.log("storing!");
     	localStorage.setItem('minkURI',request.value);
@@ -9,7 +11,7 @@ chrome.runtime.onMessage.addListener(
 		
     	sendResponse({value: "noise"});
     } else if(request.method == "retrieve"){
-    	console.log("RETRIEVING!");
+    	if(debug){console.log("RETRIEVING!");}
 
     	//console.debug(localStorage.getItem("minkURI"));
       sendResponse({value: localStorage.getItem('minkURI'),mementos: localStorage.getItem('mementos'), memento_datetime: localStorage.getItem('memento_datetime')});
@@ -53,14 +55,14 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		}
 		chrome.storage.local.set(tm);
 		if(mementoDateTimeHeader){ 
-			console.log("You're viewing something in the archive! TODO: Show simpler interface.");
+			if(debug){console.log("You're viewing something in the archive! TODO: Show simpler interface.");}
 			//var m = new Memento();
 			//m.datetime = mementoDateTimeHeader; 
 			//chrome.storage.local.set(m);
 			return;	//if we ever want to show the standard interface regardless of the memento-datetime header, disable this
 		}
 	}else {	//e.g., http://matkelly.com
-		console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");	
+		if(debug){console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");	}
 		chrome.storage.local.clear(); //get rid of previous timemaps, timegates, etc.
 	}
 	
