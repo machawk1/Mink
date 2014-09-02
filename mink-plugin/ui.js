@@ -18,12 +18,22 @@ function setMementoButtonInteractivityBasedOnMementoDropdown(){
 	$("#prevMementoButton").click(function(){viewDifferentMemento(-1);});
 }
 
-function showArchiveOptions(){
-	console.log("Showing archive options");
-	$("#archiveOptions").animate({
-		marginLeft: "-700px",
-		opacity: "1.0"
-	},500,null);
+function showArchiveOptions(){ //TODO: rename this function to say "toggle" instead of "show"
+	if($("#archiveOptions").css("marginLeft") == "-700px"){ //draw is already open, close it
+		console.log("Hiding archive options");
+		$("#archiveOptions").animate({
+			marginLeft: "0px",
+			opacity: "0.0"
+		},500,null);
+		console.log($("#archiveOptions").css("marginLeft"));		
+	}else { //open the drawer
+		console.log("Showing archive options");
+		$("#archiveOptions").animate({
+			marginLeft: "-700px",
+			opacity: "1.0"
+		},500,null);
+		console.log($("#archiveOptions").css("marginLeft"));
+	}
 }
 
 /**
