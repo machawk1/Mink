@@ -234,7 +234,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			if(keys.datetime){ //isAmemento
 				if(debug){console.log("We are a memento!");}
 				logoInFocus = true;
-			
+				if(debug){console.log(keys);}
 				//Display UI For When Browsing An Archive Page
 				displayReturnToLiveWebButton(keys.original);
 			}else if(keys.timemap){

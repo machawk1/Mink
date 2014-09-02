@@ -33,16 +33,18 @@ function Timemap(fromString){
 				url = partsOfEntry[partOfEntry];
 			}
 
+			/* Splitting into multiple ifs instead of if-else allows for e.g., rel="timegate original" */
 			if(partsOfEntry[partOfEntry].match(mtimegateregex)){
 				timegate = url;
-			}else if(partsOfEntry[partOfEntry].match(mtimemapregex)){	
+			}
+			if(partsOfEntry[partOfEntry].match(mtimemapregex)){	
 				timemap = url;
-			}else if(partsOfEntry[partOfEntry].match(moriginalregex)){	
+			}
+			if(partsOfEntry[partOfEntry].match(moriginalregex)){	
 				original = url;
-			}else if(partsOfEntry[partOfEntry].match(mementoregex)){	
-				
+			}
+			if(partsOfEntry[partOfEntry].match(mementoregex)){		
 				this.mementos.push(new Memento(linkHeaderEntries[lhe]+linkHeaderEntries[lhe+1]));
-			}else {
 			}
 		}
 	}
@@ -53,7 +55,7 @@ function Timemap(fromString){
 	if(timegate){	this.timegate = sanitizeMementoURI(timegate);}
 	if(original){	this.original = sanitizeMementoURI(original);}
 	
-	
+	if(!original){console.log("Hmm, no original"); }
 	
 	if(!timemap && !timegate && !original){
 		console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
