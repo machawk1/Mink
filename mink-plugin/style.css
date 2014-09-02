@@ -55,9 +55,12 @@
 .largeNumberOfMementoOption:hover,
 .largeNumberOfMementoOption:hover span,
 .activeButton:hover span {background-color: #0000ff; color: white; cursor: pointer;}
+.largeNumberOfMementoOption[disabled]:hover,
+.largeNumberOfMementoOption[disabled]:active,
 .largeNumberOfMementoOption[disabled='disabled']:hover,
 .largeNumberOfMementoOption[disabled='disabled']:hover span {cursor: not-allowed; background-color: white; color: #999;}
-.largeNumberOfMementoOption:active {background-color: #000099;}
+
+
 
 #drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; position: absolute; z-index: 1; left: 125px; background-color: white; font-family: Arial, sans-serif;}
 #drilldownBox ul {list-style-type: none; width: 150px; float: left; margin: 0; padding: 0;}
