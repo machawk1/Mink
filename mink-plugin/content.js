@@ -12,6 +12,12 @@ var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
 
 $("body").append("<div id=\"minkContainer\"></div>");
 //PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
+$("#minkContainer").append("<style type=\"text/css\" scoped=\"scoped\">\r\n"+
+	"#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n"+
+	"#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n"+
+	"#minkContainer input[type=button]:hover {color: blue; cursor: pointer; }"+
+"</style>");
+//$.scoped();
 $("#minkContainer").append("<div id=\"archiveOptions\"></div>");
 $("#minkContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 
@@ -23,10 +29,11 @@ $(document).ready(function(){
 	console.log("Document ready!");
 	$("#mLogo").click(function(){
 		showArchiveOptions();
+		
 	});
 	displayUIBasedOnContext();
 
-	
+
 });
 
 var jsonizedMementos = "[";

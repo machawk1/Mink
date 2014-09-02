@@ -298,7 +298,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 		"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption2\"><span>&#9678;</span>Drill Down</button>"+
 		"<button class=\"largeNumberOfMementoOption\" id=\"largeNumberOfMementoOption3\"><span>&#9678;</span>Foo Method</button>"+
 		"</div>"+
-		"<div id=\"drilldownBox\"></div>" +
+		"<div id=\"drilldownBox\" style=\"display: none;\"></div>" +
 		"<span id=\"info\"><span id=\"numberOfMementos\">"+nMementos+"</span> mementos available in <span id=\"timemapCount\">"+nTimemaps+"</span> " + "<span id=\"timemapPlurality\">" + tmVerbiage + "</span>" +  
 		select +
 		viewMementoButton +
