@@ -34,9 +34,9 @@ $(document).ready(function(){
 		
 	});
 	displayUIBasedOnContext();
-
-
+	
 });
+
 
 var jsonizedMementos = "[";
 var jsonizedMementos;
@@ -133,15 +133,20 @@ function displayReturnToLiveWebButton(uri){
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	console.log("in listener");
+	if(request.method == "hideUI"){
+		$("#minkContainer").fadeOut();
+		return;
+	}
+	
 	if(request.method == "displayUI"){
 		console.log(request.timegate);
 		console.log(request.timemap);
 		console.log(request.uri);
 		console.log("-----");
 	}
-	displayUIBasedOnContext();
+	displayUIBasedOnContext();	
 });
+
 
 
 function queryTimegate(tgURI){

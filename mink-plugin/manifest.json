@@ -17,7 +17,8 @@
        "tabs",
        "storage",
        "cookies",
-       "notifications"
+       "notifications",
+       "contextMenus"
     ],
     "content_scripts": [
     {

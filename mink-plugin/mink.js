@@ -32,6 +32,23 @@ chrome.runtime.onMessage.addListener(
 );
 
 
+chrome.contextMenus.create({
+	"title": "Hide Mink until reload",
+	"contexts": ["image"],
+	"onclick" : hideMinkUI
+	//,"targetUrlPatterns":["*://*/*"] //TODO: filter this solely to the Mink UI
+});
+
+function hideMinkUI(){
+ 	chrome.tabs.query({
+        "active": true,
+        "currentWindow": true
+    }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            "method": "hideUI"
+        });
+    });
+}
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var url = deets.url;
