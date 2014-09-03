@@ -4,7 +4,7 @@ chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
   	if(debug){console.log("hitting in mink.js");}
     if(request.method == "store"){
-		console.log("storing!");
+		if(debug){console.log("storing!");}
     	localStorage.setItem('minkURI',request.value);
     	localStorage.setItem('mementos',request.mementos);
 		localStorage.setItem('memento_datetime',request.memento_datetime);

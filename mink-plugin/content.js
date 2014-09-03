@@ -99,14 +99,14 @@ function displayUIBasedOnContext(){
 				) 																	// There were memento HTTP headers
 			){ 
 			logoInFocus = true;
-			
+					
 			//Display UI For When Browsing An Archive Page
-			displayReturnToLiveWebButton();
+			displayReturnToLiveWebButton(response.value);
 			
-			$("#archiveOptions").append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
-			$("#viewMementoButton").click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
+			//$("#archiveOptions").append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
+			//$("#viewMementoButton").click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
 		
-			setMementoButtonInteractivityBasedOnMementoDropdown(); 		
+			//setMementoButtonInteractivityBasedOnMementoDropdown(); 		
 		}else {
 			if(debug){console.log("There is no else, only if");}
 			//ugh, we don't want to be here, let's nuke the localStorage
