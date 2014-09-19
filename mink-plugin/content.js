@@ -255,6 +255,8 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				}
 				queryTimegate(keys.timegate);
 				return;
+			}else { // We had some link headers but none that were related to memento, so act as if we had no link header
+				getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 			}
 			//console.log("TODO, change the timegate/map to that which was specified in the link headers.");
 		}
