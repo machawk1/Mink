@@ -1,9 +1,9 @@
 #mLogo {width: 50px; display: none; top: 0; z-index: 999998; position: relative;}
-#minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999; font-size: 12px;}
+#minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999; font-size: 12px; border: 0; height: 50px;}
 * #minkContainer, #minkContainer * {top: auto; left: auto;} /* Fix #62 */
 
 #archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
-	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px;
+	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px; height: 1.75em;
 }
 #mdts, #dateUIButton, #helpButton {margin-left: 1.0em;}
 #prevMementoButton,#fetchLabel {margin-left: 1.5em;}
@@ -48,7 +48,7 @@
 
 #info {position: relative; z-index: 2;}
 
-#largerNumberButtons {position: absolute; z-index: 1; top: -25px; left: 125px; background-color: #ccc; border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px double #999;}
+#largerNumberButtons {position: absolute; z-index: 1; top: -25px; left: 125px; background-color: #ccc; border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 1px double #999; width: 300px; height: 2.0em;}
 #largerNumberButtons>p {float: left;  padding: 0 5px 0 5px; font-size: 12px; padding-top: 3px;}
 #largerNumberButtons p, #largerNumberButtons button, #largerNumberButtons input[type=submit], #largerNumberButtons input[type=button] {margin-bottom: 0; color: black;}
 .largeNumberOfMementoOption { padding: 3px 5px; font-weight: bold; display: block; border: 1px solid black; border-radius: 10px; background-color: white; line-height: 1.2em; box-shadow: 0px 2px 5px #888888; outline: 0; float: left;}
