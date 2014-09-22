@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
 var numberOfTimemaps = 0;
@@ -380,6 +380,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			});
 			
 			$("#archiveNow").click(function(){
+				previousPanelHTML = $("#archiveOptions").html();
 				$("#archiveOptions").html("");
 				addArchiveNowButtons();
 			});

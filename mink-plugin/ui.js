@@ -3,6 +3,7 @@ var logoInFocus = false; //used as a conditional for when to stop spinning the l
 var hideLogo = false;
 var iconUrl = chrome.extension.getURL("images/icon128.png"); 
 var iconUrlFlipped = chrome.extension.getURL("images/icon128flipped.png"); 
+var previousPanelHTML = ""; //a means of saving the UI to revert to once in the archiveNow panel
 
 function setMementoButtonInteractivityBasedOnMementoDropdown(){
 	$("#mdts").change(function(){
@@ -24,8 +25,13 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 		$("#archiveOptions").animate({
 			marginLeft: "0px",
 			opacity: "0.0"
-		},500,null);
-		console.log($("#archiveOptions").css("marginLeft"));		
+		},500,function(){
+			if(previousPanelHTML != ""){ //revert to original UI
+				$("#archiveOptions").html(previousPanelHTML);
+				previousPanelHTML = "";
+			}
+		});
+			
 	}else { //open the drawer
 		if(debug){console.log("Showing archive options");}
 		$("#archiveOptions").animate({
@@ -57,6 +63,7 @@ function displayMementoCountAtopLogo(){
  */
 function addArchiveNowButtons(addText){
 	if(!addText){addText = "";}
+	
 	$("#archiveOptions").html(
 			"<div id=\"archiveNowOptions\">"+
 			addText + "Archive now? " +
@@ -155,11 +162,11 @@ function flip(){
 		if(hideLogo){
 			$("#mLogo").attr("src",chrome.extension.getURL("images/icon128_error.png")); 
 			addArchiveNowButtons("0 mementos found. ");
-			chrome.runtime.sendMessage({
+			/*chrome.runtime.sendMessage({ //for #66, eventually turn this into a user option
 					method: "notify", 
 					title: "Mink",
 					body: "Page not found in the archives\r\nSelect exclamation icon to archive now!"
-			}, function(response) {});
+			}, function(response) {});*/
 		}else {
 			displayMementoCountAtopLogo();
 		}
