@@ -1,5 +1,7 @@
 #mLogo {width: 50px; display: none; top: 0; z-index: 999998; position: relative;}
 #minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999; font-size: 12px;}
+* #minkContainer, #minkContainer * {top: auto; left: auto;} /* Fix #62 */
+
 #archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px;
 }

@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var proxy = "http://mementoproxy.lanl.gov/aggr/timemap/link/1/";
 var numberOfTimemaps = 0;
@@ -150,14 +150,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function queryTimegate(tgURI){
-	console.log(tgURI);
+	if(debug){console.log("Querying timegate at "+tgURI);}
 	$.ajax({
 		url: tgURI,
 		type: "HEAD"
-	}).done(function(data,textStatus,xhr){
-		console.log("DONE!");
+	}).done(function(data,textStatus,xhr,a,b){
+		console.log("Done querying timegate");
 		if(xhr.status == 200){
-			
+			console.log("xhr:");
+			console.log(xhr);
+			console.log("data:");
+			console.log(data);
+			console.log("textStatus");
+			console.log(textStatus);
+			console.log("xhr responseheaders");
+			console.log(xhr.getAllResponseHeaders());
 			var linkHeaderStr = xhr.getResponseHeader("Link");
 			var tm = new Timemap(linkHeaderStr);
 			console.log("We have the ultimate timemap");
@@ -166,10 +173,10 @@ function queryTimegate(tgURI){
 			if(tm.timemap){
 				createTimemapFromURI(tm.timemap); //TODO prevent crawler trap/infinite querying
 			}
-			//console.log(tm.mementos);
-			
-			
-		}	
+			//console.log(tm.mementos);	
+		}else if(xhr.status == 302){
+			console.log("Do something with 302 here");
+		}
 	});
 	
 }
@@ -232,8 +239,8 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
 			if(debug){
-				console.log("Some links header values were stored before. Here we'll parse and re-use them.");
-				console.log(keys);
+			//	console.log("Some links header values were stored before. Here we'll parse and re-use them.");
+				//console.log(keys);
 			}
 			
 			if(keys.datetime){ //isAmemento

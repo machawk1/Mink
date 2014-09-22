@@ -2,6 +2,7 @@ function Timemap(fromString){
 	if(debug){console.log("In timemap");}
 	var timemap, timegate, original, url;
 	this.str = fromString;
+
 	
 	//parse out timegate
 	var linkHeaderEntries = this.str.split(",");
