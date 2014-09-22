@@ -10,7 +10,7 @@ var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
 
 //PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
 
-$("body").append("<div id=\"minkContainer\"></div>");
+$("body").append("<div id=\"minkContainer\"></div>"); 
 //PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
 $("#minkContainer").append("<style type=\"text/css\" scoped=\"scoped\">\r\n"+
 	"#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n"+
