@@ -5,7 +5,7 @@ Mink is a Google Chrome extension to indicate that a page a user is viewing on t
 
 ##Installation
 
-The extension has been privately deployed for testing and will be deployed to the Chrome Web Store publicly soon (as in, well before Mid-September 2014).
+The extension is publicly available from the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)!
 
 ##Usage
 
