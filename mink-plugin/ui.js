@@ -21,7 +21,7 @@ function setMementoButtonInteractivityBasedOnMementoDropdown(){
 
 function showArchiveOptions(){ //TODO: rename this function to say "toggle" instead of "show"
 	if($("#archiveOptions").css("marginLeft") == "-700px"){ //draw is already open, close it
-		console.log("Hiding archive options");
+		if(debug){console.log("Hiding archive options");}
 		$("#archiveOptions").animate({
 			marginLeft: "0px",
 			opacity: "0.0"
@@ -39,6 +39,11 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 			opacity: "1.0"
 		},500,null);
 		if(debug){console.log($("#archiveOptions").css("marginLeft"));}
+		
+		//RESTORE view button behavior
+		setMementoButtonInteractivityBasedOnMementoDropdown(); //re-attach dropdown change to affect button state
+		$("#viewMementoButton").attr("disabled","disabled"); //reset button state to disabled (default dropdown view)
+		$("#viewMementoButton").click(function(){window.location = $("#mdts").val();}); //re-attach button functionality
 	}
 }
 
@@ -423,8 +428,10 @@ function showMementoCountsByMonths(year){
 		}
 		months[monthName].push(years[year][memento]);
 	}
-	console.log("MONTHS:");
-	console.log(months);
+	if(debug){
+		console.log("MONTHS:"); console.log(months);
+	}
+	
 	for(month in months){
 		var mString = "mementos";
 		if(months[month].length == 1){mString = mString.slice(0,-1);}
@@ -438,7 +445,7 @@ function showMementoCountsByMonths(year){
 		$("#day,#time").remove();
 		$("#drilldownBox ul#months li").removeClass("selectedOption");
 		$(this).addClass("selectedOption");
-		console.log($(this).text().substr(0,$(this).text().indexOf(":")));
+		if(debug){console.log($(this).text().substr(0,$(this).text().indexOf(":")));}
 		showMementoCountsByDays(months[$(this).text().substr(0,$(this).text().indexOf(":"))]);
 	});
 	
@@ -485,7 +492,7 @@ function showMementoCountsByTime(mementos){
 		var mom = moment(mementos[memento].datetime);
 		var time = mom.format("HH:mm:ss:SSS");
 		
-		console.log(mementos[memento]);
+		if(debug){console.log(mementos[memento]);}
 		if(!times[time]){
 			times[time] = [];
 			uris[time] = [];
@@ -503,7 +510,7 @@ function showMementoCountsByTime(mementos){
 	memCountList += "</ul>";
 	$("#drilldownBox").append(memCountList);
 	$("#drilldownBox ul#time li").click(function(){
-		console.log($(this).attr("title"));
+		if(debug){console.log($(this).attr("title"));}
 		window.location = $(this).attr("title");
 		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
 	});
