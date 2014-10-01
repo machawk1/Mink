@@ -39,7 +39,7 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 			opacity: "1.0"
 		},500,null);
 		if(debug){console.log($("#archiveOptions").css("marginLeft"));}
-		
+		 
 		//RESTORE view button behavior
 		setMementoButtonInteractivityBasedOnMementoDropdown(); //re-attach dropdown change to affect button state
 		$("#viewMementoButton").attr("disabled","disabled"); //reset button state to disabled (default dropdown view)
