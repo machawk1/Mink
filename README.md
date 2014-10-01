@@ -37,3 +37,16 @@ If no mementos exist in the archive, the extension will say so and give the opti
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/5.png)
 6. Select the Mink icon again to review the interface to return to the live web.
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/6.png)
+
+### Use Case 2: A popular site with many mementos
+
+1. After installing Mink, visit a very popular web page (one that is likely to have many captures, e.g., cnn.com) and noticed the "1000+" badge, indicating that there are more mementos available beyond the initial memento timemap.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/1.png)
+2. Clicking on the icon reveals displays the initial memento listing (in the dropdown) as well as an active "Fetch All" button.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/2.png)
+3. Clicking this button tells Mink to follow the trail of mementos, which can be a length iterative process. The number of timemaps with mementos discovered so far is displayed as more are discovered.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/3.png)
+4. Once complete, the Miller Columns view will be automatically displayed (because your browser would not like a dropdown with over 40,000 items).
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/4.png)
+5. Drilling down in this date-organized list will allow you to easily select the memento with date and time you desire.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/5.png)
