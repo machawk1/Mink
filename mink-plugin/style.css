@@ -1,17 +1,21 @@
+@media print {
+	#minkContainer *, * #minkContainer {display: none;}
+}
+
 #mLogo {width: 50px; display: none; top: 0; z-index: 999998; position: relative;}
 #minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999; font-size: 12px; border: 0; height: 50px;}
 * #minkContainer, #minkContainer * {top: auto; left: auto;} /* Fix #62 */
 
-#archiveOptions {position: absolute; top: 0px left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
+#archiveOptions {position: absolute; top: 0px; left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px; height: 1.75em;
 }
 #mdts, #dateUIButton, #helpButton {margin-left: 1.0em;}
 #prevMementoButton,#fetchLabel {margin-left: 1.5em;}
 
 #datepickerContainer {position: absolute; top: 5px; left: 40%; text-align: center; width: 100px; z-index: 10000; background-color: white;}
-#datepickerOptions {position: absolute; top: 0px left: 0px; margin-top: 0px; width: 725px; min-height: 50%;  background-color: #ccc; z-index: 98; text-align: left;
+#datepickerOptions {position: absolute; top: 0px; left: 0px; margin-top: 0px; width: 725px; min-height: 50%;  background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; 
-	background: linear-gradient(to down, #999999, rgba(187,187,187,0.75)); 
+	background: linear-gradient(to bottom, #999999, rgba(187,187,187,0.75)); 
 	
 	font-weight: bold; border-radius: 4px; 
 }
@@ -67,7 +71,7 @@
 
 #drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; position: absolute; z-index: 1; left: 125px; background-color: white; font-family: Arial, sans-serif;}
 #drilldownBox ul {list-style-type: none; width: 150px; float: left; margin: 0; padding: 0;}
-#drilldownBox ul li {list-style-type: none;padding: none; margin: none;}
+#drilldownBox ul li {list-style-type: none; padding: 0; margin: 0;}
 #drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
 #drilldownBox ul li.selectedOption {background-color: #ddddff;}
 
@@ -75,3 +79,5 @@
 
 /* This isn't working, the image ought to be pulled from the extension, not the current page */
 /* option.ia {background-image: url('images/archives/ia.png');}*/
+
+} /* End @media screen */
