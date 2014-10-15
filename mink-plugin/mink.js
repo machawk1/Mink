@@ -27,6 +27,24 @@ chrome.runtime.onMessage.addListener(
 			},function() {} 
 		 );
     
+    }else if(request.method == "getMementosForHTTSSource"){
+    	var uri = "http"+request.value.substr(4);
+		$.ajax({
+			url: uri,
+			type: "GET"
+		}).done(function(data,textStatus,xhr){
+			console.log("We should parse and return the mementos here via a response");
+		}).fail(function(xhr,textStatus,error){
+			console.log("There was an error from mink.js");
+			console.log(textStatus);
+			console.log(error);
+			if(error == "Not Found"){
+				console.log("We have "+[].length+" mementos from the call to the archives using an HTTPS source!");
+				hideLogo = true;
+				showNoMementosInMinkUI();
+				//sendResponse({mementos: []}); //waste of a fuckin' time, that's what this callback is
+			}
+		});    	
     }
   }
 );
@@ -49,6 +67,33 @@ function hideMinkUI(){
         });
     });
 }
+
+function showNoMementosInMinkUI(){
+ 	chrome.tabs.query({
+        "active": true,
+        "currentWindow": true
+    }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            "method": "noMementosFromSecure"
+        });
+    });
+}
+
+chrome.webRequest.onCompleted.addListener(function(deets){
+    console.log("onHeadersReceived()");
+    console.log(deets.url);
+    console.log(deets);
+   
+    chrome.tabs.query({
+        "active": true,
+        "currentWindow": true
+    }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            "method": "displayUI"
+        });
+    });
+},
+{urls: ["*://twitter.com/*/status/*"],types: ["xmlhttprequest"]},["responseHeaders"]);
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var url = deets.url;

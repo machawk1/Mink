@@ -138,6 +138,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 	
+	if(request.method == "noMementosFromSecure"){
+		logoInFocus = true;
+		hideLogo = true;
+	}
+	
 	if(request.method == "displayUI"){
 		console.log(request.timegate);
 		console.log(request.timemap);
@@ -280,13 +285,27 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
 	
+	if(timemaploc.indexOf("https://") > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
+		//timemaploc = "https"+timemaploc.substr(4);
+		chrome.runtime.sendMessage({
+					method: "getMementosForHTTSSource", 
+					value: timemaploc
+		}, function(response) {
+			//This will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call. Do the logic at this message's destination (above)
+			console.log("We have "+response.mementos.length+" mementos from the call to the archives using an HTTPS source!");
+		});
+		return;
+		
+	}
+	
 	if(debug){console.log("About to fire off Ajax request for "+timemaploc);}
 	jsonizedMementos = "[";
 	$.ajax({
 		url: timemaploc,
 		type: "GET"
 	}).done(function(data,textStatus,xhr){
-		if(xhr.status == 200){
+		if(xhr.status == 200){ 
+			//TODO: Split this functionality up, it seeds to be called from elsewhere. HOLY GOD FUNCTION!
 			var othertimemaps = data.match(embeddedTimemapRegex);
 
 			numberOfTimemaps++;
@@ -419,16 +438,18 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			console.log("404 received");
 			return;
 		}
-	}).error(function(e){
+	}).fail(function(xhr,textStatus){
 		console.log("ERROR");
-
-		if(e.status == 404){
+		console.log(textStatus);
+		console.log(xhr);
+		if(xhr.status == 404){
 			console.log("404");
 			//return; //prevent infinite loop. This is probably not the correct way to handle it
 		}
 		
 		//check if we're currently viewing an archive
 		console.log("Are we viewing the archive? Basis 1: two http[s]*?://");
+		
 		var schemeOccurances = (window.location+"").match(/http[s]*:\/\//g);
 		if(schemeOccurances.length > 1){ //we likely have two URIs in window.location
 			console.log("  It appears we are viewing the archive based on multiple instances of http[s]*:// in window.location");
@@ -441,7 +462,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		// hide the Memento logo
 		hideLogo = true; logoInFocus = true;
 		
-		console.log(e);
+		console.log(xhr);
 	});
 }
 
