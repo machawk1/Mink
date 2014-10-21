@@ -138,6 +138,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 	
+	if(request.method == "showArchiveNowUI"){
+		if(debug){console.log("Hide logo here");}
+		logoInFocus = true;
+		hideLogo = true;
+		
+		return;
+	}	
+	
 	if(request.method == "getMementosFromSecureSource"){
 		logoInFocus = true;
 		hideLogo = true;
@@ -255,13 +263,8 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 		if(isEmpty(keys)){ 	//no link headers in the request. :(
 			if(debug){console.log("No link header");}
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
-		}else {				//we have link headers!
-			if(debug){
-			//	console.log("Some links header values were stored before. Here we'll parse and re-use them.");
-				//console.log(keys);
-			}
-			
-			if(keys.datetime){ //isAmemento
+		}else {				//we have link headers!			
+			if(keys.datetime){ //isA memento
 				if(debug){console.log("We are a memento!");}
 				logoInFocus = true;
 				if(debug){console.log(keys);}
@@ -305,10 +308,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		chrome.runtime.sendMessage({
 					method: "getMementosForHTTPSSource", 
 					value: timemaploc
-		}, function(response) {
-			//This will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call. Do the logic at this message's destination (above)
-			console.log("We have "+response.mementos.length+" mementos from the call to the archives using an HTTPS source!");
-		});
+		}, function(response) {});
+		//Cannot use above callback, will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call. 
+			
 		return;
 		
 	}

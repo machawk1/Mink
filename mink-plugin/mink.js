@@ -2,9 +2,7 @@ var debug = false;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-  	if(debug){console.log("hitting in mink.js");}
     if(request.method == "store"){
-		if(debug){console.log("storing!");}
     	localStorage.setItem('minkURI',request.value);
     	localStorage.setItem('mementos',request.mementos);
 		localStorage.setItem('memento_datetime',request.memento_datetime);
@@ -13,7 +11,6 @@ chrome.runtime.onMessage.addListener(
     } else if(request.method == "retrieve"){
     	if(debug){console.log("RETRIEVING!");}
 
-    	//console.debug(localStorage.getItem("minkURI"));
       sendResponse({value: localStorage.getItem('minkURI'),mementos: localStorage.getItem('mementos'), memento_datetime: localStorage.getItem('memento_datetime')});
     }else if(request.method == "nukeFromOrbit"){
     	localStorage.removeItem('minkURI');
@@ -37,7 +34,7 @@ chrome.runtime.onMessage.addListener(
 		}).done(function(data,textStatus,xhr){
 			if(debug){
 				console.log("We should parse and return the mementos here via a response");
-				console.log(data);
+				//console.log(data);
 			}
 			chrome.tabs.query({
 				"active": true,
@@ -51,16 +48,16 @@ chrome.runtime.onMessage.addListener(
 			
 		}).fail(function(xhr,textStatus,error){
 			if(debug){
-				console.log("There was an error from mink.js");
-				console.log(textStatus);
-				console.log(error);
-				if(error == "Not Found"){
-					console.log("We have "+[].length+" mementos from the call to the archives using an HTTPS source!");
-					hideLogo = true;
-					//getMementosForHTTPSWebsite();
-					//sendResponse({mementos: []}); //waste of a fuckin' time, that's what this callback is
-				}
+				//console.log("There was an error from mink.js");
+				//console.log(textStatus);
+				//console.log(error);
 			}
+			if(error == "Not Found"){
+				//console.log("We have "+[].length+" mementos from the call to the archives using an HTTPS source!");
+				hideLogo = true;
+				showArchiveNowUI();
+			}
+			
 		});    	
     }
   }
@@ -85,6 +82,17 @@ function hideMinkUI(){
     });
 }
 
+function showArchiveNowUI(){
+ 	chrome.tabs.query({
+        "active": true,
+        "currentWindow": true
+    }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+            "method": "showArchiveNowUI"
+        });
+    });
+}
+
 function getMementosForHTTPSWebsite(){
  	chrome.tabs.query({
         "active": true,
@@ -97,9 +105,9 @@ function getMementosForHTTPSWebsite(){
 }
 
 chrome.webRequest.onCompleted.addListener(function(deets){
-    console.log("onHeadersReceived()");
-    console.log(deets.url);
-    console.log(deets);
+   // console.log("onHeadersReceived()");
+   // console.log(deets.url);
+   // console.log(deets);
    
     chrome.tabs.query({
         "active": true,
@@ -134,7 +142,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		}
 		chrome.storage.local.set(tm);
 		if(mementoDateTimeHeader){ 
-			if(debug){console.log("You're viewing something in the archive! TODO: Show simpler interface.");}
+			//if(debug){console.log("You're viewing something in the archive! TODO: Show simpler interface.");}
 			//var m = new Memento();
 			//m.datetime = mementoDateTimeHeader; 
 			//chrome.storage.local.set(m);

@@ -21,7 +21,6 @@ function setMementoButtonInteractivityBasedOnMementoDropdown(){
 
 function showArchiveOptions(){ //TODO: rename this function to say "toggle" instead of "show"
 	if($("#archiveOptions").css("marginLeft") == "-700px"){ //draw is already open, close it
-		if(debug){console.log("Hiding archive options");}
 		$("#archiveOptions").animate({
 			marginLeft: "0px",
 			opacity: "0.0"
@@ -33,12 +32,10 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 		});
 			
 	}else { //open the drawer
-		if(debug){console.log("Showing archive options");}
 		$("#archiveOptions").animate({
 			marginLeft: "-700px",
 			opacity: "1.0"
 		},500,null);
-		if(debug){console.log($("#archiveOptions").css("marginLeft"));}
 		 
 		//RESTORE view button behavior
 		setMementoButtonInteractivityBasedOnMementoDropdown(); //re-attach dropdown change to affect button state
@@ -99,13 +96,13 @@ function addArchiveNowButtons(addText){
 				$("#archiveNow_archivedotorg").html("View on Archive.org");
 				var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
 				var archiveURI = "http://web.archive.org"+parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
-				console.log(archiveURI);
+				//console.log(archiveURI);
 				$("#archiveNow_archivedotorg").attr("title",archiveURI);
 				$(".archiveNowSuccess").click(function(){
 					window.open($(this).attr("title"));
 				});
 			}else {
-				console.log(b);
+				//console.log(b);
 				
 			}
 			//console.log(c);
@@ -119,7 +116,7 @@ function addArchiveNowButtons(addText){
 			data: { coo: '', url: document.URL}
 		})
 		.done(function(a,b,c){
-			console.log(a);
+			//console.log(a);
 			if(b == "success"){
 				chrome.runtime.sendMessage({
 					method: "notify", 
@@ -130,7 +127,7 @@ function addArchiveNowButtons(addText){
 				$("#archiveNow_archivedottoday").html("View on Archive.today");
 				var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.today\/.*\"/g);
 				var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
-				console.log(archiveURI);
+				//console.log(archiveURI);
 				$("#archiveNow_archivedottoday").attr("title",archiveURI);
 				$(".archiveNowSuccess").click(function(){
 					window.open($(this).attr("title"));
@@ -162,7 +159,6 @@ function flip(){
 	if(shrinking){w = "50px"; }
 	
 	if(logoInFocus && w == "0px" && $("#mLogo").attr("src") == iconUrl){
-		if(debug){console.log("Stopping the rotation on front of logo!");}
 		$("#mLogo").css("opacity","1.0");
 		if(hideLogo){
 			$("#mLogo").attr("src",chrome.extension.getURL("images/icon128_error.png")); 
@@ -220,8 +216,6 @@ function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
 	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
 	delete dropdownOptions;
 	
-	if(debug){console.log("activeSelectioNDatetime = "+activeSelectionDatetime);}
-	
 	var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
 	
 	var previousMementoDisabledValue = "";
@@ -269,12 +263,7 @@ function displayDatepicker(){
 	var yearList = "<ul>\r\n";
 	
 	for(var key in Object.keys(yearbuckets)){
-		if(debug){
-			console.log(Object.keys(yearbuckets)[key]+" has "+yearbuckets[Object.keys(yearbuckets)[key]].length+" mementos");
-			console.log(Object.keys(yearbuckets)[key]+","+yearbuckets[Object.keys(yearbuckets)[key]].length);
-		}
 		yearList += "\t<li>"+Object.keys(yearbuckets)[key]+": "+yearbuckets[Object.keys(yearbuckets)[key]].length+"</li>\r\n";
-		//csv += "\r\n"+Object.keys(yearbuckets)[key]+","+yearbuckets[Object.keys(yearbuckets)[key]].length;
 	}
 	yearList += "</ul>";
 
@@ -293,7 +282,6 @@ function displayDatepicker(){
 
 	
      $("#datepickerOptions").append(getHighchartsData());
-     if(debug){console.log(tsv);}
      $("#tsv").text(tsv);
     
      
@@ -355,13 +343,11 @@ function showMementoCountsByYear(){
 	years = {};
 
 	var mems;
-	if(debug){console.log(jsonizedMementos);}
 	try {
 		mems = JSON.parse(jsonizedMementos);
 	}catch(e){
-		console.log(e);
+		//console.log(e);
 	}
-	if(debug){console.log(mems);}
 	
 	$(mems).each(function(){ //exclude garbage option select values
 		
@@ -428,10 +414,7 @@ function showMementoCountsByMonths(year){
 		}
 		months[monthName].push(years[year][memento]);
 	}
-	if(debug){
-		console.log("MONTHS:"); console.log(months);
-	}
-	
+
 	for(month in months){
 		var mString = "mementos";
 		if(months[month].length == 1){mString = mString.slice(0,-1);}
@@ -445,7 +428,7 @@ function showMementoCountsByMonths(year){
 		$("#day,#time").remove();
 		$("#drilldownBox ul#months li").removeClass("selectedOption");
 		$(this).addClass("selectedOption");
-		if(debug){console.log($(this).text().substr(0,$(this).text().indexOf(":")));}
+
 		showMementoCountsByDays(months[$(this).text().substr(0,$(this).text().indexOf(":"))]);
 	});
 	
@@ -492,7 +475,6 @@ function showMementoCountsByTime(mementos){
 		var mom = moment(mementos[memento].datetime);
 		var time = mom.format("HH:mm:ss:SSS");
 		
-		if(debug){console.log(mementos[memento]);}
 		if(!times[time]){
 			times[time] = [];
 			uris[time] = [];
@@ -510,7 +492,6 @@ function showMementoCountsByTime(mementos){
 	memCountList += "</ul>";
 	$("#drilldownBox").append(memCountList);
 	$("#drilldownBox ul#time li").click(function(){
-		if(debug){console.log($(this).attr("title"));}
 		window.location = $(this).attr("title");
 		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
 	});
