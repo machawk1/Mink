@@ -138,16 +138,26 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 	
-	if(request.method == "noMementosFromSecure"){
+	if(request.method == "getMementosFromSecureSource"){
 		logoInFocus = true;
 		hideLogo = true;
 	}
 	
+	if(request.method == "displayThisMementoData"){
+		//Parse the data received from the secure source and display the number of mementos
+		var tm = new Timemap(request.data);
+		displayUIBasedOnTimemap(tm);
+
+		return;
+	}
+	
 	if(request.method == "displayUI"){
-		console.log(request.timegate);
-		console.log(request.timemap);
-		console.log(request.uri);
-		console.log("-----");
+		if(debug){
+			console.log(request.timegate);
+			console.log(request.timemap);
+			console.log(request.uri);
+			console.log("-----");
+		}
 	}
 	displayUIBasedOnContext();	
 });
@@ -160,7 +170,7 @@ function queryTimegate(tgURI){
 		url: tgURI,
 		type: "HEAD"
 	}).done(function(data,textStatus,xhr,a,b){
-		console.log("Done querying timegate");
+		if(debug){console.log("Done querying timegate");}
 		if(xhr.status == 200){
 			console.log("xhr:");
 			console.log(xhr);
@@ -186,6 +196,34 @@ function queryTimegate(tgURI){
 	
 }
 
+function displayUIBasedOnTimemap(tm){
+	if(tm.mementos.length > 0){
+		logoInFocus = true; //stop rotating the logo, we have a list of mementos
+		chrome.runtime.sendMessage({
+			method: "notify", 
+			title: "TimeMap fetching complete.",
+			body: tm.mementos.length+"+ mementos returned."
+		}, function(response) {});
+		displayMementoCountAtopLogo();
+		
+		var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+		jsonizedMementos = "[";
+		$(tm.mementos).each(function(i,m){
+			selectBox += "\t<option value=\""+m.uri+"\">"+m.datetime+"</option>\r\n";
+			jsonizedMementos += "{\"uri\": \""+m.uri+"\", \"datetime\": \""+m.datetime+"\"},";
+		});
+		selectBox += "</select>";
+		jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
+		jsonizedMementos+= "]"; //make it valid JSON
+		
+		addInterfaceComponents(tm.mementos.length,1," thumbnails",selectBox);
+		$("#viewMementoButton").click(function(){viewDifferentMemento();});
+		setMementoButtonInteractivityBasedOnMementoDropdown();
+		//$("#countOverLogo").text(":)");//tm.mementos.length
+		
+	}
+}
+
 function createTimemapFromURI(uri,callback){
 	$.ajax({
 		url: uri,
@@ -195,32 +233,7 @@ function createTimemapFromURI(uri,callback){
 		if(xhr.status == 200){
 			//console.log(data);
 			var tm = new Timemap(data);
-			console.log(tm);
-			if(tm.mementos.length > 0){
-				logoInFocus = true; //stop rotating the logo, we have a list of mementos
-				chrome.runtime.sendMessage({
-					method: "notify", 
-					title: "TimeMap fetching complete.",
-					body: tm.mementos.length+"+ mementos returned."
-				}, function(response) {});
-				displayMementoCountAtopLogo();
-				
-				var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
-				jsonizedMementos = "[";
-				$(tm.mementos).each(function(i,m){
-					selectBox += "\t<option value=\""+m.uri+"\">"+m.datetime+"</option>\r\n";
-					jsonizedMementos += "{\"uri\": \""+m.uri+"\", \"datetime\": \""+m.datetime+"\"},";
-				});
-				selectBox += "</select>";
-				jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
-				jsonizedMementos+= "]"; //make it valid JSON
-				
-				addInterfaceComponents(tm.mementos.length,1," thumbnails",selectBox);
-				$("#viewMementoButton").click(function(){viewDifferentMemento();});
-				setMementoButtonInteractivityBasedOnMementoDropdown();
-				//$("#countOverLogo").text(":)");//tm.mementos.length
-				
-			}
+			displayUIBasedOnTimemap(tm);
 			
 		}	
 	});
@@ -276,6 +289,8 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 }
 	
 
+
+
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	if(!timemaploc){ //use the aggregator
 		timemaploc = proxy + window.location;
@@ -288,7 +303,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	if(timemaploc.indexOf("https://") > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		//timemaploc = "https"+timemaploc.substr(4);
 		chrome.runtime.sendMessage({
-					method: "getMementosForHTTSSource", 
+					method: "getMementosForHTTPSSource", 
 					value: timemaploc
 		}, function(response) {
 			//This will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call. Do the logic at this message's destination (above)

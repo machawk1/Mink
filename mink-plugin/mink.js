@@ -27,22 +27,39 @@ chrome.runtime.onMessage.addListener(
 			},function() {} 
 		 );
     
-    }else if(request.method == "getMementosForHTTSSource"){
+    }else if(request.method == "getMementosForHTTPSSource"){
+    	//ideally, we would talk to an HTTPS version of the aggregator,
+    	// instead, we will communicate with Mink's bg script to get around scheme issue
     	var uri = "http"+request.value.substr(4);
 		$.ajax({
 			url: uri,
 			type: "GET"
 		}).done(function(data,textStatus,xhr){
-			console.log("We should parse and return the mementos here via a response");
+			if(debug){
+				console.log("We should parse and return the mementos here via a response");
+				console.log(data);
+			}
+			chrome.tabs.query({
+				"active": true,
+				"currentWindow": true
+			}, function (tabs) {
+				chrome.tabs.sendMessage(tabs[0].id, {
+					"method": "displayThisMementoData",
+					"data": data
+				});
+			});
+			
 		}).fail(function(xhr,textStatus,error){
-			console.log("There was an error from mink.js");
-			console.log(textStatus);
-			console.log(error);
-			if(error == "Not Found"){
-				console.log("We have "+[].length+" mementos from the call to the archives using an HTTPS source!");
-				hideLogo = true;
-				showNoMementosInMinkUI();
-				//sendResponse({mementos: []}); //waste of a fuckin' time, that's what this callback is
+			if(debug){
+				console.log("There was an error from mink.js");
+				console.log(textStatus);
+				console.log(error);
+				if(error == "Not Found"){
+					console.log("We have "+[].length+" mementos from the call to the archives using an HTTPS source!");
+					hideLogo = true;
+					//getMementosForHTTPSWebsite();
+					//sendResponse({mementos: []}); //waste of a fuckin' time, that's what this callback is
+				}
 			}
 		});    	
     }
@@ -68,13 +85,13 @@ function hideMinkUI(){
     });
 }
 
-function showNoMementosInMinkUI(){
+function getMementosForHTTPSWebsite(){
  	chrome.tabs.query({
         "active": true,
         "currentWindow": true
     }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
-            "method": "noMementosFromSecure"
+            "method": "getMementosFromSecureSource"
         });
     });
 }
