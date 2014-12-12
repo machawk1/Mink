@@ -224,7 +224,7 @@ function displayUIBasedOnTimemap(tm){
 		jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
 		jsonizedMementos+= "]"; //make it valid JSON
 		
-		addInterfaceComponents(tm.mementos.length,1," thumbnails",selectBox);
+		addInterfaceComponents(tm.mementos.length,1," timemaps",selectBox);
 		$("#viewMementoButton").click(function(){viewDifferentMemento();});
 		setMementoButtonInteractivityBasedOnMementoDropdown();
 		//$("#countOverLogo").text(":)");//tm.mementos.length
