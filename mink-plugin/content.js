@@ -404,8 +404,14 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 								maxTimemapIndex = index;
 							}
 					}
+					var mostRecentTimemap = getMementosInTimeMap(tms[tms.length-1]); //TODO: use better "last item" syntax
+
 					console.log("There are at least "+maxTimemapIndex+" mementos for this URI.");
 					addInterfaceComponents(maxTimemapIndex+"+",tms.length,"TimeMaps","")
+			}
+
+			function getMementosInTimeMap(tm){
+					console.log(tm);
 			}
 
 			function createUIShowingMementos(timemaps,mementoURIs,relmatches){
