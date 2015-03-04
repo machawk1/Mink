@@ -362,7 +362,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 
 
-			console.log(alreadyAcquiredTimemaps);
+			//console.log(alreadyAcquiredTimemaps);
 
 			var mementoURIs = [];
 			$(matches).each(function(i,v){
@@ -390,24 +390,78 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				createUIShowingMementos(alreadyAcquiredTimemaps,mementoURIs,relmatches);
 			}else if(mLength == 0 && tLength > 0){
 					//we have an index of Timemaps
-					console.log("We have an index of Timemaps");
+					console.log("We have an index of Timemaps, count ="+timemapURIs.length);
 					createUIShowingTimemaps(timemapURIs);
 			}
 
 			//UNUSED: var iaSrc = chrome.extension.getURL("images/archives/ia.png");
 
-			function createUIShowingTimemaps(tms){
+
+			function createUIShowingTimemaps(tmURIs){
 					var maxTimemapIndex = 0;
-					for(var tm=0; tm<tms.length; tm++){
-							var index = parseInt(tms[tm].match(/\/([0-9]+)\//)[1],10);
+					for(var tm=0; tm<tmURIs.length; tm++){
+							var index = parseInt(tmURIs[tm].match(/\/([0-9]+)\//)[1],10);
 							if(index > maxTimemapIndex){
 								maxTimemapIndex = index;
 							}
 					}
-					var mostRecentTimemap = getMementosInTimeMap(tms[tms.length-1]); //TODO: use better "last item" syntax
 
-					console.log("There are at least "+maxTimemapIndex+" mementos for this URI.");
-					addInterfaceComponents(maxTimemapIndex+"+",tms.length,"TimeMaps","")
+					var pullOutUIDetails = {};
+					pullOutUIDetails.timemapCount = maxTimemapIndex;
+					pullOutUIDetails.urisCount = tmURIs.length;
+					pullOutUIDetails.timemapPlurality = "TimeMaps";
+					doSomethingWithURIMsInURIT(tmURIs[tmURIs.length-1],portable_createUIShowingMementosInTimeMap,pullOutUIDetails);
+
+					function doSomethingWithURIMsInURIT(uri_t, callback){
+						console.log("ARRGS");
+						console.log(arguments);
+						var args = arguments;
+						$.ajax({
+							url: uri_t,
+							type: "GET" /* The payload is in the response body, not the head */
+						}).done(function(data,textStatus,xhr){
+							console.log("Done fetching Timemap from URI!");
+							if(xhr.status == 200){
+								//console.log(data);
+								var tm = new Timemap(data);
+								console.log("memento count: "+tm.mementos.length);
+								console.log(tm.mementos[tm.mementos.length - 1]);
+								if(callback){
+									if(args[2]){callback(tm,args[2]); return;}//passes the callback function any other params passed in
+
+									callback(tm);
+								}
+							}
+						});
+					}
+
+
+
+
+					function portable_createUIShowingMementosInTimeMap(tm,pulloutDetails){
+						console.log("In callback, here are the deets");
+						console.log(pulloutDetails);
+
+						//var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
+						//var dtMatches = alreadyAcquiredTimemaps.match(datetimesInTimemapRegex);
+						//refactoring: create memento objects for iteration...not as efficient but an initial step at using a consistent interface
+						/*var mementoObjs = [];
+						$(dtMatches).each(function(i,v){
+							var m = new Memento();
+							m.uri = mementoURIs[i];
+							m.datetime = v.substring(10,dtMatches[0].length-1);
+							mementoObjs.push(m);
+						});*/
+
+						var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
+						for(var m=0; m<tm.mementos.length; m++){
+							selectBox += "\t<option value=\""+tm.mementos[m].uri+"\">"+tm.mementos[m].datetime+"</option>\r\n";
+						}
+						selectBox += "</select>";
+
+						addInterfaceComponents(pulloutDetails.timemapCount,pulloutDetails.urisCount,pulloutDetails.timemapPlurality,selectBox);
+					}
+
 			}
 
 			function getMementosInTimeMap(tm){
@@ -444,7 +498,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				var correctTMPlural = "timemap";
 				if(numberOfTimemaps > 1){correctTMPlural += "s";}
 
-				addInterfaceComponents(numberOfMementos,numberOfTimemaps,correctTMPlural,selectBox)
+				addInterfaceComponents(numberOfMementos,numberOfTimemaps,correctTMPlural,selectBox);
 			}
 
 
