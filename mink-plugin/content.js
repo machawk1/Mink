@@ -460,6 +460,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 						selectBox += "</select>";
 
 						addInterfaceComponents(pulloutDetails.timemapCount,pulloutDetails.urisCount,pulloutDetails.timemapPlurality,selectBox);
+						displayMementoCountAtopLogo();
+						$("#countOverLogo").text($("#countOverLogo").html()+"+");
 					}
 
 			}

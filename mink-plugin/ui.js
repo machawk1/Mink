@@ -49,7 +49,10 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
  */
 function displayMementoCountAtopLogo(){
 	//numberOfMementos
+	console.log("Displaying count:");
+
 	var count = $("#numberOfMementos").text();
+	console.log(count);
 	$("#mLogo").after("<span id=\"countOverLogo\">"+count+"</span>");
 	$("#countOverLogo").click(
 		function(){
