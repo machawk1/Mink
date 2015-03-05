@@ -410,11 +410,16 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 					pullOutUIDetails.timemapCount = maxTimemapIndex;
 					pullOutUIDetails.urisCount = tmURIs.length;
 					pullOutUIDetails.timemapPlurality = "TimeMaps";
-					doSomethingWithURIMsInURIT(tmURIs[tmURIs.length-1],portable_createUIShowingMementosInTimeMap,pullOutUIDetails);
+					doSomethingWithURIMsInURIT(tmURIs[tmURIs.length-1],[
+						function(tmN){
+							portable_createUIShowingMementosInTimeMap(tmN,pullOutUIDetails);
+						}
+					]);
 
-					function doSomethingWithURIMsInURIT(uri_t, callback){
+					function doSomethingWithURIMsInURIT(uri_t, callbacksArray){
 						console.log("ARRGS");
 						console.log(arguments);
+						var callbacks = callbacksArray;
 						var args = arguments;
 						$.ajax({
 							url: uri_t,
@@ -427,9 +432,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 								console.log("memento count: "+tm.mementos.length);
 								console.log(tm.mementos[tm.mementos.length - 1]);
 								if(callback){
-									if(args[2]){callback(tm,args[2]); return;}//passes the callback function any other params passed in
+									if(args[2]){callback(tm,args[2],callbacks.slice(1)); return;}//passes the callback function any other params passed in
 
-									callback(tm);
+									callback[0](tm,null,callbacks.slice(1));
 								}
 							}
 						});
@@ -437,21 +442,11 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 
 
-
-					function portable_createUIShowingMementosInTimeMap(tm,pulloutDetails){
+					/* Refactoring the code the prevent it from being dependent on some magical global variable, hence the duplication */
+					// This method is only called for the indexed TimeMap scenario and needs unification
+					function portable_createUIShowingMementosInTimeMap(tm,pulloutDetails,callbacks){
 						console.log("In callback, here are the deets");
 						console.log(pulloutDetails);
-
-						//var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
-						//var dtMatches = alreadyAcquiredTimemaps.match(datetimesInTimemapRegex);
-						//refactoring: create memento objects for iteration...not as efficient but an initial step at using a consistent interface
-						/*var mementoObjs = [];
-						$(dtMatches).each(function(i,v){
-							var m = new Memento();
-							m.uri = mementoURIs[i];
-							m.datetime = v.substring(10,dtMatches[0].length-1);
-							mementoObjs.push(m);
-						});*/
 
 						var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
 						for(var m=0; m<tm.mementos.length; m++){
@@ -462,6 +457,13 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 						addInterfaceComponents(pulloutDetails.timemapCount,pulloutDetails.urisCount,pulloutDetails.timemapPlurality,selectBox);
 						displayMementoCountAtopLogo();
 						$("#countOverLogo").text($("#countOverLogo").html()+"+");
+						$("#fetchAllMementosButton").click(function(){
+								logoInFocus = false;
+								flip();
+								console.log("This is where we fetch ALL THE MEMENTOS!");
+								//console.log(
+							});
+
 					}
 
 			}
