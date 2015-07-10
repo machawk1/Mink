@@ -1,6 +1,10 @@
 var debug = true;
 
 var proxy = "http://timetravel.mementoweb.org/timemap/link/";
+var aggregator_wdi_link = "http://labs.mementoweb.org/timemap/link/";
+var aggregator_wdi_json = "http://labs.mementoweb.org/timemap/json/";
+var aggregator_diy_link = "http://timetravel.mementoweb.org/timemap/link/";
+var aggregator_diy_json = "http://timetravel.mementoweb.org/timemap/json/";
 var numberOfTimemaps = 0;
 
 var embeddedTimemapRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g;
@@ -31,7 +35,6 @@ $("#minkContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
 setTimeout(flip,1000);
 
 $(document).ready(function(){
-	if(debug){console.log("Document ready!");}
 	$("#mLogo").click(function(){
 		showArchiveOptions();
 
@@ -264,7 +267,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	if(debug){console.log("In getMementos");}
 	chrome.storage.local.get(null,function(keys){
 		if(isEmpty(keys)){ 	//no link headers in the request. :(
-			if(debug){console.log("No link header");}
+			if(debug){console.log("No URI accessed did not have an HTTP link header");}
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
 			if(keys.datetime){ //isA memento
@@ -299,7 +302,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	if(!timemaploc){ //use the aggregator
-		timemaploc = proxy + window.location;
+		timemaploc = aggregator_wdi_json + window.location;
 	}
 
 	if(uri){
@@ -308,6 +311,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 	if(timemaploc.indexOf("https://") > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		//timemaploc = "https"+timemaploc.substr(4);
+		console.log("in https conditional");
 		chrome.runtime.sendMessage({
 					method: "getMementosForHTTPSSource",
 					value: timemaploc
@@ -319,197 +323,81 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	}
 
 	if(debug){console.log("About to fire off Ajax request for "+timemaploc);}
-	jsonizedMementos = "[";
 	$.ajax({
 		url: timemaploc,
 		type: "GET"
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
-			//TODO: Split this functionality up, it seeds to be called from elsewhere. HOLY GOD FUNCTION!
-			var othertimemaps = data.match(embeddedTimemapRegex);
-			if(debug){console.log(embeddedTimemapRegex);}
-
-			numberOfTimemaps++;
-			if(	uri && 											// URI passed in is a condition for pagination, else we'll assume the user just wants the first page
-				othertimemaps && othertimemaps.length > 0 &&
-				othertimemaps[0] != proxy + window.location && //the timemap contained references to other timemaps
-				!stopAtOneTimemap){
-
-				var timemapURI = othertimemaps[0].substring(1,othertimemaps[0].indexOf(">"));
-
-				$("#timemapCount").text(numberOfTimemaps);
-				if(numberOfTimemaps > 1){
-					$("#timemapPlurality").text("timemaps"); //fix the plurality while fetching more timemaps
-				}
-				console.log("Fetching timemap "+timemapURI);
-				//should run a filter function here instead of naive equality
-				if(!alreadyAcquiredTimemaps){
-					return getMementosWithTimemap(timemapURI,data);
-				}else {
-					return getMementosWithTimemap(timemapURI,alreadyAcquiredTimemaps+data);
-				}
-			}else if(!alreadyAcquiredTimemaps){ //only the initial timemap exists
-				alreadyAcquiredTimemaps = data;
-			}else {
-				if(debug){console.log("in else, how'd that happen?");}
+			console.log(data);
+			var numberOfMementos = data.mementos ? data.mementos.list.length : 0;
+			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
+			console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');
+			if(numberOfMementos > 0) {
+				revamp_createUIShowingMementosInTimeMap(data);
+				displayUIBasedOnTimemap(data);
+			}else if(numberOfTimeMaps > 0){
+					console.log("Show indexed TimeMap interface here");
+					revamp_countMementosInTimeMaps(data.timemap_index);
 			}
 
-			var matches = alreadyAcquiredTimemaps.match(mementosURIsWithinTimemapsRegex);
-			var matches_timemaps = alreadyAcquiredTimemaps.match(timemapsURIsWithinTimemapsRegex);
+			function revamp_createUIShowingMementosInTimeMap(tm){
+				var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
+				for(var m=0; m<tm.mementos.list.length; m++){
+					selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + tm.mementos.list[m].datetime + '</option>\r\n';
+				}
+				selectBox += '</select>';
 
-			var relmatches = alreadyAcquiredTimemaps.match(mementosInTimemapBasedOnRelAttributeRegex);
-			var relmatches_timemaps = alreadyAcquiredTimemaps.match(timemapsInTimemapBasedOnRelAttributeRegex);
+				var numberOfTimeMaps = 1; // TODO: Looks to be an object an not an array, need example where multiple are defined
+				addInterfaceComponents(tm.mementos.list.length,numberOfTimeMaps,"TimeMap",selectBox);
+				displayMementoCountAtopLogo();
+				$('#countOverLogo').text($('#countOverLogo').html());
+				logoInFocus = true; // Stop spinning the logo
 
-
-
-			//console.log(alreadyAcquiredTimemaps);
-
-			var mementoURIs = [];
-			$(matches).each(function(i,v){
-				mementoURIs.push(v.substring(1,v.indexOf(">")));
-			});
-
-			var timemapURIs = [];
-			$(matches_timemaps).each(function(i,v){
-				timemapURIs.push(v.substring(1,v.indexOf(">")));
-			});
-
-
-			var mLength = relmatches ? relmatches.length : 0;
-			var mURIsLength = mementoURIs ? mementoURIs.length : 0;
-			var tLength = relmatches_timemaps ? relmatches_timemaps.length : 0;
-			var tURIsLength = timemapURIs ? timemapURIs.length : 0;
-			if(debug){
-				console.log("rel matches (mementos) count = "+mLength+"    uris = "+mURIsLength);
-				console.log("rel matches (timemaps) count = "+tLength+"    uris = "+tURIsLength);
-			} //these values should be the same, else there's a parsing problem
-
-
-
-			if(mLength > 0){
-				createUIShowingMementos(alreadyAcquiredTimemaps,mementoURIs,relmatches);
-			}else if(mLength == 0 && tLength > 0){
-					//we have an index of Timemaps
-					console.log("We have an index of Timemaps, count ="+timemapURIs.length);
-					createUIShowingTimemaps(timemapURIs);
+				$('#fetchAllMementosButton').click(function(){
+						logoInFocus = false;
+						flip();
+					});
 			}
 
-			//UNUSED: var iaSrc = chrome.extension.getURL("images/archives/ia.png");
-
-
-			function createUIShowingTimemaps(tmURIs){
-					var maxTimemapIndex = 0;
-					for(var tm=0; tm<tmURIs.length; tm++){
-							var index = parseInt(tmURIs[tm].match(/\/([0-9]+)\//)[1],10);
-							if(index > maxTimemapIndex){
-								maxTimemapIndex = index;
-							}
-					}
-
-					var pullOutUIDetails = {};
-					pullOutUIDetails.timemapCount = maxTimemapIndex;
-					pullOutUIDetails.urisCount = tmURIs.length;
-					pullOutUIDetails.timemapPlurality = "TimeMaps";
-					doSomethingWithURIMsInURIT(tmURIs[tmURIs.length-1],[
-						function(tmN){
-							portable_createUIShowingMementosInTimeMap(tmN,pullOutUIDetails);
-						}
-					]);
-
-					function doSomethingWithURIMsInURIT(uri_t, callbacksArray){
-						console.log("ARRGS");
-						console.log(arguments);
-						var callbacks = callbacksArray;
-						var args = arguments;
-						$.ajax({
-							url: uri_t,
-							type: "GET" /* The payload is in the response body, not the head */
-						}).done(function(data,textStatus,xhr){
-							console.log("Done fetching Timemap from URI!");
-							if(xhr.status == 200){
-								//console.log(data);
-								var tm = new Timemap(data);
-								console.log("memento count: "+tm.mementos.length);
-								console.log(tm.mementos[tm.mementos.length - 1]);
-								if(callback){
-									if(args[2]){callback(tm,args[2],callbacks.slice(1)); return;}//passes the callback function any other params passed in
-
-									callback[0](tm,null,callbacks.slice(1));
-								}
-							}
-						});
-					}
-
-
-
-					/* Refactoring the code the prevent it from being dependent on some magical global variable, hence the duplication */
-					// This method is only called for the indexed TimeMap scenario and needs unification
-					function portable_createUIShowingMementosInTimeMap(tm,pulloutDetails,callbacks){
-						console.log("In callback, here are the deets");
-						console.log(pulloutDetails);
-
-						var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
-						for(var m=0; m<tm.mementos.length; m++){
-							selectBox += "\t<option value=\""+tm.mementos[m].uri+"\">"+tm.mementos[m].datetime+"</option>\r\n";
-						}
-						selectBox += "</select>";
-
-						addInterfaceComponents(pulloutDetails.timemapCount,pulloutDetails.urisCount,pulloutDetails.timemapPlurality,selectBox);
-						displayMementoCountAtopLogo();
-						$("#countOverLogo").text($("#countOverLogo").html()+"+");
-						$("#fetchAllMementosButton").click(function(){
-								logoInFocus = false;
-								flip();
-								console.log("This is where we fetch ALL THE MEMENTOS!");
-								//console.log(
+			function fetchTimeMap(uri){
+					var prom = new Promise(
+						function(resolve, reject) {
+							$.ajax({
+								url: uri
+							}).done(function(tmData){
+								resolve(tmData);
 							});
+						}
+					);
+					return prom;
+			}
 
+			function revamp_countMementosInTimeMaps(tms){
+					var totalNumberOfMementos = 0;
+					var tmFetchPromises = [];
+					for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
+						tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
 					}
+					console.log('Fetching ' + tms.length + 'TimeMaps');
+					Promise.all(tmFetchPromises).then(allTimeMapsFetched).catch(function(e) {
+						console.log("A promise failed");
+					});
 
+					return;
 			}
 
-			function getMementosInTimeMap(tm){
-					console.log(tm);
+			function allTimeMapsFetched(arrayOfTimeMaps){
+					console.log("Counting mementos for " + arrayOfTimeMaps.length + ' TimeMaps');
+					var totalNumberOfMementos = 0;
+					for(var tm = arrayOfTimeMaps.length - 1; tm >= 0; tm--){
+						totalNumberOfMementos += arrayOfTimeMaps[tm].mementos.list.length;
+					}
+					console.log('Found ' + totalNumberOfMementos);
+					addInterfaceComponents(totalNumberOfMementos,arrayOfTimeMaps.length,"TimeMaps","");
+					displayMementoCountAtopLogo();
 			}
 
-			function createUIShowingMementos(timemaps,mementoURIs,relmatches){
-				console.log("TODO: hoist regex vars after access and functionality are re-confirmed");
-				var datetimesInTimemapRegex = /datetime=\"(.*)\"/g;
-				var dtMatches = alreadyAcquiredTimemaps.match(datetimesInTimemapRegex);
-				//refactoring: create memento objects for iteration...not as efficient but an initial step at using a consistent interface
-				var mementoObjs = [];
-				$(dtMatches).each(function(i,v){
-					var m = new Memento();
-					m.uri = mementoURIs[i];
-					m.datetime = v.substring(10,dtMatches[0].length-1);
-					mementoObjs.push(m);
-				});
-
-				var selectBox = "<select id=\"mdts\"><option>Select a Memento to view</option>";
-				$(mementoObjs).each(function(i,m){
-					selectBox += "\t<option value=\""+m.uri+"\">"+m.datetime+"</option>\r\n";
-					jsonizedMementos += "{\"uri\": \""+m.uri+"\", \"datetime\": \""+m.datetime+"\"},";
-				});
-				jsonizedMementos = jsonizedMementos.slice(0,-1); //kill the last char (a comma)
-				jsonizedMementos+= "]"; //make it valid JSON
-
-				selectBox += "</select>";
-
-
-				var numberOfMementos = relmatches.length;
-				if(othertimemaps){numberOfMementos += "+";}
-
-				var correctTMPlural = "timemap";
-				if(numberOfTimemaps > 1){correctTMPlural += "s";}
-
-				addInterfaceComponents(numberOfMementos,numberOfTimemaps,correctTMPlural,selectBox);
-			}
-
-
-
-			$("#fetchAllMementosButton").click(function(){logoInFocus = false; flip(); getMementosWithTimemap(proxy + window.location,data);});
-			if(!othertimemaps){$("#fetchAllMementosButton").attr("disabled","disabled");}
-
+/* TODO: tie the history manipulation into the revamp design
 			$("#viewMementoButton").click(function(){
 				addToHistory(window.location,$("#mdts option:selected").text(),null,//save the URI-R and Memento-Datetime of option chosen to localStorage
 					function(){
@@ -518,6 +406,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				);
 
 			});
+*/
 
 			$("#helpButton").click(function(){
 				//alert("More information will be provided here about the recursive memento acquisition and parsing");

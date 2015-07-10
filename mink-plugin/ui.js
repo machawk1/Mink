@@ -48,11 +48,8 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
  * After the query for the memento list via the URI's timemap, show a numerical count atop the logo
  */
 function displayMementoCountAtopLogo(){
-	//numberOfMementos
-	console.log("Displaying count:");
-
 	var count = $("#numberOfMementos").text();
-	console.log(count);
+
 	$("#mLogo").after("<span id=\"countOverLogo\">"+count+"</span>");
 	$("#countOverLogo").click(
 		function(){
