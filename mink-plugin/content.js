@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var proxy = "http://timetravel.mementoweb.org/timemap/link/";
 var aggregator_wdi_link = "http://labs.mementoweb.org/timemap/link/";
@@ -196,12 +196,18 @@ function queryTimegate(tgURI){
 			console.log(xhr.getAllResponseHeaders());
 			var linkHeaderStr = xhr.getResponseHeader("Link");
 			var tm = new Timemap(linkHeaderStr);
+			if(tm.timemap && tm.timemap != ""){
+					// TODO, query this timemap
+			}
 			console.log("We have the ultimate timemap");
 			console.log("From the timegate: "+(tm.timegate ? "TimeGate, ":"")+(tm.timemap ? " TimeMap, ":"")+"and "+tm.mementos.length +" mementos");
 			console.log(tm);
-			if(tm.timemap){
-				createTimemapFromURI(tm.timemap); //TODO prevent crawler trap/infinite querying
+			if(tm.timemap){ // Paginated TimeMaps likely
+				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.self);
+				createTimemapFromURI(tm.timemap);
+				return;
 			}
+
 			//console.log(tm.mementos);
 		}else if(xhr.status == 302){
 			console.log("Do something with 302 here");
@@ -234,17 +240,24 @@ function displayUIBasedOnTimemap(tm){
 	}
 }
 
-function createTimemapFromURI(uri,callback){
+function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
+	if(!accumulatedArrayOfTimemaps){accumulatedArrayOfTimemaps = [];}
+
 	$.ajax({
 		url: uri,
 		type: 'GET' /* The payload is in the response body, not the head */
 	}).done(function(data,textStatus,xhr){
-		console.log("Done fetching Timemap from URI!");
 		if(xhr.status == 200){
-			//console.log(data);
 			var tm = new Timemap(data);
-			displayUIBasedOnTimemap(tm);
-
+			tm.mementos.list = tm.mementos;
+			//delete tm.mementos;
+			if(tm.timemap && tm.self && tm.timemap != tm.self){ // Paginated TimeMaps likely
+				//Recursing to find more TMs
+				return createTimemapFromURI(tm.timemap,accumulatedArrayOfTimemaps.concat(tm));
+			}
+			console.log(accumulatedArrayOfTimemaps.concat(tm));
+			console.log("resolving");
+			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm));
 		}
 	});
 }
@@ -278,12 +291,24 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 					console.log("We have a timemap, let's do more! The timemap:");
 					console.log(keys.timemap);
 				}
+				console.log("coverage test 1");
 				createTimemapFromURI(keys.timemap);
 			}else if(keys.timegate){
 				if(debug){
 					console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
 				}
-				queryTimegate(keys.timegate);
+				//todo: set this up using promises to allow recursion, callback with returned arrays
+				var prom = new Promise(
+					function(resolve, reject) {
+						queryTimegate(keys.timegate);
+					}
+				).then(function(tms){
+					console.log("accepted:");
+					console.log(tms);
+				},function(val){
+					console.log("rejected");
+				});;
+				//queryTimegate(keys.timegate);
 				return;
 			}else { // We had some link headers but none that were related to memento, so act as if we had no link header
 				getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
