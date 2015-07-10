@@ -420,7 +420,6 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			});
 
 
-			console.log("TODO: find out the number of mementos by not using this array length");
 			if(false && dtMatches.length > 1002){
 				//replace dropdown with a button to access a better UI is there are many mementos
 				var dateUIButton = "<input type=\"button\" value=\"Select a Memento\" id=\"dateUIButton\" />";
