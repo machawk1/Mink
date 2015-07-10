@@ -323,7 +323,6 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	);
 
 	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
-		showMementoCountsByYear();
 		setActiveButtonStyle('largeNumberOfMementoOption2');
 	}
 
