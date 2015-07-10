@@ -16,6 +16,7 @@
        "webRequestBlocking",
        "tabs",
        "storage",
+       "unlimitedStorage",
        "cookies",
        "notifications",
        "contextMenus"
@@ -23,24 +24,24 @@
     "content_scripts": [
     {
     	"js": [
-    		"js/jquery-2.1.1.min.js", 
+    		"js/jquery-2.1.1.min.js",
     		"jQuery-Scoped/jquery.scoped.js",
     		"moment-with-langs.min.js",
     		"jquery.miller.js/js/jquery.miller.js",
-    		
+
     		"bootstrap-daterangepicker/daterangepicker.js",
     		"bootstrap/js/bootstrap.min.js",
 
     		"d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
     		"Highcharts-4.0.3/js/highcharts.js","Highcharts-4.0.3/js/modules/data.js","Highcharts-4.0.3/js/modules/drilldown.js",
 			"highchartsdata.js","doThatHighchartsThingYouDo.js",
-			
+
     		"ui.js","content.js","timemap.js"],
     	"matches": ["<all_urls>"],
     	"css": ["style.css",
     		"font-awesome-4.0.3/css/font-awesome-modified.css",
     		"jquery.miller.js/css/jquery.miller.css"
-    		
+
     		]
     }
   	],

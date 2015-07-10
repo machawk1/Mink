@@ -336,8 +336,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				revamp_createUIShowingMementosInTimeMap(data);
 				displayUIBasedOnTimemap(data);
 			}else if(numberOfTimeMaps > 0){
-					console.log("Show indexed TimeMap interface here");
-					revamp_countMementosInTimeMaps(data.timemap_index);
+			  console.log("Show indexed TimeMap interface here");
+			  revamp_fetchTimeMaps(data.timemap_index);
 			}
 
 			function revamp_createUIShowingMementosInTimeMap(tm){
@@ -372,29 +372,48 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 					return prom;
 			}
 
-			function revamp_countMementosInTimeMaps(tms){
-					var totalNumberOfMementos = 0;
+			function revamp_fetchTimeMaps(tms){
 					var tmFetchPromises = [];
 					for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
 						tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
 					}
-					console.log('Fetching ' + tms.length + 'TimeMaps');
-					Promise.all(tmFetchPromises).then(allTimeMapsFetched).catch(function(e) {
-						console.log("A promise failed");
+					console.log('Fetching ' + tms.length + ' TimeMaps');
+					Promise.all(tmFetchPromises).then(storeTimeMapData).catch(function(e) {
+						console.log("A promise failed: ");
+						console.log(e);
 					});
 
 					return;
 			}
 
-			function allTimeMapsFetched(arrayOfTimeMaps){
+			function countNumberOfMementos(arrayOfTimeMaps){
 					console.log("Counting mementos for " + arrayOfTimeMaps.length + ' TimeMaps');
 					var totalNumberOfMementos = 0;
 					for(var tm = arrayOfTimeMaps.length - 1; tm >= 0; tm--){
 						totalNumberOfMementos += arrayOfTimeMaps[tm].mementos.list.length;
 					}
 					console.log('Found ' + totalNumberOfMementos);
-					addInterfaceComponents(totalNumberOfMementos,arrayOfTimeMaps.length,"TimeMaps","");
-					displayMementoCountAtopLogo();
+					return totalNumberOfMementos;
+			}
+
+			function storeTimeMapData(arrayOfTimeMaps){
+					chrome.storage.local.set({
+						'uri_r': arrayOfTimeMaps[0].original_uri,
+						'timemaps': arrayOfTimeMaps
+					},displayUIBasedOnStoredTimeMapData); //end set
+			}
+
+			function displayUIBasedOnStoredTimeMapData(){
+				console.log(chrome.runtime.lastError);
+				chrome.storage.local.get('timemaps',
+					function(localStore){
+						var tms = localStore.timemaps;
+						var numberOfMementos = countNumberOfMementos(tms);
+						addInterfaceComponents(numberOfMementos, tms.length, 'TimeMaps', '');
+						displayMementoCountAtopLogo();
+					}
+				);
+
 			}
 
 /* TODO: tie the history manipulation into the revamp design

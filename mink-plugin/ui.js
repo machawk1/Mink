@@ -304,6 +304,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 
 	if(nMementos > 101) { // 101 is a "a lot", don't show dropdown, only drilldown
 		viewMementoButton = '';
+		//showMementoCountsByYear();
 	}
 
 	$('#archiveOptions').html('<div id="largerNumberButtons"><p>List Mementos By:</p>' +
