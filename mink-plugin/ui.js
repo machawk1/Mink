@@ -1,8 +1,8 @@
 var shrinking = true; // State variable to show whether the logo is currently shrinking in size
 var logoInFocus = false; //used as a conditional for when to stop spinning the logo
 var hideLogo = false;
-var iconUrl = chrome.extension.getURL("images/icon128.png");
-var iconUrlFlipped = chrome.extension.getURL("images/icon128flipped.png");
+var iconUrl = chrome.extension.getURL('images/icon128.png');
+var iconUrlFlipped = chrome.extension.getURL('images/icon128flipped.png');
 var previousPanelHTML = ""; //a means of saving the UI to revert to once in the archiveNow panel
 
 function setMementoButtonInteractivityBasedOnMementoDropdown(){
@@ -26,8 +26,11 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 			opacity: "0.0"
 		},500,function(){
 			if(previousPanelHTML != ""){ //revert to original UI
+				if(previousPanelHTML.indexOf("Archive now?") > -1){return;}
 				$("#archiveOptions").html(previousPanelHTML);
-				previousPanelHTML = "";
+				//previousPanelHTML = "";
+			}else {
+					console.log("NOT restoring");
 			}
 		});
 
@@ -41,6 +44,8 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 		setMementoButtonInteractivityBasedOnMementoDropdown(); //re-attach dropdown change to affect button state
 		$("#viewMementoButton").attr("disabled","disabled"); //reset button state to disabled (default dropdown view)
 		$("#viewMementoButton").click(function(){window.location = $("#mdts").val();}); //re-attach button functionality
+		//TODO: restore archiveNow and helpButton behavior
+		addExtraButtonBehaviors();
 	}
 }
 
@@ -71,8 +76,8 @@ function addArchiveNowButtons(addText){
 			addText + "Archive now? " +
 			"<button id=\"archiveNow_archivedotorg\">Archive.org</button>"+
 			"<button id=\"archiveNow_archivedottoday\">Archive.today</button>"+
-			"<button id=\"archiveNow_webcite\"     disabled=\"disabled\">WebCite</button>"+
-			"<button id=\"archiveNow_permadotcc\"  disabled=\"disabled\">Perma.cc</button>"+
+			//"<button id=\"archiveNow_webcite\"     disabled=\"disabled\">WebCite</button>"+
+			//"<button id=\"archiveNow_permadotcc\"  disabled=\"disabled\">Perma.cc</button>"+
 			"<button id=\"archiveNow_all\"         >All</button>"+
 			//"<button id=\"archiveNow_org\"         >Other...</button>"+
 			"</div>"
@@ -208,7 +213,7 @@ function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
 			selectedIndex = i;
 		}
 
-		dropdownOptions += "\t<option value=\""+$(v).attr("uri")+"\" "+selectedString+">"+$(v).attr("datetime")+"</option>\r\n";
+		dropdownOptions += '\t<option value="' + $(v).attr('uri') + '" ' + selectedString + '>' + $(v).attr('datetime') + '</option>\r\n';
 	});
 	var selectBox = "<select id=\"mdts\" alt=\""+(selectedIndex + 1)+"\"><option>Select a Memento to view</option>" +
 					dropdownOptions +
@@ -295,7 +300,19 @@ function displayDatepicker(){
 }
 
 
+function addExtraButtonBehaviors(){
+	$("#helpButton").click(function(){
+		window.open("http://matkelly.com/mink");
+	});
 
+	$("#archiveNow").click(function(){
+		if($("#archiveOptions").html().indexOf("Archive now?") == -1){// Save the HTML from the original panel
+			previousPanelHTML = $("#archiveOptions").html();
+		}
+		$("#archiveOptions").html("");
+		addArchiveNowButtons();
+	});
+}
 
 function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
@@ -326,6 +343,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 		setActiveButtonStyle('largeNumberOfMementoOption2');
 	}
 
+	addExtraButtonBehaviors();
 
 	$(".largeNumberOfMementoOption").click(function(){
 		setActiveButtonStyle($(this).attr('id'));
