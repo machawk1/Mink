@@ -383,7 +383,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 	if(timemaploc.indexOf("https://") > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		//timemaploc = "https"+timemaploc.substr(4);
-		console.log("in https conditional");
+		console.warn("Mink still has issues with Cross-scheme querying (this is an https site).");
 		chrome.runtime.sendMessage({
 					method: "getMementosForHTTPSSource",
 					value: timemaploc
