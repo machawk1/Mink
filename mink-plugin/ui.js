@@ -298,14 +298,17 @@ function displayDatepicker(){
 
 
 function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
-	var viewMementoButton = '<input type="button" value=\"View" id="viewMementoButton" disabled="disabled" />';
+	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
 	var helpButton = '<input type="button" value="?" id="helpButton" />';
+
+	if(nMementos > 101) { // 101 is a "a lot", don't show dropdown, only drilldown
+		viewMementoButton = '';
+	}
 
 	$('#archiveOptions').html('<div id="largerNumberButtons"><p>List Mementos By:</p>' +
 		'<button class="largeNumberOfMementoOption activeButton" id="largeNumberOfMementoOption1"><span>&#9673;</span>Dropdown</button>' +
 		'<button class="largeNumberOfMementoOption" id="largeNumberOfMementoOption2"><span>&#9678;</span>Drill Down</button>' +
-		//'<button class="largeNumberOfMementoOption" id="largeNumberOfMementoOption3"><span>&#9678;</span>Foo Method</button>' +
 		'</div>' +
 		'<div id="drilldownBox" style="display: none;"></div>' +
 		'<span id="info">' +
