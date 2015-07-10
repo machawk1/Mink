@@ -301,10 +301,10 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
 	var helpButton = '<input type="button" value="?" id="helpButton" />';
+  var LARGE_NUMBER_OF_MEMENTOS_THRESHOLD = 101;
 
-	if(nMementos > 101) { // 101 is a "a lot", don't show dropdown, only drilldown
+	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
 		viewMementoButton = '';
-		showMementoCountsByYear();
 	}
 
 	$('#archiveOptions').html('<div id="largerNumberButtons"><p>List Mementos By:</p>' +
@@ -321,17 +321,27 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 		archiveNowButton +
 		helpButton
 	);
+
+	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
+		showMementoCountsByYear();
+		setActiveButtonStyle('largeNumberOfMementoOption2');
+	}
+
+
 	$(".largeNumberOfMementoOption").click(function(){
-		var activeButtonId = "#"+$(this).attr("id");
-
-		$(".largeNumberOfMementoOption").removeClass("activeButton");
-		$(".largeNumberOfMementoOption span").text("◎");
-		$(activeButtonId+" span").text("◉");
-		$(activeButtonId).addClass("activeButton");
-
-		if(activeButtonId == "#largeNumberOfMementoOption2"){showMementoCountsByYear();}
-		else {destroyMementoCountsByYear();}
+		setActiveButtonStyle($(this).attr('id'));
 	});
+
+	function setActiveButtonStyle(bId){
+		var activeButtonId = '#' + bId;
+		$('.largeNumberOfMementoOption').removeClass("activeButton");
+		$('.largeNumberOfMementoOption span').text("◎");
+		$(activeButtonId + ' span').text("◉");
+		$(activeButtonId).addClass('activeButton');
+
+		if(activeButtonId == '#largeNumberOfMementoOption2'){showMementoCountsByYear();}
+		else {destroyMementoCountsByYear();}
+	}
 
 }
 
@@ -352,10 +362,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
-			console.log("We have the items!");
-			console.log(localStore.timemaps);
-			//TODO: organize mementos by year
-
 			if($("#drilldownBox").css("display") == "none" && $("#drilldownBox").html() != ""){
 				$("#drilldownBox").css("display","block");
 				return;
@@ -364,7 +370,7 @@ function showMementoCountsByYear(){
 			years = {};
 			var yearDataFromLastIteration = "";
 
-			function updateProgress(){
+			function updateProgress(){ /* For debugging */
 				console.clear();
 				var yearData = "";
 				for(var year in years){
@@ -376,7 +382,7 @@ function showMementoCountsByYear(){
 				setTimeout(updateProgress,3000);
 			}
 
-			setTimeout(updateProgress,3000);
+			//setTimeout(updateProgress,3000);
 			$(localStore.timemaps).each(function(tmI,tm){
 				$(tm.mementos.list).each(function(mI,m){
 					var dt = moment(m.datetime);

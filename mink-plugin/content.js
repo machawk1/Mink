@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 var proxy = "http://timetravel.mementoweb.org/timemap/link/";
 var aggregator_wdi_link = "http://labs.mementoweb.org/timemap/link/";
@@ -328,15 +328,16 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		type: "GET"
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
-			console.log(data);
+			if(debug){console.log(data);}
 			var numberOfMementos = data.mementos ? data.mementos.list.length : 0;
 			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
-			console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');
+			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
+
 			if(numberOfMementos > 0) {
 				revamp_createUIShowingMementosInTimeMap(data);
 				displayUIBasedOnTimemap(data);
 			}else if(numberOfTimeMaps > 0){
-			  console.log("Show indexed TimeMap interface here");
+			  if(debug){console.log("Show indexed TimeMap interface here");}
 			  revamp_fetchTimeMaps(data.timemap_index);
 			}
 
@@ -377,7 +378,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 					for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
 						tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
 					}
-					console.log('Fetching ' + tms.length + ' TimeMaps');
+					if(debug){console.log('Fetching ' + tms.length + ' TimeMaps');}
 					Promise.all(tmFetchPromises).then(storeTimeMapData).catch(function(e) {
 						console.log("A promise failed: ");
 						console.log(e);
@@ -387,12 +388,14 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			}
 
 			function countNumberOfMementos(arrayOfTimeMaps){
-					console.log("Counting mementos for " + arrayOfTimeMaps.length + ' TimeMaps');
+					if(debug){console.log("Counting mementos for " + arrayOfTimeMaps.length + ' TimeMaps');}
+
 					var totalNumberOfMementos = 0;
 					for(var tm = arrayOfTimeMaps.length - 1; tm >= 0; tm--){
 						totalNumberOfMementos += arrayOfTimeMaps[tm].mementos.list.length;
 					}
-					console.log('Found ' + totalNumberOfMementos);
+
+					if(debug){console.log('Found ' + totalNumberOfMementos);}
 					return totalNumberOfMementos;
 			}
 
@@ -401,16 +404,6 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 						'uri_r': arrayOfTimeMaps[0].original_uri,
 						'timemaps': arrayOfTimeMaps
 					}, displayUIBasedOnStoredTimeMapData); //end set
-			}
-
-			function getTimeMapDataFromStorage(resp){
-
-				console.log("From content.js - getTimeMapFromStorage");
-				chrome.storage.local.get('timemaps',
-					function(localStore){
-						console.log("We have the items!");
-
-					});
 			}
 
 			function displayUIBasedOnStoredTimeMapData(){
