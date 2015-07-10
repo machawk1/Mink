@@ -27,8 +27,8 @@ $("#minkContainer").append("<style type=\"text/css\" scoped=\"scoped\">\r\n"+
 	"#minkContainer input[type=button]:disabled {opacity: 0.25; }"+
 "</style>");
 //$.scoped();
-$("#minkContainer").append("<div id=\"archiveOptions\"></div>");
-$("#minkContainer").append("<img src=\""+iconUrl+"\" id=\"mLogo\" />");
+$("#minkContainer").append('<div id="archiveOptions"></div>');
+$("#minkContainer").append('<img src="' + iconUrl + '" id="mLogo" />');
 
 
 
@@ -400,11 +400,20 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 					chrome.storage.local.set({
 						'uri_r': arrayOfTimeMaps[0].original_uri,
 						'timemaps': arrayOfTimeMaps
-					},displayUIBasedOnStoredTimeMapData); //end set
+					}, displayUIBasedOnStoredTimeMapData); //end set
+			}
+
+			function getTimeMapDataFromStorage(resp){
+
+				console.log("From content.js - getTimeMapFromStorage");
+				chrome.storage.local.get('timemaps',
+					function(localStore){
+						console.log("We have the items!");
+
+					});
 			}
 
 			function displayUIBasedOnStoredTimeMapData(){
-				console.log(chrome.runtime.lastError);
 				chrome.storage.local.get('timemaps',
 					function(localStore){
 						var tms = localStore.timemaps;

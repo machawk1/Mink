@@ -304,7 +304,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 
 	if(nMementos > 101) { // 101 is a "a lot", don't show dropdown, only drilldown
 		viewMementoButton = '';
-		//showMementoCountsByYear();
+		showMementoCountsByYear();
 	}
 
 	$('#archiveOptions').html('<div id="largerNumberButtons"><p>List Mementos By:</p>' +
@@ -339,56 +339,75 @@ function destroyMementoCountsByYear(){
 	$("#drilldownBox").css("display","none");
 }
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.method == "test")
+		 console.log("Received message!");
+		else
+		 console.log("some other method");
+      //sendResponse({data: localStorage[request.key]});
+    //else
+  //    sendResponse({}); // snub them.
+});
+
 function showMementoCountsByYear(){
-	//if the expensive operation was done once, just resurrect the data from before
-	// Also, if nothing has been done (due to few mementos), do it now
-	if($("#drilldownBox").css("display") == "none" && $("#drilldownBox").html() != ""){
-		$("#drilldownBox").css("display","block");
-		return;
-	}
-	years = null;
-	years = {};
+	chrome.storage.local.get('timemaps',
+		function(localStore){
+			console.log("We have the items!");
+			console.log(localStore.timemaps);
+			//TODO: organize mementos by year
 
-	var mems;
-	try {
-		mems = JSON.parse(jsonizedMementos);
-	}catch(e){
-		//console.log(e);
-	}
+			if($("#drilldownBox").css("display") == "none" && $("#drilldownBox").html() != ""){
+				$("#drilldownBox").css("display","block");
+				return;
+			}
+			years = null;
+			years = {};
+			var yearDataFromLastIteration = "";
 
-	$(mems).each(function(){ //exclude garbage option select values
+			function updateProgress(){
+				console.clear();
+				var yearData = "";
+				for(var year in years){
+					yearData += year + ': ' +years[year].length + '\n';
+				}
+				console.log(yearData)
+				if(yearData == yearDataFromLastIteration) return;
+				yearDataFromLastIteration = yearData;
+				setTimeout(updateProgress,3000);
+			}
 
-		var dt = moment($(this)[0].datetime);
+			setTimeout(updateProgress,3000);
+			$(localStore.timemaps).each(function(tmI,tm){
+				$(tm.mementos.list).each(function(mI,m){
+					var dt = moment(m.datetime);
+					if(!years[dt.year()]){years[dt.year()] = [];}
+					years[dt.year()].push(m);
+				})
+			});
 
-		if(!years[dt.year()]){years[dt.year()] = [];}
 
-		var m = new Memento();
-		m.uri = $(this)[0].uri;
-		m.datetime = $(this)[0].datetime;
-		years[dt.year()].push(m);
-	});
+			var memCountList = "<ul id=\"years\">";
+			for(var year in years){
+				var mString = "mementos";
+				if(years[year].length == 1){mString = mString.slice(0,-1);}
+				memCountList += "<li>"+year+": "+years[year].length+" "+mString+"</li>\r\n"
+			}
 
-	var memCountList = "<ul id=\"years\">";
-	for(var year in years){
-		var mString = "mementos";
-		if(years[year].length == 1){mString = mString.slice(0,-1);}
-		memCountList += "<li>"+year+": "+years[year].length+" "+mString+"</li>\r\n"
-	}
+			memCountList += "</ul>";
+			$("#drilldownBox").append(memCountList);
+			$("#drilldownBox ul#years li").click(function(){
+				$("#month,#day,#time").remove();
+				$("#drilldownBox ul#years li").removeClass("selectedOption");
+				$(this).addClass("selectedOption");
+				showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(":")));
+			});
 
-	memCountList += "</ul>";
-	$("#drilldownBox").append(memCountList);
-	$("#drilldownBox ul#years li").click(function(){
-		$("#month,#day,#time").remove();
-		$("#drilldownBox ul#years li").removeClass("selectedOption");
-		$(this).addClass("selectedOption");
-		showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(":")));
-	});
+			//adjust positional offset of year display box based on contents
+			adjustDrilldownPositionalOffset();
 
-	//adjust positional offset of year display box based on contents
-	adjustDrilldownPositionalOffset();
-
-	//ensure that the new display is visible (it won't be without this for few mementos)
-	$("#drilldownBox").css("display","block");
+			//ensure that the new display is visible (it won't be without this for few mementos)
+			$("#drilldownBox").css("display","block");
+	}); //end local.get(
 };
 
 
