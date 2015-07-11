@@ -196,19 +196,14 @@ function queryTimegate(tgURI){
 			console.log(xhr.getAllResponseHeaders());
 			var linkHeaderStr = xhr.getResponseHeader("Link");
 			var tm = new Timemap(linkHeaderStr);
-			if(tm.timemap && tm.timemap != ""){
-					// TODO, query this timemap
-			}
+
 			console.log("We have the ultimate timemap");
 			console.log("From the timegate: "+(tm.timegate ? "TimeGate, ":"")+(tm.timemap ? " TimeMap, ":"")+"and "+tm.mementos.length +" mementos");
 			console.log(tm);
 			if(tm.timemap){ // Paginated TimeMaps likely
-				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.self);
-				createTimemapFromURI(tm.timemap);
-				return;
+				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.self);}
+				Promise.resolve(createTimemapFromURI(tm.timemap));
 			}
-
-			//console.log(tm.mementos);
 		}else if(xhr.status == 302){
 			console.log("Do something with 302 here");
 		}
@@ -258,6 +253,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
 			console.log(accumulatedArrayOfTimemaps.concat(tm));
 			console.log("resolving");
 			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm));
+			console.log("coverage test 3");
 		}
 	});
 }
@@ -305,9 +301,11 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				).then(function(tms){
 					console.log("accepted:");
 					console.log(tms);
+					//revamp_createUIShowingMementosInTimeMap(tm);
+				//	revamp_fetchTimeMaps(tms);
 				},function(val){
 					console.log("rejected");
-				});;
+				});
 				//queryTimegate(keys.timegate);
 				return;
 			}else { // We had some link headers but none that were related to memento, so act as if we had no link header
