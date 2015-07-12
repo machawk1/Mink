@@ -389,7 +389,11 @@ function displayUIBasedOnStoredTimeMapData(){
 			var tms = localStore.timemaps;
 
 			var numberOfMementos = countNumberOfMementos(tms);
-			addInterfaceComponents(numberOfMementos, tms.length, 'TimeMaps', '');
+			var tmPlurality = 'TimeMap';
+			if(tms > 1) {
+				tmPlurality += 's';
+			}
+			addInterfaceComponents(numberOfMementos, tms.length, tmPlurality, '');
 			displayMementoCountAtopLogo();
 			logoInFocus = true;
 		}
