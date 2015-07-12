@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 var proxy = "http://timetravel.mementoweb.org/timemap/link/";
 var aggregator_wdi_link = "http://labs.mementoweb.org/timemap/link/";
@@ -186,21 +186,16 @@ function queryTimegate(tgURI){
 	}).done(function(data,textStatus,xhr,a,b){
 		if(debug){console.log("Done querying timegate");}
 		if(xhr.status == 200){
-			console.log("xhr:");
-			console.log(xhr);
-			console.log("data:");
-			console.log(data);
-			console.log("textStatus");
-			console.log(textStatus);
-			console.log("xhr responseheaders");
-			console.log(xhr.getAllResponseHeaders());
 			var linkHeaderStr = xhr.getResponseHeader("Link");
 			var tm = new Timemap(linkHeaderStr);
 
-			console.log("We have the ultimate timemap");
-			console.log("From the timegate: "+(tm.timegate ? "TimeGate, ":"")+(tm.timemap ? " TimeMap, ":"")+"and "+tm.mementos.length +" mementos");
-			console.log(tm);
-			if(tm.timemap){ // Paginated TimeMaps likely
+			if(debug){
+				console.log("We have the ultimate timemap");
+			  console.log("From the timegate: "+(tm.timegate ? "TimeGate, ":"")+(tm.timemap ? " TimeMap, ":"")+"and "+tm.mementos.length +" mementos");
+			  console.log(tm);
+			}
+
+			if(tm.timemap){ // Paginated TimeMaps likely (e.g., http://mementoweb.org/guide/)
 				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.self);}
 				Promise.resolve(createTimemapFromURI(tm.timemap));
 			}
@@ -244,16 +239,21 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
 			var tm = new Timemap(data);
-			tm.mementos.list = tm.mementos;
+			// Move data from tm.mementos as array to tm.mementos as an object and
+			//  tm.mementos.list as array to conform to JSON API from LANL aggregator
+			var mementosFromTimeMap = tm.mementos;
+			tm.mementos = null;
+			tm.mementos = {};
+			tm.mementos.list = mementosFromTimeMap;
+
 			//delete tm.mementos;
 			if(tm.timemap && tm.self && tm.timemap != tm.self){ // Paginated TimeMaps likely
 				//Recursing to find more TMs
 				return createTimemapFromURI(tm.timemap,accumulatedArrayOfTimemaps.concat(tm));
 			}
-			console.log(accumulatedArrayOfTimemaps.concat(tm));
-			console.log("resolving");
-			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm));
-			console.log("coverage test 3");
+			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm)).then(function(tms){
+				storeTimeMapData(tms);
+			});
 		}
 	});
 }
@@ -301,6 +301,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				).then(function(tms){
 					console.log("accepted:");
 					console.log(tms);
+					logoInFocus = true;
 					//revamp_createUIShowingMementosInTimeMap(tm);
 				//	revamp_fetchTimeMaps(tms);
 				},function(val){
@@ -386,9 +387,11 @@ function displayUIBasedOnStoredTimeMapData(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
 			var tms = localStore.timemaps;
+
 			var numberOfMementos = countNumberOfMementos(tms);
 			addInterfaceComponents(numberOfMementos, tms.length, 'TimeMaps', '');
 			displayMementoCountAtopLogo();
+			logoInFocus = true;
 		}
 	);
 
