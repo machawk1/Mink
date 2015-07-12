@@ -418,12 +418,6 @@ function showMementoCountsByYear(){
 
 			memCountList += "</ul>";
 
-			if($("#drilldownBox").length){ // Exists?
-				$("#drilldownBox").css("display","block"); //simply display and do not re-add to the DOM, for 92.
-				return;
-
-			}
-
 			$("#drilldownBox").append(memCountList);
 			$("#drilldownBox ul#years li").click(function(){
 				$("#month,#day,#time").remove();
