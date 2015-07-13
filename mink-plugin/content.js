@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var proxy = "http://timetravel.mementoweb.org/timemap/link/";
 var aggregator_wdi_link = "http://labs.mementoweb.org/timemap/link/";
@@ -207,6 +207,8 @@ function queryTimegate(tgURI){
 }
 
 function displayUIBasedOnTimemap(tm){
+	console.log("likely obsolete interface");
+
 	if(tm.mementos.length > 0){
 		logoInFocus = true; //stop rotating the logo, we have a list of mementos
 		chrome.runtime.sendMessage({
@@ -222,6 +224,7 @@ function displayUIBasedOnTimemap(tm){
 		});
 		selectBox += "</select>";
 
+		console.log("Calling addInterfaceComponents from 1");
 		addInterfaceComponents(tm.mementos.length, 1, ' timemaps', selectBox);
 		$('#viewMementoButton').click(function(){viewDifferentMemento();});
 		setMementoButtonInteractivityBasedOnMementoDropdown();
@@ -249,9 +252,10 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
 			//delete tm.mementos;
 			if(tm.timemap && tm.self && tm.timemap != tm.self){ // Paginated TimeMaps likely
 				//Recursing to find more TMs
-				return createTimemapFromURI(tm.timemap,accumulatedArrayOfTimemaps.concat(tm));
+				return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
 			}
 			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm)).then(function(tms){
+				console.log("calling storeTimeMapData from promise");
 				storeTimeMapData(tms);
 			});
 		}
@@ -271,7 +275,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 	if(debug){console.log("In getMementos");}
 	chrome.storage.local.get(null,function(keys){
-		if(isEmpty(keys)){ 	//no link headers in the request. :(
+		if(isEmpty(keys)){ 	// No link headers in the request. :(
 			if(debug){console.log("No URI accessed did not have an HTTP link header");}
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
@@ -286,9 +290,14 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 				if(debug){
 					console.log("We have a timemap, let's do more! The timemap:");
 					console.log(keys.timemap);
+					console.log('coverage test 1');
+					console.log("We will need to call getMementosWithTimemap() here if we want the dropdown to be generated");
 				}
-				console.log("coverage test 1");
+
 				createTimemapFromURI(keys.timemap);
+
+				if(debug){console.log("Starting call chain to generate dropdown HTML");}
+				getMementosWithTimemap();
 			}else if(keys.timegate){
 				if(debug){
 					console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
@@ -299,7 +308,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 						queryTimegate(keys.timegate);
 					}
 				).then(function(tms){
-					console.log("accepted:");
+					console.log('accepted:');
 					console.log(tms);
 					logoInFocus = true;
 					//revamp_createUIShowingMementosInTimeMap(tm);
@@ -319,14 +328,18 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 
 
 function revamp_createUIShowingMementosInTimeMap(tm){
+	console.log("********************1");
+	console.log("coverage test 99");
 	var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
 	for(var m=0; m<tm.mementos.list.length; m++){
 		selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + moment(tm.mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
 	}
 	selectBox += '</select>';
+	if(debug){console.log("Coverage test 44");}
 
 	var numberOfTimeMaps = 1; // TODO: Looks to be an object an not an array, need example where multiple are defined
-	addInterfaceComponents(tm.mementos.list.length,numberOfTimeMaps,"TimeMap",selectBox);
+	console.log("Calling addInterfaceComponents from 2");
+	addInterfaceComponents(tm.mementos.list.length, numberOfTimeMaps, 'TimeMap', selectBox);
 	displayMementoCountAtopLogo();
 	$('#countOverLogo').text($('#countOverLogo').html());
 	logoInFocus = true; // Stop spinning the logo
@@ -376,14 +389,18 @@ function countNumberOfMementos(arrayOfTimeMaps){
 		return totalNumberOfMementos;
 }
 
-function storeTimeMapData(arrayOfTimeMaps){
+function storeTimeMapData(arrayOfTimeMaps, cbIn){
+	var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
+	console.log("storeTimeMapData called");
+	console.log(arrayOfTimeMaps[0]);
 		chrome.storage.local.set({
 			'uri_r': arrayOfTimeMaps[0].original_uri,
 			'timemaps': arrayOfTimeMaps
-		}, displayUIBasedOnStoredTimeMapData); //end set
+		}, cbIn); //end set
 }
 
 function displayUIBasedOnStoredTimeMapData(){
+	console.log("********************2");
 	chrome.storage.local.get('timemaps',
 		function(localStore){
 			var tms = localStore.timemaps;
@@ -393,6 +410,7 @@ function displayUIBasedOnStoredTimeMapData(){
 			if(tms > 1) {
 				tmPlurality += 's';
 			}
+			console.log("This should not be called on the GoT wiki!");
 			addInterfaceComponents(numberOfMementos, tms.length, tmPlurality, '');
 			displayMementoCountAtopLogo();
 			logoInFocus = true;
@@ -413,9 +431,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 	if(timemaploc.indexOf("https://") > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		//timemaploc = "https"+timemaploc.substr(4);
-		console.warn("Mink still has issues with Cross-scheme querying (this is an https site).");
+		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
 		chrome.runtime.sendMessage({
-					method: "getMementosForHTTPSSource",
+					method: 'getMementosForHTTPSSource',
 					value: timemaploc
 		}, function(response) {});
 		//Cannot use above callback, will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call.
@@ -424,10 +442,10 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 	}
 
-	if(debug){console.log("About to fire off Ajax request for "+timemaploc);}
+	if(debug){console.log('About to fire off Ajax request for ' + timemaploc);}
 	$.ajax({
 		url: timemaploc,
-		type: "GET"
+		type: 'GET'
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
 			if(debug){console.log(data);}
@@ -436,16 +454,19 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
 
 			if(numberOfMementos > 0) {
-				revamp_createUIShowingMementosInTimeMap(data);
-				displayUIBasedOnTimemap(data);
+				console.log("COVERAGE TEST YY");
+				storeTimeMapData([data],function(){revamp_createUIShowingMementosInTimeMap(data);});
+				console.log("COVERAGE TEST XX");
+				//storeTimeMapData([data]);
+				//displayUIBasedOnTimemap(data);
 			}else if(numberOfTimeMaps > 0){
-			  if(debug){console.log("Show indexed TimeMap interface here");}
+			  if(debug){console.log('Show indexed TimeMap interface here');}
 			  revamp_fetchTimeMaps(data.timemap_index);
 			}else {
-				if(debug){console.log(numberOfMementos + " " + numberOfTimeMaps);}
+				if(debug){console.log(numberOfMementos + ' ' + numberOfTimeMaps);}
 			}
-
-
+			return;
+		}
 
 /* TODO: tie the history manipulation into the revamp design
 			$("#viewMementoButton").click(function(){
@@ -456,7 +477,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				);
 
 			});
-*/
+
 
 
 
@@ -495,6 +516,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			console.log("404 received");
 			return;
 		}
+
+		*/
 	}).fail(function(xhr,textStatus){
 		if(debug){
 			console.log("ERROR");

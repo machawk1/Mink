@@ -204,6 +204,8 @@ function flip(){
  *  @return String representative of the HTML UI elements to appear when viewing a memento
  */
 function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
+	console.log("Hit obsolete function");
+	/*
 	var mementoObjects = JSON.parse(jsonStr); // format: [{'uri':(uri),'datetime':(datetime),...]
 	var dropdownOptions, selectedIndex = 0;
 	$(mementoObjects).each(function(i,v){
@@ -215,33 +217,35 @@ function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
 
 		dropdownOptions += '\t<option value="' + $(v).attr('uri') + '" ' + selectedString + '>' + $(v).attr('datetime') + '</option>\r\n';
 	});
-	var selectBox = "<select id=\"mdts\" alt=\""+(selectedIndex + 1)+"\"><option>Select a Memento to view</option>" +
+
+	var selectBox = '<select id="mdts" alt="' + (selectedIndex + 1) + '"><option>Select a Memento to view</option>' +
 					dropdownOptions +
-					"</select>";
+					'</select>';
 	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
 	delete dropdownOptions;
 
-	var viewMementoButton = "<input type=\"button\" value=\"View\" id=\"viewMementoButton\" disabled=\"disabled\" />";
+	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 
 	var previousMementoDisabledValue = "";
 	var nextMementoDisabledValue = "";
-	var disabledValue = "disabled=\"disabled\"";
+	var disabledValue = 'disabled="disabled"';
 
 	if(selectedIndex == 0){previousMementoDisabledValue = disabledValue;}
 	if(selectedIndex == mementoObjects.length -1){nextMementoDisabledValue = disabledValue;}
 
-	var previousMementoButton = "<input type=\"button\" value=\"&lt;&lt;prev\" id=\"prevMementoButton\" "+previousMementoDisabledValue+" />";
-	var nextMementoButton = "<input type=\"button\" value=\"&gt;&gt;next\" id=\"nextMementoButton\" "+nextMementoDisabledValue+" />";
+	var previousMementoButton = '<input type="button" value="&lt;&lt;prev" id="prevMementoButton" ' + previousMementoDisabledValue + ' />';
+	var nextMementoButton = '<input type="button" value="&gt;&gt;next" id="nextMementoButton" ' + nextMementoDisabledValue + ' />';
 
 
 
 	return selectBox + viewMementoButton + previousMementoButton + nextMementoButton;
+	*/
 }
 
 function displayDatepicker(){
 	if($("#datepickerContainer").length){return;} //to prevent multiple datepicker UIs from appearing
 
-	$("body").append("<div id=\"datepickerContainer\"><div id=\"datepickerOptions\"></div></div>");
+	$("body").append('<div id="datepickerContainer"><div id="datepickerOptions"></div></div>');
 
 	var yearbuckets = [];
 	var completeCSV = "year,month,datetime,uri,src";
@@ -272,7 +276,7 @@ function displayDatepicker(){
 	}
 	yearList += "</ul>";
 
-	var daterangepicker = "<input type=\"text\" style=\"width: 300px\" name=\"reservation\" id=\"reservationtime\" class=\"form-control\" value=\"08/01/2013 1:00 PM - 08/01/2013 1:30 PM\"  class=\"span4\"/>";
+	var daterangepicker = '<input type="text" style="width: 300px" name="reservation" id="reservationtime" class="form-control" value="08/01/2013 1:00 PM - 08/01/2013 1:30 PM"  class="span4"/>';
 
 
 	$("#datepickerOptions").append(daterangepicker);
@@ -315,20 +319,24 @@ function addExtraButtonBehaviors(){
 }
 
 function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
+	console.log("addInterfaceComponents called");
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
 	var helpButton = '<input type="button" value="?" id="helpButton" />';
   var LARGE_NUMBER_OF_MEMENTOS_THRESHOLD = 101;
 
+	console.log("adding select box...len = "+select.length);
+
 	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
-		viewMementoButton = '';
+	  var classAttributeInjectionPoint = viewMementoButton.length - ' />'.length;
+		viewMementoButton = viewMementoButton.substr(0, classAttributeInjectionPoint) + ' class="hiddenUI" ' + viewMementoButton.substr(classAttributeInjectionPoint + 1);
 	}
 
 	$('#archiveOptions').html('<div id="largerNumberButtons"><p>List Mementos By:</p>' +
 		'<button class="largeNumberOfMementoOption activeButton" id="largeNumberOfMementoOption1"><span>&#9673;</span>Dropdown</button>' +
 		'<button class="largeNumberOfMementoOption" id="largeNumberOfMementoOption2"><span>&#9678;</span>Drill Down</button>' +
 		'</div>' +
-		'<div id="drilldownBox" style="display: none;"></div>' +
+		'<div id="drilldownBox"></div>' +
 		'<span id="info">' +
 			'<span id="numberOfMementos">' + nMementos + '</span> mementos available in ' +
 			'<span id="timemapCount">' + nTimemaps + '</span> ' +
@@ -341,29 +349,48 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 
 	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
 		setActiveButtonStyle('largeNumberOfMementoOption2');
+		$('#mdts').addClass('hiddenUI'); // Hide the dropdown if we have sufficient memento count.
 	}
 
 	addExtraButtonBehaviors();
 
-	$(".largeNumberOfMementoOption").click(function(){
+	$('.largeNumberOfMementoOption').click(function(){
 		setActiveButtonStyle($(this).attr('id'));
 	});
 
 	function setActiveButtonStyle(bId){
+		console.log("setActiveButtonStyleCalled with bid "+bId);
 		var activeButtonId = '#' + bId;
 		$('.largeNumberOfMementoOption').removeClass("activeButton");
 		$('.largeNumberOfMementoOption span').text("◎");
 		$(activeButtonId + ' span').text("◉");
 		$(activeButtonId).addClass('activeButton');
 
-		if(activeButtonId == '#largeNumberOfMementoOption2'){showMementoCountsByYear();}
-		else {destroyMementoCountsByYear();}
+		if(activeButtonId == '#largeNumberOfMementoOption2'){
+			console.log("Hiding dropdown UI, showing miller columns");
+			showMementoCountsByYear();
+			// Hide non-relevant UI elements
+			$('#mdts').addClass('hiddenUI');
+			$('#viewMementoButton').addClass('hiddenUI');
+			$("#drilldownBox").removeClass("hiddenUI");
+
+		} else {
+			console.log("Hiding Miller column UI, showing dropdown");
+			$("#drilldownBox").addClass("hiddenUI");
+			
+			$('#mdts').removeClass('hiddenUI');
+			$('#viewMementoButton').removeClass('hiddenUI');
+			//destroyMementoCountsByYear();
+			//$('#mdts').addClass('hiddenUI');
+
+		}
 	}
 
 }
 
 function destroyMementoCountsByYear(){
-	$("#drilldownBox").css("display","none");
+	//$("#drilldownBox").css("display","none");
+	$('#drilldownBox').addClass('hiddenUI');
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -379,8 +406,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
-			if($("#drilldownBox").css("display") == "none" && $("#drilldownBox").html() != ""){
-				$("#drilldownBox").css("display","block");
+			console.log("ls:");
+			console.log(localStore);
+			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() != ''){
+				$('#drilldownBox').removeClass('hiddenUI');
 				return;
 			}
 			years = null;
@@ -408,29 +437,45 @@ function showMementoCountsByYear(){
 				})
 			});
 
+			console.log(years);
+			console.log("see above");
+			if($("#years").html()){ // We already created Miller UI, return
+					console.log("NOT re-creating Miller");
+					return;
+			}
 
-			var memCountList = "<ul id=\"years\">";
+			var memCountList = '<ul id="years">';
 			for(var year in years){
-				var mString = "mementos";
+				var mString = 'mementos';
 				if(years[year].length == 1){mString = mString.slice(0,-1);}
-				memCountList += "<li>"+year+": "+years[year].length+" "+mString+"</li>\r\n"
+				memCountList += '<li>' + year + ': ' + years[year].length + ' ' + mString + '</li>\r\n';
 			}
 
 			memCountList += "</ul>";
 
+
+			if(debug){console.log("coverage test 89");console.log($("drilldownBox"));}
+
+			//if($("#years")){return;} //prevent duplicate addition of UI
+
+			console.log("testy");
+			console.log(memCountList);
+
 			$("#drilldownBox").append(memCountList);
+			console.log($("#drilldownBox"));
 			$("#drilldownBox ul#years li").click(function(){
 				$("#month,#day,#time").remove();
 				$("#drilldownBox ul#years li").removeClass("selectedOption");
 				$(this).addClass("selectedOption");
 				showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(":")));
+				console.log("coverage test 67");
 			});
 
 			//adjust positional offset of year display box based on contents
 			adjustDrilldownPositionalOffset();
 
 			//ensure that the new display is visible (it won't be without this for few mementos)
-			$("#drilldownBox").css("display","block");
+			//$("#drilldownBox").css("display","block");
 	}); //end local.get(
 };
 
