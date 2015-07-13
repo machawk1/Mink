@@ -196,7 +196,7 @@ function queryTimegate(tgURI){
 			}
 
 			if(tm.timemap){ // Paginated TimeMaps likely (e.g., http://mementoweb.org/guide/)
-				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.self);}
+				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.timemap.self);}
 				Promise.resolve(createTimemapFromURI(tm.timemap));
 			}
 		}else if(xhr.status == 302){
@@ -256,7 +256,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
 			}
 			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm)).then(function(tms){
 				console.log("calling storeTimeMapData from promise");
-				storeTimeMapData(tms);
+				storeTimeMapData(tms,displayUIBasedOnStoredTimeMapData);
 			});
 		}
 	});
@@ -391,8 +391,8 @@ function countNumberOfMementos(arrayOfTimeMaps){
 
 function storeTimeMapData(arrayOfTimeMaps, cbIn){
 	var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
-	console.log("storeTimeMapData called");
-	console.log(arrayOfTimeMaps[0]);
+	console.log("storeTimeMapData()");
+
 		chrome.storage.local.set({
 			'uri_r': arrayOfTimeMaps[0].original_uri,
 			'timemaps': arrayOfTimeMaps
@@ -407,10 +407,11 @@ function displayUIBasedOnStoredTimeMapData(){
 
 			var numberOfMementos = countNumberOfMementos(tms);
 			var tmPlurality = 'TimeMap';
-			if(tms > 1) {
+			if(tms.length > 1) {
 				tmPlurality += 's';
 			}
 			console.log("This should not be called on the GoT wiki!");
+
 			addInterfaceComponents(numberOfMementos, tms.length, tmPlurality, '');
 			displayMementoCountAtopLogo();
 			logoInFocus = true;

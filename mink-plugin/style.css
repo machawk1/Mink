@@ -27,7 +27,7 @@
 	}
 #countOverLogo:hover {cursor: pointer; background-color: #999;}
 
-
+#archiveNow {margin-left: 0.5em;}
 #archiveNowOptions button:enabled {border: 4px double black; background-color: white; outline: 0;}
 #archiveNowOptions button:disabled {border: 4px dashed #999;}
 #archiveNowOptions button:enabled:hover {cursor: pointer; border: 4px solid black;}
