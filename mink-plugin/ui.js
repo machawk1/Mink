@@ -319,13 +319,10 @@ function addExtraButtonBehaviors(){
 }
 
 function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
-	console.log("addInterfaceComponents called");
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
 	var helpButton = '<input type="button" value="?" id="helpButton" />';
   var LARGE_NUMBER_OF_MEMENTOS_THRESHOLD = 101;
-
-	console.log("adding select box...len = "+select.length);
 
 	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
 	  var classAttributeInjectionPoint = viewMementoButton.length - ' />'.length;
@@ -359,7 +356,6 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	});
 
 	function setActiveButtonStyle(bId){
-		console.log("setActiveButtonStyleCalled with bid "+bId);
 		var activeButtonId = '#' + bId;
 		$('.largeNumberOfMementoOption').removeClass("activeButton");
 		$('.largeNumberOfMementoOption span').text("◎");
@@ -367,17 +363,17 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 		$(activeButtonId).addClass('activeButton');
 
 		if(activeButtonId == '#largeNumberOfMementoOption2'){
-			console.log("Hiding dropdown UI, showing miller columns");
+			if(debug){console.log('Hiding dropdown UI, showing miller columns');}
 			showMementoCountsByYear();
 			// Hide non-relevant UI elements
 			$('#mdts').addClass('hiddenUI');
 			$('#viewMementoButton').addClass('hiddenUI');
-			$("#drilldownBox").removeClass("hiddenUI");
+			$('#drilldownBox').removeClass('hiddenUI');
 
 		} else {
-			console.log("Hiding Miller column UI, showing dropdown");
-			$("#drilldownBox").addClass("hiddenUI");
-			
+			if(debug){console.log('Hiding Miller column UI, showing dropdown');}
+			$('#drilldownBox').addClass('hiddenUI');
+
 			$('#mdts').removeClass('hiddenUI');
 			$('#viewMementoButton').removeClass('hiddenUI');
 			//destroyMementoCountsByYear();
@@ -389,36 +385,30 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 }
 
 function destroyMementoCountsByYear(){
-	//$("#drilldownBox").css("display","none");
 	$('#drilldownBox').addClass('hiddenUI');
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.method == "test")
-		 console.log("Received message!");
+    if (request.method == 'test')
+		 console.log('Received message!');
 		else
-		 console.log("some other method");
-      //sendResponse({data: localStorage[request.key]});
-    //else
-  //    sendResponse({}); // snub them.
+		 console.log('some other method');
 });
 
 function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
-			console.log("ls:");
-			console.log(localStore);
 			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() != ''){
 				$('#drilldownBox').removeClass('hiddenUI');
 				return;
 			}
 			years = null;
 			years = {};
-			var yearDataFromLastIteration = "";
+			var yearDataFromLastIteration = '';
 
 			function updateProgress(){ /* For debugging */
 				console.clear();
-				var yearData = "";
+				var yearData = '';
 				for(var year in years){
 					yearData += year + ': ' +years[year].length + '\n';
 				}
@@ -437,10 +427,8 @@ function showMementoCountsByYear(){
 				})
 			});
 
-			console.log(years);
-			console.log("see above");
-			if($("#years").html()){ // We already created Miller UI, return
-					console.log("NOT re-creating Miller");
+			if($('#years').html()){ // We already created Miller UI, return
+					if(debug){console.log('NOT re-creating Miller');}
 					return;
 			}
 
@@ -451,38 +439,32 @@ function showMementoCountsByYear(){
 				memCountList += '<li>' + year + ': ' + years[year].length + ' ' + mString + '</li>\r\n';
 			}
 
-			memCountList += "</ul>";
+			memCountList += '</ul>';
 
 
-			if(debug){console.log("coverage test 89");console.log($("drilldownBox"));}
+			if(debug){console.log('coverage test 89');console.log($('drilldownBox'));}
 
-			//if($("#years")){return;} //prevent duplicate addition of UI
+			$('#drilldownBox').append(memCountList);
 
-			console.log("testy");
-			console.log(memCountList);
-
-			$("#drilldownBox").append(memCountList);
-			console.log($("#drilldownBox"));
-			$("#drilldownBox ul#years li").click(function(){
-				$("#month,#day,#time").remove();
-				$("#drilldownBox ul#years li").removeClass("selectedOption");
-				$(this).addClass("selectedOption");
-				showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(":")));
-				console.log("coverage test 67");
+			$('#drilldownBox ul#years li').click(function(){
+				$('#month,#day,#time').remove();
+				$('#drilldownBox ul#years li').removeClass('selectedOption');
+				$(this).addClass('selectedOption');
+				showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(':')));
 			});
 
 			//adjust positional offset of year display box based on contents
 			adjustDrilldownPositionalOffset();
 
 			//ensure that the new display is visible (it won't be without this for few mementos)
-			//$("#drilldownBox").css("display","block");
+			//$('#drilldownBox').css('display','block');
 	}); //end local.get(
 };
 
 
 function adjustDrilldownPositionalOffset(){
-	var h = $("#drilldownBox").css("height").substr(0,$("#drilldownBox").css("height").indexOf("px"));
-	$("#drilldownBox").css("top",((h*-1)-30)+"px");
+	var h = $('#drilldownBox').css('height').substr(0,$('#drilldownBox').css('height').indexOf('px'));
+	$('#drilldownBox').css('top',((h*-1)-30)+'px');
 }
 
 
@@ -490,17 +472,16 @@ var years = {};
 
 
 
-//var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-var monthNames = ["Jan ","Feb ","Mar ","Apr ","May ","June","July","Aug ","Sept ","Oct ","Nov ","Dec "];
+//var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var monthNames = ['Jan ','Feb ','Mar ','Apr ','May ','June','July','Aug ','Sept ','Oct ','Nov ','Dec '];
 
 
 function showMementoCountsByMonths(year){
-	$("#months,#day,#time").remove();
-	//console.log("showing mementos for months in "+year);
-	var memCountList = "<ul id=\"months\">";
+	$('#months,#day,#time').remove();
+	//console.log('showing mementos for months in '+year);
+	var memCountList = '<ul id="months">';
 	var months = {}
-	//console.log("X");
-	//console.log(years[year]);
+
 	for(memento in years[year]){
 
 		var monthName = monthNames[moment(years[year][memento].datetime).month()];
@@ -511,20 +492,20 @@ function showMementoCountsByMonths(year){
 	}
 
 	for(month in months){
-		var mString = "mementos";
+		var mString = 'mementos';
 		if(months[month].length == 1){mString = mString.slice(0,-1);}
-		memCountList += "<li>"+month+": "+months[month].length+" "+mString+"</li>\r\n";
+		memCountList += '<li>' + month + ': '+months[month].length + ' ' + mString + '</li>\r\n';
 	}
 
-	memCountList += "</ul>";
-	$("#drilldownBox").append(memCountList);
+	memCountList += '</ul>';
+	$('#drilldownBox').append(memCountList);
 
-	$("#drilldownBox ul#months li").click(function(){
-		$("#day,#time").remove();
-		$("#drilldownBox ul#months li").removeClass("selectedOption");
-		$(this).addClass("selectedOption");
+	$('#drilldownBox ul#months li').click(function(){
+		$('#day,#time').remove();
+		$('#drilldownBox ul#months li').removeClass('selectedOption');
+		$(this).addClass('selectedOption');
 
-		showMementoCountsByDays(months[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+		showMementoCountsByDays(months[$(this).text().substr(0,$(this).text().indexOf(':'))]);
 	});
 
 	adjustDrilldownPositionalOffset();
@@ -532,9 +513,9 @@ function showMementoCountsByMonths(year){
 
 function showMementoCountsByDays(mementos){
 	var days = {};
-	var dayNames = ["NA","1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th",
-					"11th","12th","13th","14th","15th","16th","17th","18th","19th","20th",
-					"21st","22nd","23rd","24th","25th","26th","27th","28th","29th","30th","31st"];
+	var dayNames = ['NA','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
+					'11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
+					'21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th','31st'];
 
 	for(memento in mementos){
 		var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
@@ -543,21 +524,21 @@ function showMementoCountsByDays(mementos){
 		}
 		days[dayNumber].push(mementos[memento]);
 	}
-	var memCountList = "<ul id=\"day\">";
+	var memCountList = '<ul id="day">';
 	for(day in days){
-		var mString = "mementos";
+		var mString = 'mementos';
 		if(days[day].length == 1){mString = mString.slice(0,-1);}
-		memCountList += "<li>"+day+": "+days[day].length+" "+mString+"</li>\r\n";
+		memCountList += '<li>' + day + ': ' + days[day].length + ' ' + mString + '</li>\r\n';
 	}
 
-	memCountList += "</ul>";
-	$("#drilldownBox").append(memCountList);
-	$("#drilldownBox ul#day li").click(function(){
-		$("#time").remove();
-		$("#drilldownBox ul#day li").removeClass("selectedOption");
-		$(this).addClass("selectedOption");
+	memCountList += '</ul>';
+	$('#drilldownBox').append(memCountList);
+	$('#drilldownBox ul#day li').click(function(){
+		$('#time').remove();
+		$('#drilldownBox ul#day li').removeClass('selectedOption');
+		$(this).addClass('selectedOption');
 
-		showMementoCountsByTime(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+		showMementoCountsByTime(days[$(this).text().substr(0,$(this).text().indexOf(':'))]);
 	});
 
 	adjustDrilldownPositionalOffset();
@@ -568,7 +549,7 @@ function showMementoCountsByTime(mementos){
 	var uris = {};
 	for(memento in mementos){
 		var mom = moment(mementos[memento].datetime);
-		var time = mom.format("HH:mm:ss:SSS");
+		var time = mom.format('HH:mm:ss:SSS');
 
 		if(!times[time]){
 			times[time] = [];
@@ -577,9 +558,9 @@ function showMementoCountsByTime(mementos){
 		times[time].push(mementos[memento]);
 		uris[time] = mementos[memento].uri;
 	}
-	var memCountList = "<ul id=\"time\">";
+	var memCountList = '<ul id="time">';
 	for(time in times){
-		var mString = "mementos";
+		var mString = 'mementos';
 		if(times[time].length == 1){mString = mString.slice(0,-1);}
 		memCountList += "<li title=\""+uris[time]+"\">"+time+"</li>\r\n";//: "+times[time].length+" "+mString+"</li>\r\n";
 	}
