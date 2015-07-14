@@ -14,21 +14,25 @@ var timemapsURIsWithinTimemapsRegex = /<https?:.*>;rel=\".*timemap.*\"/g;
 var mementosInTimemapBasedOnRelAttributeRegex = /;rel=\".*memento.*\"/g;
 var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g;
 
+//TODO: check if in blacklist
+if(debug){console.log('blacklist test');}
+//getBlacklist();
+
 
 //PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
 
-$("body").append("<div id=\"minkContainer\"></div>");
+$('body').append('<div id="minkContainer"></div>');
 //PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
-$("#minkContainer").append("<style type=\"text/css\" scoped=\"scoped\">\r\n"+
-	"#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n"+
-	"#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n"+
-	"#minkContainer input[type=button]:enabled:hover {cursor: pointer; background-color: #ccc; }"+
-	"#minkContainer input[type=button]:disabled:hover {cursor: not-allowed; }"+
-	"#minkContainer input[type=button]:disabled {opacity: 0.25; }"+
-"</style>");
+$("#minkContainer").append('<style type="text/css" scoped="scoped">\r\n' +
+	'#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n' +
+	'#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n' +
+	'#minkContainer input[type=button]:enabled:hover {cursor: pointer; background-color: #ccc; }' +
+	'#minkContainer input[type=button]:disabled:hover {cursor: not-allowed; }' +
+	'#minkContainer input[type=button]:disabled {opacity: 0.25; }' +
+'</style>');
 //$.scoped();
-$("#minkContainer").append('<div id="archiveOptions"></div>');
-$("#minkContainer").append('<img src="' + iconUrl + '" id="mLogo" />');
+$('#minkContainer').append('<div id="archiveOptions"></div>');
+$('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
 //var shadow = document.querySelector("#minkContainer").createShadowRoot();
 
 
@@ -37,7 +41,6 @@ setTimeout(flip,1000);
 $(document).ready(function(){
 	$("#mLogo").click(function(){
 		showArchiveOptions();
-
 	});
 	displayUIBasedOnContext();
 
@@ -142,22 +145,27 @@ function displayReturnToLiveWebButton(uri){
 function getBlacklist(cb){
 	var callbackArguments = arguments;
 	chrome.storage.sync.get("uris",function(items){
-		console.log("Current blacklist: ");
-		console.log(items);
-		if(!cb){console.log("no callback specified for getBlacklist();"); return;}
+		if(debug){
+			console.log("Current blacklist: ");
+			console.log(items);
+		}
 
-		console.log("args");
-		console.log(callbackArguments);
+		if(!cb){
+			if(debug){console.log("no callback specified for getBlacklist();"); }
+			return;
+		}
+
 		cb(items, callbackArguments[1]);
 	});
 }
 
 
 
-
-
 function addToBlacklist(currentBlacklist, uriIn){
-	var save = {'uris': []};
+	var uri = uriIn;
+	var save = {
+		'uris': null
+	};
 
 	if($.isEmptyObject(currentBlacklist)){
 			save.uris = [];
@@ -192,18 +200,19 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 	chrome.storage.sync.set(save,
 		function(){
-			if(debug){
-				console.log("done adding "+uri+" to blacklist. Prev blacklist:");
-				console.log(currentBlacklist);
-				getBlacklist();
-			}
+			console.log("done adding "+uri+" to blacklist. Prev blacklist:");
+			console.log(currentBlacklist);
+			getBlacklist();
 		}
-	);
+);
 }
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if(request.method == "addToBlacklist"){
+		// TODO: convert this to add to blacklist
+
+	//	console.log("adding " + request.uri + " to blacklist");
 		getBlacklist(addToBlacklist, request.uri); // And add uri
 
 		//$("#minkContainer").fadeOut();
@@ -326,6 +335,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
 				//Recursing to find more TMs
 				return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
 			}
+			if(debug){console.log('Executing set of promises');}
 			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm)).then(function(tms){
 				storeTimeMapData(tms,displayUIBasedOnStoredTimeMapData);
 			});
@@ -436,12 +446,21 @@ function revamp_createUIShowingMementosInTimeMap(tm){
 }
 
 function fetchTimeMap(uri){
+	//if(debug){console.log("Created promise to fetch TimeMap at "+uri);}
 		var prom = new Promise(
 			function(resolve, reject) {
+
 				$.ajax({
 					url: uri
 				}).done(function(tmData){
 					resolve(tmData);
+				}).fail(function(xhr,status,err){
+					if(debug){
+						console.log("A ajax request within a promise failed!");
+						console.log(xhr);
+						console.log(status);
+						console.log(err);
+					}
 				});
 			}
 		);
@@ -455,8 +474,10 @@ function revamp_fetchTimeMaps(tms){
 		}
 		if(debug){console.log('Fetching ' + tms.length + ' TimeMaps');}
 		Promise.all(tmFetchPromises).then(storeTimeMapData).catch(function(e) {
-			console.log("A promise failed: ");
-			console.log(e);
+			if(debug){
+				console.log("A promise failed: ");
+				console.log(e);
+			}
 		});
 
 		return;
@@ -476,10 +497,12 @@ function countNumberOfMementos(arrayOfTimeMaps){
 
 function storeTimeMapData(arrayOfTimeMaps, cbIn){
 	var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
+	if(debug){console.log('executing storeTimeMapData');}
+
 	chrome.storage.local.set({
 			'uri_r': arrayOfTimeMaps[0].original_uri,
 			'timemaps': arrayOfTimeMaps
-	}, cbIn); //end set
+	}, cb); //end set
 }
 
 function displayUIBasedOnStoredTimeMapData(){
@@ -487,7 +510,7 @@ function displayUIBasedOnStoredTimeMapData(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
 			var tms = localStore.timemaps;
-
+			if(debug){console.log("We got the data from localstorage in "+displayUIBasedOnStoredTimeMapData());}
 			var numberOfMementos = countNumberOfMementos(tms);
 			var tmPlurality = 'TimeMap';
 			if(tms.length > 1) {

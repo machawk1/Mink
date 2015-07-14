@@ -52,10 +52,11 @@ function createAddURIBinder(){
     $("#add").click(function(){
       $("#options").prepend('<li><input type="text" placeholder="http://" id="newURI" /><button id="addToBlacklist">Add to Blacklist</button></li>');
       $("#addToBlacklist").click(function(){
-        var uri = $("#newURI").val();
+        var uri = $('#newURI').val();
 
         $(this).parent().replaceWith(getListItemHTML(uri, 'glyphicon-plus newItem'));
         $('.newItem').removeClass('newItem').parent().addClass('newEntry');
+        //$('.newEntry').append('<button  class="btn btn-default btn-xs glyphicon glyphicon-chevron-left" style="font-size: 12px; margin-left: 1.0em;">Nevermind</button>');
         updateSaveButtonStatus();
       });
     });

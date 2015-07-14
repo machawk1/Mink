@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener(
 
 
 chrome.contextMenus.create({
-	"title": "Hide Mink until reload",
+	"title": "Add to Mink Blacklist",
 	"contexts": ["image"],
 	"onclick" : hideMinkUI
 	//,"targetUrlPatterns":["*://*/*"] //TODO: filter this solely to the Mink UI
