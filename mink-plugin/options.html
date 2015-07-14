@@ -1,11 +1,33 @@
-<html>
-<head><title>Mink Options</title>
-<script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+<!DOCTYPE html>
+<html id="minkOptions">
+<head>
+  <title>Mink Options</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <style>
+    body {width: 500px; height: 750px; margin: 1.0em;}
+
+    h2 {font-size: 1.0em;}
+
+    ul {margin-left: 0; padding-left: 0; list-style-type: none;}
+    li {vertical-align: middle; }
+    button {margin-right: 0.5em;}
+    </style>
+  <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
 
 <body>
+  <h2>Blacklist</h2>
+  <ul id="options"></ul>
 
-<p>No options available for Mink.</p>
+  <div id="status"></div>
+  <button id="save">Save</button>
 
+  <script src="options.js"></script>
 </body>
 </html>

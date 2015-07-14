@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener(
     	localStorage.setItem('minkURI',request.value);
     	localStorage.setItem('mementos',request.mementos);
 		localStorage.setItem('memento_datetime',request.memento_datetime);
-		
+
     	sendResponse({value: "noise"});
     } else if(request.method == "retrieve"){
     	if(debug){console.log("RETRIEVING!");}
@@ -16,14 +16,14 @@ chrome.runtime.onMessage.addListener(
     	localStorage.removeItem('minkURI');
     }else if(request.method == "notify"){
 		var notify = chrome.notifications.create(
-			'id1',{   
+			'id1',{
 				type:"basic",
 				title:request.title,
 				message:request.body,
 				iconUrl: "images/icon128.png"
-			},function() {} 
+			},function() {}
 		 );
-    
+
     }else if(request.method == "getMementosForHTTPSSource"){
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(
 					"data": data
 				});
 			});
-			
+
 		}).fail(function(xhr,textStatus,error){
 			if(debug){
 				//console.log("There was an error from mink.js");
@@ -57,8 +57,8 @@ chrome.runtime.onMessage.addListener(
 				hideLogo = true;
 				showArchiveNowUI();
 			}
-			
-		});    	
+
+		});
     }
   }
 );
@@ -71,15 +71,30 @@ chrome.contextMenus.create({
 	//,"targetUrlPatterns":["*://*/*"] //TODO: filter this solely to the Mink UI
 });
 
+chrome.contextMenus.create({
+	"title": "Nuke Blacklist Cache",
+	"contexts": ["image"],
+	"onclick" : nukeBlacklistCache
+	//,"targetUrlPatterns":["*://*/*"] //TODO: filter this solely to the Mink UI
+},function(err){
+  if(err){console.log("error creating second contextmenu");}
+});
+
 function hideMinkUI(){
  	chrome.tabs.query({
         "active": true,
         "currentWindow": true
     }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
-            "method": "hideUI"
+            "method": "addToBlacklist",
+            "uri": tabs[0].url
         });
     });
+}
+
+function nukeBlacklistCache(){
+  chrome.storage.sync.clear();
+  console.log("chrome.storage.sync cleared");
 }
 
 function showArchiveNowUI(){
@@ -108,7 +123,7 @@ chrome.webRequest.onCompleted.addListener(function(deets){
    // console.log("onHeadersReceived()");
    // console.log(deets.url);
    // console.log(deets);
-   
+
     chrome.tabs.query({
         "active": true,
         "currentWindow": true
@@ -133,18 +148,18 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 			linkHeaderAsString = headers[headerI].value;
 		}
 	}
-				
+
 	if(linkHeaderAsString){
 		var tm = new Timemap(linkHeaderAsString);
-		chrome.storage.local.clear(); 
-		if(mementoDateTimeHeader){ 
+		chrome.storage.local.clear();
+		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
 		}
 		chrome.storage.local.set(tm);
-		if(mementoDateTimeHeader){ 
+		if(mementoDateTimeHeader){
 			//if(debug){console.log("You're viewing something in the archive! TODO: Show simpler interface.");}
 			//var m = new Memento();
-			//m.datetime = mementoDateTimeHeader; 
+			//m.datetime = mementoDateTimeHeader;
 			//chrome.storage.local.set(m);
 			return;	//if we ever want to show the standard interface regardless of the memento-datetime header, disable this
 		}
@@ -152,7 +167,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		if(debug){console.log("There is no HTTP link header, Mink will utilize a Memento aggregator instead.");	}
 		chrome.storage.local.clear(); //get rid of previous timemaps, timegates, etc.
 	}
-	
-	
+
+
 },
 {urls: ["<all_urls>"],types: ["main_frame"]},["responseHeaders"]);

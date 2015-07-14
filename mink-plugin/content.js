@@ -138,9 +138,82 @@ function displayReturnToLiveWebButton(uri){
 		$("#liveWeb").click(function(){window.location = (uri ? uri : response.value);});
 }
 
+
+function getBlacklist(cb){
+	var callbackArguments = arguments;
+	chrome.storage.sync.get("uris",function(items){
+		console.log("Current blacklist: ");
+		console.log(items);
+		if(!cb){console.log("no callback specified for getBlacklist();"); return;}
+
+		console.log("args");
+		console.log(callbackArguments);
+		cb(items, callbackArguments[1]);
+	});
+}
+
+
+
+function addToBlacklist(currentBlacklist, uriIn){
+	var uri = uriIn;
+	var save = {
+		'uris': null
+	};
+
+	if($.isEmptyObject(currentBlacklist)){
+			save.uris = [];
+	} else {
+		save.uris = currentBlacklist.uris;
+	}
+
+	if(!save.uris){
+		save.uris = [];
+	}
+
+	// Check if URI is already in blacklist before adding
+	if(save.uris.indexOf(uriIn) > -1){
+		if(debug){
+			console.log("URI already in blacklist");
+			console.log(save.uris);
+		}
+		return;
+	}
+
+	if(debug){
+		console.log("Previous blacklist contents:");
+		console.log(save.uris);
+	}
+
+	save.uris.push(uriIn);
+
+	if(debug){
+		console.log("Current blacklist contents:");
+		console.log(save.uris);
+	}
+
+	chrome.storage.sync.set(save,
+		function(){
+			if(debug){
+				console.log("done adding "+uri+" to blacklist. Prev blacklist:");
+				console.log(currentBlacklist);
+				getBlacklist();
+			}
+		}
+	);
+}
+
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if(request.method == "hideUI"){
-		$("#minkContainer").fadeOut();
+	if(request.method == "addToBlacklist"){
+		getBlacklist(addToBlacklist, request.uri); // And add uri
+
+		//$("#minkContainer").fadeOut();
+		return;
+	}
+
+	if(request.method == "echoBlacklist") {
+		console.log("Here's the current blacklist:");
+		console.log(request.blacklist);
 		return;
 	}
 

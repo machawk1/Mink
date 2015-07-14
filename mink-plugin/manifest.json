@@ -46,8 +46,11 @@
     }
   	],
     "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
-    "minimum_chrome_version": "36",
-    "options_page": "options.html",
+    "minimum_chrome_version": "40",
+    "options_ui": {
+      "page": "options.html",
+      "chrome_style": false
+    },
     "web_accessible_resources": [
     	"images/icon-on-19.png","images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
     	"images/archives/ia.png",

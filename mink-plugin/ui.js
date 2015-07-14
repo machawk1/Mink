@@ -388,13 +388,6 @@ function destroyMementoCountsByYear(){
 	$('#drilldownBox').addClass('hiddenUI');
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.method == 'test')
-		 console.log('Received message!');
-		else
-		 console.log('some other method');
-});
-
 function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
