@@ -17,16 +17,24 @@
     ul {margin-left: 0; padding-left: 0; list-style-type: none;}
     li {vertical-align: middle; }
     button {margin-right: 0.5em;}
+    .strike span {text-decoration:line-through; background-color: #ffdddd}
+    button#save {color: blue;}
+    button#save.disabled {color: #999;}
+    #add {float: right;}
+
+    .newEntry span {background-color: #ddffdd; text-decoration: underline;}
+    .glyphicon-plus-sign {font-size: 18px;}
     </style>
   <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
 
 <body>
-  <h2>Blacklist</h2>
+  <h2>Blacklist <button id="add" class="btn btn-default btn-xs glyphicon glyphicon-plus-sign" type="button"></button></h2>
   <ul id="options"></ul>
 
-  <div id="status"></div>
-  <button id="save">Save</button>
+  <p id="status"></p>
+
+  <button id="save">Save Blacklist</button>
 
   <script src="options.js"></script>
 </body>

@@ -154,11 +154,10 @@ function getBlacklist(cb){
 
 
 
+
+
 function addToBlacklist(currentBlacklist, uriIn){
-	var uri = uriIn;
-	var save = {
-		'uris': null
-	};
+	var save = {'uris': []};
 
 	if($.isEmptyObject(currentBlacklist)){
 			save.uris = [];
