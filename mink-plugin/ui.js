@@ -3,47 +3,47 @@ var logoInFocus = false; //used as a conditional for when to stop spinning the l
 var hideLogo = false;
 var iconUrl = chrome.extension.getURL('images/icon128.png');
 var iconUrlFlipped = chrome.extension.getURL('images/icon128flipped.png');
-var previousPanelHTML = ""; //a means of saving the UI to revert to once in the archiveNow panel
+var previousPanelHTML = ''; //a means of saving the UI to revert to once in the archiveNow panel
 
 function setMementoButtonInteractivityBasedOnMementoDropdown(){
-	$("#mdts").change(function(){
+	$('#mdts').change(function(){
 		// If we're on the select box title or the original value, disable view button
-		if($(this)[0].selectedIndex == 0 || $(this)[0].selectedIndex == $($(this)[0]).attr("alt")){
-			$("#viewMementoButton").attr("disabled","disabled");
+		if($(this)[0].selectedIndex == 0 || $(this)[0].selectedIndex == $($(this)[0]).attr('alt')){
+			$('#viewMementoButton').attr('disabled','disabled');
 		}else {
-			$("#viewMementoButton").removeAttr("disabled");
+			$('#viewMementoButton').removeAttr('disabled');
 		}
 	});
 
-	$("#nextMementoButton").click(function(){viewDifferentMemento(1);});
-	$("#prevMementoButton").click(function(){viewDifferentMemento(-1);});
+	$('#nextMementoButton').click(function(){viewDifferentMemento(1);});
+	$('#prevMementoButton').click(function(){viewDifferentMemento(-1);});
 }
 
 function showArchiveOptions(){ //TODO: rename this function to say "toggle" instead of "show"
-	if($("#archiveOptions").css("marginLeft") == "-700px"){ //draw is already open, close it
-		$("#archiveOptions").animate({
-			marginLeft: "0px",
-			opacity: "0.0"
+	if($('#archiveOptions').css('marginLeft') == '-700px'){ //draw is already open, close it
+		$('#archiveOptions').animate({
+			marginLeft: '0px',
+			opacity: '0.0'
 		},500,function(){
-			if(previousPanelHTML != ""){ //revert to original UI
-				if(previousPanelHTML.indexOf("Archive now?") > -1){return;}
-				$("#archiveOptions").html(previousPanelHTML);
-				//previousPanelHTML = "";
+			if(previousPanelHTML != ''){ //revert to original UI
+				if(previousPanelHTML.indexOf('Archive now?') > -1){return;}
+				$('#archiveOptions').html(previousPanelHTML);
+				//previousPanelHTML = '';
 			}else {
-					console.log("NOT restoring");
+					console.log('NOT restoring');
 			}
 		});
 
 	}else { //open the drawer
-		$("#archiveOptions").animate({
+		$('#archiveOptions').animate({
 			marginLeft: "-700px",
 			opacity: "1.0"
 		},500,null);
 
 		//RESTORE view button behavior
 		setMementoButtonInteractivityBasedOnMementoDropdown(); //re-attach dropdown change to affect button state
-		$("#viewMementoButton").attr("disabled","disabled"); //reset button state to disabled (default dropdown view)
-		$("#viewMementoButton").click(function(){window.location = $("#mdts").val();}); //re-attach button functionality
+		$('#viewMementoButton').attr('disabled','disabled'); //reset button state to disabled (default dropdown view)
+		$('#viewMementoButton').click(function(){window.location = $('#mdts').val();}); //re-attach button functionality
 		//TODO: restore archiveNow and helpButton behavior
 		addExtraButtonBehaviors();
 	}
@@ -53,15 +53,15 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
  * After the query for the memento list via the URI's timemap, show a numerical count atop the logo
  */
 function displayMementoCountAtopLogo(){
-	var count = $("#numberOfMementos").text();
+	var count = $('#numberOfMementos').text();
 
-	$("#mLogo").after("<span id=\"countOverLogo\">"+count+"</span>");
-	$("#countOverLogo").click(
+	$('#mLogo').after('<span id="countOverLogo">' + count + '</span>');
+	$('#countOverLogo').click(
 		function(){
 			showArchiveOptions();
 		}
 	);
-	$("#countOverLogo").fadeIn();
+	$('#countOverLogo').fadeIn();
 }
 
 /**
@@ -69,42 +69,42 @@ function displayMementoCountAtopLogo(){
  * that fire off a request to crawl the page to the archives
  */
 function addArchiveNowButtons(addText){
-	if(!addText){addText = "";}
+	if(!addText){addText = '';}
 
-	$("#archiveOptions").html(
-			"<div id=\"archiveNowOptions\">"+
-			addText + "Archive now? " +
-			"<button id=\"archiveNow_archivedotorg\">Archive.org</button>"+
-			"<button id=\"archiveNow_archivedottoday\">Archive.today</button>"+
-			//"<button id=\"archiveNow_webcite\"     disabled=\"disabled\">WebCite</button>"+
-			//"<button id=\"archiveNow_permadotcc\"  disabled=\"disabled\">Perma.cc</button>"+
-			"<button id=\"archiveNow_all\"         >All</button>"+
-			//"<button id=\"archiveNow_org\"         >Other...</button>"+
-			"</div>"
+	$('#archiveOptions').html(
+			'<div id="archiveNowOptions">' +
+			addText + 'Archive now? ' +
+			'<button id="archiveNow_archivedotorg">Archive.org</button>' +
+			'<button id="archiveNow_archivedottoday">Archive.today</button>' +
+			//'<button id="archiveNow_webcite"     disabled="disabled">WebCite</button>'+
+			//'<button id="archiveNow_permadotcc"  disabled="disabled">Perma.cc</button>'+
+			'<button id="archiveNow_all">All</button>' +
+			//'<button id="archiveNow_org"         >Other...</button>' +
+			'</div>'
 
 		);
 
-	$("#archiveNow_archivedotorg").click(function(){
+	$('#archiveNow_archivedotorg').click(function(){
 		$.ajax({
 			method: 'GET',
-			url: "https://web.archive.org/save/"+document.URL
+			url: 'https://web.archive.org/save/' + document.URL
 		})
 		.done(function(a,b,c){
 			//console.log(a);
-			if(b == "success"){
+			if(b == 'success'){
 				chrome.runtime.sendMessage({
-					method: "notify",
-					title: "Mink",
-					body: "Archive.org Successfully Preserved page.\r\nSelect again to view."
+					method: 'notify',
+					title: 'Mink',
+					body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
 				}, function(response) {});
-				$("#archiveNow_archivedotorg").addClass("archiveNowSuccess");
-				$("#archiveNow_archivedotorg").html("View on Archive.org");
+				$('#archiveNow_archivedotorg').addClass('archiveNowSuccess');
+				$('#archiveNow_archivedotorg').html('View on Archive.org');
 				var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
-				var archiveURI = "http://web.archive.org"+parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
+				var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
 				//console.log(archiveURI);
-				$("#archiveNow_archivedotorg").attr("title",archiveURI);
-				$(".archiveNowSuccess").click(function(){
-					window.open($(this).attr("title"));
+				$('#archiveNow_archivedotorg').attr('title', archiveURI);
+				$('.archiveNowSuccess').click(function(){
+					window.open($(this).attr('title'));
 				});
 			}else {
 				//console.log(b);
@@ -114,28 +114,28 @@ function addArchiveNowButtons(addText){
 		});
 	});
 
-	$("#archiveNow_archivedottoday").click(function(){
+	$('#archiveNow_archivedottoday').click(function(){
 		$.ajax({
 			method: 'POST',
-			url: "http://archive.today/submit/",
+			url: 'http://archive.today/submit/',
 			data: { coo: '', url: document.URL}
 		})
 		.done(function(a,b,c){
 			//console.log(a);
-			if(b == "success"){
+			if(b == 'success'){
 				chrome.runtime.sendMessage({
-					method: "notify",
-					title: "Mink",
-					body: "Archive.today Successfully Preserved page.\r\nSelect again to view."
+					method: 'notify',
+					title: 'Mink',
+					body: 'Archive.today Successfully Preserved page.\r\nSelect again to view.'
 				}, function(response) {});
-				$("#archiveNow_archivedottoday").addClass("archiveNowSuccess");
-				$("#archiveNow_archivedottoday").html("View on Archive.today");
+				$('#archiveNow_archivedottoday').addClass('archiveNowSuccess');
+				$('#archiveNow_archivedottoday').html('View on Archive.today');
 				var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.today\/.*\"/g);
 				var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
 				//console.log(archiveURI);
-				$("#archiveNow_archivedottoday").attr("title",archiveURI);
-				$(".archiveNowSuccess").click(function(){
-					window.open($(this).attr("title"));
+				$('#archiveNow_archivedottoday').attr('title', archiveURI);
+				$('.archiveNowSuccess').click(function(){
+					window.open($(this).attr('title'));
 				});
 			}else {
 				console.log(b);
@@ -145,11 +145,11 @@ function addArchiveNowButtons(addText){
 		});
 	});
 
-	$("#archiveNow_all").click(function(){
-		$("#archiveNow_archivedotorg").trigger("click");
-		$("#archiveNow_archivedottoday").trigger("click");
-		$(this).html("View All");
-		$(this).addClass("archiveNowSuccess");
+	$('#archiveNow_all').click(function(){
+		$('#archiveNow_archivedotorg').trigger('click');
+		$('#archiveNow_archivedottoday').trigger('click');
+		$(this).html('View All');
+		$(this).addClass('archiveNowSuccess');
 	});
 
 }
@@ -158,20 +158,20 @@ function addArchiveNowButtons(addText){
  * Animate the memento logo by modifying the image width on a timer until logoInFocus is set
  */
 function flip(){
-	$("#mLogo").fadeIn();
-	$("#mLogo").css("opacity","0.5");
-	var w = "0px";
-	if(shrinking){w = "50px"; }
+	$('#mLogo').fadeIn();
+	$('#mLogo').css('opacity', '0.5');
+	var w = '0px';
+	if(shrinking){w = '50px';}
 
-	if(logoInFocus && w == "0px" && $("#mLogo").attr("src") == iconUrl){
-		$("#mLogo").css("opacity","1.0");
+	if(logoInFocus && w == '0px' && $('#mLogo').attr('src') == iconUrl){
+		$('#mLogo').css('opacity','1.0');
 		if(hideLogo){
-			$("#mLogo").attr("src",chrome.extension.getURL("images/icon128_error.png"));
-			addArchiveNowButtons("0 mementos found. ");
+			$('#mLogo').attr('src', chrome.extension.getURL('images/icon128_error.png'));
+			addArchiveNowButtons('0 mementos found. ');
 			/*chrome.runtime.sendMessage({ //for #66, eventually turn this into a user option
-					method: "notify",
-					title: "Mink",
-					body: "Page not found in the archives\r\nSelect exclamation icon to archive now!"
+					method: 'notify',
+					title: 'Mink',
+					body: 'Page not found in the archives\r\nSelect exclamation icon to archive now!'
 			}, function(response) {});*/
 		}else {
 			displayMementoCountAtopLogo();
@@ -180,16 +180,16 @@ function flip(){
 	}
 
 	shrinking = !shrinking;
-	$("#mLogo").animate({
+	$('#mLogo').animate({
 		width: w,
-		height: "50px"
+		height: '50px'
 	},800,
 		function(){
-			if($("#mLogo").css("width") == "0px"){
-				if($("#mLogo").attr("src") == iconUrl){
-					$("#mLogo").attr("src",iconUrlFlipped);
+			if($('#mLogo').css('width') == '0px'){
+				if($('#mLogo').attr('src') == iconUrl){
+					$('#mLogo').attr('src', iconUrlFlipped);
 				}else {
-					$("#mLogo").attr("src",iconUrl);
+					$('#mLogo').attr('src', iconUrl);
 				}
 			}
 			flip();
@@ -204,7 +204,7 @@ function flip(){
  *  @return String representative of the HTML UI elements to appear when viewing a memento
  */
 function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
-	console.log("Hit obsolete function");
+	console.log('Hit obsolete function');
 	/*
 	var mementoObjects = JSON.parse(jsonStr); // format: [{'uri':(uri),'datetime':(datetime),...]
 	var dropdownOptions, selectedIndex = 0;
@@ -243,19 +243,19 @@ function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
 }
 
 function displayDatepicker(){
-	if($("#datepickerContainer").length){return;} //to prevent multiple datepicker UIs from appearing
+	if($('#datepickerContainer').length){return;} //to prevent multiple datepicker UIs from appearing
 
-	$("body").append('<div id="datepickerContainer"><div id="datepickerOptions"></div></div>');
+	$('body').append('<div id="datepickerContainer"><div id="datepickerOptions"></div></div>');
 
 	var yearbuckets = [];
-	var completeCSV = "year,month,datetime,uri,src";
-	var tsv = "";
-	$("#mdts option").each(function(i,v){
+	var completeCSV = 'year,month,datetime,uri,src';
+	var tsv = '';
+	$('#mdts option').each(function(i,v){
 		if(i==0){return;} // The first entry in the list is not a date but a directive
 
 		var mom = moment($(v).text());
-		var year = mom.format("YYYY");
-		var month = mom.format("MM");
+		var year = mom.format('YYYY');
+		var month = mom.format('MM');
 
 		var host = $(v).val().match(/\/\/(.*?)\//g)[0].substr(2);
 
@@ -266,21 +266,21 @@ function displayDatepicker(){
 			yearbuckets[year].push(new Memento($(v).val(),$(v).text()));
 		}
 
-		tsv += year+" "+month+"\t"+$(v).val()+"\r\n";
+		tsv += year + ' ' + month + '\t' + $(v).val() + '\r\n';
 	});
 
-	var yearList = "<ul>\r\n";
+	var yearList = '<ul>\r\n';
 
 	for(var key in Object.keys(yearbuckets)){
-		yearList += "\t<li>"+Object.keys(yearbuckets)[key]+": "+yearbuckets[Object.keys(yearbuckets)[key]].length+"</li>\r\n";
+		yearList += '\t<li>' + Object.keys(yearbuckets)[key]+ ': ' +yearbuckets[Object.keys(yearbuckets)[key]].length + '</li>\r\n';
 	}
-	yearList += "</ul>";
+	yearList += '</ul>';
 
 	var daterangepicker = '<input type="text" style="width: 300px" name="reservation" id="reservationtime" class="form-control" value="08/01/2013 1:00 PM - 08/01/2013 1:30 PM"  class="span4"/>';
 
 
-	$("#datepickerOptions").append(daterangepicker);
-	//$("#datepickerOptions").append(yearList);
+	$('#datepickerOptions').append(daterangepicker);
+	//$('#datepickerOptions').append(yearList);
 
 	$('#reservationtime').daterangepicker({
 		timePicker: true,
@@ -290,30 +290,30 @@ function displayDatepicker(){
 
 
 
-     $("#datepickerOptions").append(getHighchartsData());
-     $("#tsv").text(tsv);
+     $('#datepickerOptions').append(getHighchartsData());
+     $('#tsv').text(tsv);
 
 
 	doThatHighchartsThingYouDo();
 
 
 
-	//$("body").append("<span id=\"csvdata\">"+csv+"</span>");
+	//$('body').append('<span id="csvdata">' + csv + '</span>');
 	//renderChart();
 	//$("#datepickerContainer").css("bottom",$("#datepickerContainer").css("bottom")+$("#datepickerContainer").css("height"));
 }
 
 
 function addExtraButtonBehaviors(){
-	$("#helpButton").click(function(){
-		window.open("http://matkelly.com/mink");
+	$('#helpButton').click(function(){
+		window.open('http://matkelly.com/mink');
 	});
 
-	$("#archiveNow").click(function(){
-		if($("#archiveOptions").html().indexOf("Archive now?") == -1){// Save the HTML from the original panel
-			previousPanelHTML = $("#archiveOptions").html();
+	$('#archiveNow').click(function(){
+		if($('#archiveOptions').html().indexOf('Archive now?') == -1){// Save the HTML from the original panel
+			previousPanelHTML = $('#archiveOptions').html();
 		}
-		$("#archiveOptions").html("");
+		$('#archiveOptions').html('');
 		addArchiveNowButtons();
 	});
 }
@@ -555,14 +555,14 @@ function showMementoCountsByTime(mementos){
 	for(time in times){
 		var mString = 'mementos';
 		if(times[time].length == 1){mString = mString.slice(0,-1);}
-		memCountList += "<li title=\""+uris[time]+"\">"+time+"</li>\r\n";//: "+times[time].length+" "+mString+"</li>\r\n";
+		memCountList += '<li title="' + uris[time] + '">' + time + '</li>\r\n';//: "+times[time].length+" "+mString+"</li>\r\n";
 	}
 
-	memCountList += "</ul>";
-	$("#drilldownBox").append(memCountList);
-	$("#drilldownBox ul#time li").click(function(){
-		window.location = $(this).attr("title");
-		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(":"))]);
+	memCountList += '</ul>';
+	$('#drilldownBox').append(memCountList);
+	$('#drilldownBox ul#time li').click(function(){
+		window.location = $(this).attr('title');
+		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(':'))]);
 	});
 
 	adjustDrilldownPositionalOffset();
