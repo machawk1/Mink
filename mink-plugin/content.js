@@ -98,7 +98,7 @@ function ceaseQuery(){ //stop everything (AND DANCE!)
 function displayUIBasedOnContext(){
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
 		if(response == null || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
-			$('#archiveOptions').html('Fetching Mementos...<button onclick="ceaseQuery();" style="margin-left: 1.0em;">Halt and Catch Fire</button>');
+			$('#archiveOptions').html('Fetching Mementos...<!--<button onclick="ceaseQuery();" style="margin-left: 1.0em;">Halt and Catch Fire</button>-->');
 			getMementos();
 		}else if(response && response.value != null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
 				( ((window.location + '').indexOf(response.value) > -1) ||					//check if URI-R is in URI-M

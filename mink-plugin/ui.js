@@ -30,7 +30,7 @@ function showArchiveOptions(){ //TODO: rename this function to say "toggle" inst
 				$('#archiveOptions').html(previousPanelHTML);
 				//previousPanelHTML = '';
 			}else {
-					console.log('NOT restoring');
+				if(debug){console.log('NOT restoring');}
 			}
 		});
 
@@ -75,7 +75,7 @@ function addArchiveNowButtons(addText){
 			'<div id="archiveNowOptions">' +
 			addText + 'Archive now? ' +
 			'<button id="archiveNow_archivedotorg">Archive.org</button>' +
-			'<button id="archiveNow_archivedottoday">Archive.today</button>' +
+			'<button id="archiveNow_archivedotis">Archive.is</button>' +
 			//'<button id="archiveNow_webcite"     disabled="disabled">WebCite</button>'+
 			//'<button id="archiveNow_permadotcc"  disabled="disabled">Perma.cc</button>'+
 			'<button id="archiveNow_all">All</button>' +
@@ -114,10 +114,10 @@ function addArchiveNowButtons(addText){
 		});
 	});
 
-	$('#archiveNow_archivedottoday').click(function(){
+	$('#archiveNow_archivedotis').click(function(){
 		$.ajax({
 			method: 'POST',
-			url: 'http://archive.today/submit/',
+			url: 'http://archive.is/submit/',
 			data: { coo: '', url: document.URL}
 		})
 		.done(function(a,b,c){
@@ -126,14 +126,21 @@ function addArchiveNowButtons(addText){
 				chrome.runtime.sendMessage({
 					method: 'notify',
 					title: 'Mink',
-					body: 'Archive.today Successfully Preserved page.\r\nSelect again to view.'
+					body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
 				}, function(response) {});
-				$('#archiveNow_archivedottoday').addClass('archiveNowSuccess');
-				$('#archiveNow_archivedottoday').html('View on Archive.today');
-				var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.today\/.*\"/g);
-				var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
+				$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
+				$('#archiveNow_archivedotis').html('View on Archive.is');
+				
+
+				var linkHeader = c.getResponseHeader('link');
+				var tmFromLinkHeader = new Timemap(linkHeader);
+				var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
+				
+				//var mm = linkHeader.match("<http://archive.is/20150608165224/http://matkelly.com/>; rel="last memento"
+				//var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.today\/.*\"/g);
+				//var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
 				//console.log(archiveURI);
-				$('#archiveNow_archivedottoday').attr('title', archiveURI);
+				$('#archiveNow_archivedotis').attr('title', archiveURI);
 				$('.archiveNowSuccess').click(function(){
 					window.open($(this).attr('title'));
 				});
@@ -147,7 +154,7 @@ function addArchiveNowButtons(addText){
 
 	$('#archiveNow_all').click(function(){
 		$('#archiveNow_archivedotorg').trigger('click');
-		$('#archiveNow_archivedottoday').trigger('click');
+		$('#archiveNow_archivedotis').trigger('click');
 		$(this).html('View All');
 		$(this).addClass('archiveNowSuccess');
 	});

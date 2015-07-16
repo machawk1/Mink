@@ -63,11 +63,13 @@ function Timemap(fromString){
 	if(original){	this.original = sanitizeMementoURI(original);}
 	if(self){	this.self = sanitizeMementoURI(self);}
 
-	if(!original){console.log("Hmm, no original"); }
+	if(!original && debug){console.log("Hmm, no original"); }
 
 	if(!timemap && !timegate && !original){
-		console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
-		console.log(linkHeaderEntries);
+		if(debug){
+			console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
+			console.log(linkHeaderEntries);
+		}
 	}
 }
 
