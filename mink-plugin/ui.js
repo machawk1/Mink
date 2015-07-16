@@ -322,7 +322,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
 	var helpButton = '<input type="button" value="?" id="helpButton" />';
-  var LARGE_NUMBER_OF_MEMENTOS_THRESHOLD = 101;
+    var LARGE_NUMBER_OF_MEMENTOS_THRESHOLD = 101;
 
 	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
 	  var classAttributeInjectionPoint = viewMementoButton.length - ' />'.length;
@@ -347,6 +347,8 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
 		setActiveButtonStyle('largeNumberOfMementoOption2');
 		$('#mdts').addClass('hiddenUI'); // Hide the dropdown if we have sufficient memento count.
+	}else {
+		$('#drilldownBox').addClass('hiddenUI');
 	}
 
 	addExtraButtonBehaviors();
