@@ -1,10 +1,10 @@
 var debug = false;
 
-var proxy = "http://timetravel.mementoweb.org/timemap/link/";
-var aggregator_wdi_link = "http://labs.mementoweb.org/timemap/link/";
-var aggregator_wdi_json = "http://labs.mementoweb.org/timemap/json/";
-var aggregator_diy_link = "http://timetravel.mementoweb.org/timemap/link/";
-var aggregator_diy_json = "http://timetravel.mementoweb.org/timemap/json/";
+var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
+var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
+var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
+var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/';
+var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/';
 var numberOfTimemaps = 0;
 
 var embeddedTimemapRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g;
@@ -23,7 +23,7 @@ if(debug){console.log('blacklist test');}
 
 $('body').append('<div id="minkContainer"></div>');
 //PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
-$("#minkContainer").append('<style type="text/css" scoped="scoped">\r\n' +
+$('#minkContainer').append('<style type="text/css" scoped="scoped">\r\n' +
 	'#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n' +
 	'#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n' +
 	'#minkContainer input[type=button]:enabled:hover {cursor: pointer; background-color: #ccc; }' +
@@ -39,7 +39,7 @@ $('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
 setTimeout(flip,1000);
 
 $(document).ready(function(){
-	$("#mLogo").click(function(){
+	$('#mLogo').click(function(){
 		showArchiveOptions();
 	});
 	displayUIBasedOnContext();
@@ -47,7 +47,7 @@ $(document).ready(function(){
 });
 
 
-var jsonizedMementos = "[";
+var jsonizedMementos = '[';
 var jsonizedMementos;
 
 function addToHistory(uri_r,memento_datetime,mementos,callback){
@@ -71,40 +71,40 @@ function clearHistory(){
 function viewDifferentMemento(index){
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
 		if(index == null || index == 0){
-			addToHistory(response.value,$("#mdts option:selected").text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
-				function(){window.location = $("#mdts").val();}
+			addToHistory(response.value,$('#mdts option:selected').text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
+				function(){window.location = $('#mdts').val();}
 			);
 		}else if(index == 1){ //next Memento
-			var nextMemento = $("#mdts option:nth-child("+(parseInt($("#mdts").attr("alt"))+2)+")");
+			var nextMemento = $('#mdts option:nth-child(' + (parseInt($('#mdts').attr('alt')) + 2) + ')');
 			addToHistory(response.value,nextMemento.text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
 				function(){window.location = nextMemento.val();}
 			);
 		}else if(index == -1){ //prev Memento
-			var prevMemento = $("#mdts option:nth-child("+(parseInt($("#mdts").attr("alt")))+")");
+			var prevMemento = $('#mdts option:nth-child(' + (parseInt($('#mdts').attr('alt'))) + ')');
 			addToHistory(response.value,prevMemento.text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
 				function(){window.location = prevMemento.val();}
 			);
 		}else {
-			console.log("Bad index value in viewDifferentMemento, "+index);
+			console.log('Bad index value in viewDifferentMemento, ' + index);
 			console.log(index);
 		}
 	});
 }
 
 function ceaseQuery(){ //stop everything (AND DANCE!)
-	alert("Halting execution");
+	alert('Halting execution');
 }
 
 function displayUIBasedOnContext(){
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
 		if(response == null || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
-			$("#archiveOptions").html("Fetching Mementos...<button onclick=\"ceaseQuery();\" style=\"margin-left: 1.0em;\">Halt and Catch Fire</button>");
+			$('#archiveOptions').html('Fetching Mementos...<button onclick="ceaseQuery();" style="margin-left: 1.0em;">Halt and Catch Fire</button>');
 			getMementos();
 		}else if(response && response.value != null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
-				( ((window.location+"").indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
-				  ((window.location+"").replace("www.","").indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
-				  ((window.location+"").indexOf(response.value.replace("www.","")) > -1) ||
-				  ((window.location+"").replace("www.","").indexOf(response.value.replace("www.","")) > -1)
+				( ((window.location + '').indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
+				  ((window.location + '').replace('www.','').indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
+				  ((window.location + '').indexOf(response.value.replace('www.','')) > -1) ||
+				  ((window.location + '').replace('www.','').indexOf(response.value.replace('www.', '')) > -1)
 				) 																	// There were memento HTTP headers
 			){
 			logoInFocus = true;
@@ -112,12 +112,12 @@ function displayUIBasedOnContext(){
 			//Display UI For When Browsing An Archive Page
 			displayReturnToLiveWebButton(response.value);
 
-			//$("#archiveOptions").append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
-			//$("#viewMementoButton").click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
+			//$('#archiveOptions').append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
+			//$('#viewMementoButton').click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
 
 			//setMementoButtonInteractivityBasedOnMementoDropdown();
 		}else {
-			if(debug){console.log("There is no else, only if");}
+			if(debug){console.log('There is no else, only if');}
 			//ugh, we don't want to be here, let's nuke the localStorage
 			clearHistory();
 			displayUIBasedOnContext();
@@ -137,21 +137,21 @@ function isEmpty(o){ //returns if empty object is passed in
 
 function displayReturnToLiveWebButton(uri){
 		//Display UI For When Browsing An Archive Page
-		$("#archiveOptions").html("<button id=\"liveWeb\">Return to Live Web</button>");
-		$("#liveWeb").click(function(){window.location = (uri ? uri : response.value);});
+		$('#archiveOptions').html('<button id="liveWeb">Return to Live Web</button>');
+		$('#liveWeb').click(function(){window.location = (uri ? uri : response.value);});
 }
 
 
 function getBlacklist(cb){
 	var callbackArguments = arguments;
-	chrome.storage.sync.get("uris",function(items){
+	chrome.storage.sync.get('uris', function(items){
 		if(debug){
-			console.log("Current blacklist: ");
+			console.log('Current blacklist: ');
 			console.log(items);
 		}
 
 		if(!cb){
-			if(debug){console.log("no callback specified for getBlacklist();"); }
+			if(debug){console.log('no callback specified for getBlacklist();'); }
 			return;
 		}
 
@@ -180,27 +180,27 @@ function addToBlacklist(currentBlacklist, uriIn){
 	// Check if URI is already in blacklist before adding
 	if(save.uris.indexOf(uriIn) > -1){
 		if(debug){
-			console.log("URI already in blacklist");
+			console.log('URI already in blacklist');
 			console.log(save.uris);
 		}
 		return;
 	}
 
 	if(debug){
-		console.log("Previous blacklist contents:");
+		console.log('Previous blacklist contents:');
 		console.log(save.uris);
 	}
 
 	save.uris.push(uriIn);
 
 	if(debug){
-		console.log("Current blacklist contents:");
+		console.log('Current blacklist contents:');
 		console.log(save.uris);
 	}
 
 	chrome.storage.sync.set(save,
 		function(){
-			console.log("done adding "+uri+" to blacklist. Prev blacklist:");
+			console.log('done adding ' + uri + ' to blacklist. Prev blacklist:');
 			console.log(currentBlacklist);
 			getBlacklist();
 		}
@@ -209,36 +209,36 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if(request.method == "addToBlacklist"){
+	if(request.method == 'addToBlacklist'){
 		// TODO: convert this to add to blacklist
 
-	//	console.log("adding " + request.uri + " to blacklist");
+	//	console.log('adding ' + request.uri + ' to blacklist');
 		getBlacklist(addToBlacklist, request.uri); // And add uri
 
-		//$("#minkContainer").fadeOut();
+		//$('#minkContainer').fadeOut();
 		return;
 	}
 
-	if(request.method == "echoBlacklist") {
-		console.log("Here's the current blacklist:");
+	if(request.method == 'echoBlacklist') {
+		console.log('Here is the current blacklist:');
 		console.log(request.blacklist);
 		return;
 	}
 
-	if(request.method == "showArchiveNowUI"){
-		if(debug){console.log("Hide logo here");}
+	if(request.method == 'showArchiveNowUI'){
+		if(debug){console.log('Hide logo here');}
 		logoInFocus = true;
 		hideLogo = true;
 
 		return;
 	}
 
-	if(request.method == "getMementosFromSecureSource"){
+	if(request.method == 'getMementosFromSecureSource'){
 		logoInFocus = true;
 		hideLogo = true;
 	}
 
-	if(request.method == "displayThisMementoData"){
+	if(request.method == 'displayThisMementoData'){
 		//Parse the data received from the secure source and display the number of mementos
 		var tm = new Timemap(request.data);
 		displayUIBasedOnTimemap(tm);
@@ -246,12 +246,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 
-	if(request.method == "displayUI"){
+	if(request.method == 'displayUI'){
 		if(debug){
 			console.log(request.timegate);
 			console.log(request.timemap);
 			console.log(request.uri);
-			console.log("-----");
+			console.log('-----');
 		}
 	}
 	displayUIBasedOnContext();
@@ -260,35 +260,35 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function queryTimegate(tgURI){
-	if(debug){console.log("Querying timegate at "+tgURI);}
+	if(debug){console.log('Querying timegate at ' + tgURI);}
 	$.ajax({
 		url: tgURI,
 		type: "HEAD"
 	}).done(function(data,textStatus,xhr,a,b){
-		if(debug){console.log("Done querying timegate");}
+		if(debug){console.log('Done querying timegate');}
 		if(xhr.status == 200){
-			var linkHeaderStr = xhr.getResponseHeader("Link");
+			var linkHeaderStr = xhr.getResponseHeader('Link');
 			var tm = new Timemap(linkHeaderStr);
 
 			if(debug){
-				console.log("We have the ultimate timemap");
-			  console.log("From the timegate: "+(tm.timegate ? "TimeGate, ":"")+(tm.timemap ? " TimeMap, ":"")+"and "+tm.mementos.length +" mementos");
+				console.log('We have the ultimate timemap');
+			  console.log('From the timegate: ' + (tm.timegate ? 'TimeGate, ':'') + (tm.timemap ? ' TimeMap, ':'') + 'and ' + tm.mementos.length + ' mementos');
 			  console.log(tm);
 			}
 
 			if(tm.timemap){ // Paginated TimeMaps likely (e.g., http://mementoweb.org/guide/)
-				if(debug){console.log("Recursing to find more TMs, last TM:"+tm.timemap.self);}
+				if(debug){console.log('Recursing to find more TMs, last TM:' + tm.timemap.self);}
 				Promise.resolve(createTimemapFromURI(tm.timemap));
 			}
 		}else if(xhr.status == 302){
-			console.log("Do something with 302 here");
+			console.log('Do something with 302 here');
 		}
 	});
 
 }
 
 function displayUIBasedOnTimemap(tm){
-	console.log("likely obsolete interface");
+	console.log('likely obsolete interface');
 
 	if(tm.mementos.length > 0){
 		logoInFocus = true; //stop rotating the logo, we have a list of mementos
@@ -303,13 +303,13 @@ function displayUIBasedOnTimemap(tm){
 		$(tm.mementos).each(function(i,m){
 			selectBox += '\t<option value="' + m.uri + '">' + moment(m.datetime) + '</option>\r\n';
 		});
-		selectBox += "</select>";
+		selectBox += '</select>';
 
-		console.log("Calling addInterfaceComponents from 1");
+		console.log('Calling addInterfaceComponents from 1');
 		addInterfaceComponents(tm.mementos.length, 1, ' timemaps', selectBox);
 		$('#viewMementoButton').click(function(){viewDifferentMemento();});
 		setMementoButtonInteractivityBasedOnMementoDropdown();
-		//$("#countOverLogo").text(":)");//tm.mementos.length
+		//$('#countOverLogo').text(':)');//tm.mementos.length
 
 	}
 }
@@ -354,14 +354,14 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps){
  *         references should be followed and parsed before data is returned
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
-	if(debug){console.log("In getMementos");}
+	if(debug){console.log('In getMementos');}
 	chrome.storage.local.get(null,function(keys){
 		if(isEmpty(keys)){ 	// No link headers in the request. :(
-			if(debug){console.log("No URI accessed did not have an HTTP link header");}
+			if(debug){console.log('No URI accessed did not have an HTTP link header');}
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
 			if(keys.datetime){ //isA memento
-				if(debug){console.log("We are a memento!");}
+				if(debug){console.log('We are a memento!');}
 				logoInFocus = true;
 				if(debug){console.log(keys);}
 				//Display UI For When Browsing An Archive Page
@@ -369,18 +369,18 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 			}else if(keys.timemap){
 				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
 				if(debug){
-					console.log("We have a timemap, let's do more! The timemap:");
+					console.log('We have a timemap, lets do more! The timemap:');
 					console.log(keys.timemap);;
-					console.log("We will need to call getMementosWithTimemap() here if we want the dropdown to be generated");
+					console.log('We will need to call getMementosWithTimemap() here if we want the dropdown to be generated');
 				}
 
 				createTimemapFromURI(keys.timemap);
 
-				if(debug){console.log("Starting call chain to generate dropdown HTML");}
+				if(debug){console.log('Starting call chain to generate dropdown HTML');}
 				getMementosWithTimemap();
 			}else if(keys.timegate){
 				if(debug){
-					console.log("We have a timegate URI, let's fetch it and try to get mementos or a timemap");
+					console.log('We have a timegate URI, lets fetch it and try to get mementos or a timemap');
 				}
 				//todo: set this up using promises to allow recursion, callback with returned arrays
 				var prom = new Promise(
@@ -394,14 +394,14 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap){
 					//revamp_createUIShowingMementosInTimeMap(tm);
 				//	revamp_fetchTimeMaps(tms);
 				},function(val){
-					console.log("rejected");
+					console.log('rejected');
 				});
 				//queryTimegate(keys.timegate);
 				return;
 			}else { // We had some link headers but none that were related to memento, so act as if we had no link header
 				getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 			}
-			//console.log("TODO, change the timegate/map to that which was specified in the link headers.");
+			//console.log('TODO, change the timegate/map to that which was specified in the link headers.');
 		}
 	});
 }
@@ -431,7 +431,7 @@ function revamp_createUIShowingMementosInTimeMap(tm){
 		selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + moment(tm.mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
 	}
 	selectBox += '</select>';
-	if(debug){console.log("Coverage test 44");}
+	if(debug){console.log('Coverage test 44');}
 
 	var numberOfTimeMaps = 1; // TODO: Looks to be an object an not an array, need example where multiple are defined
 	addInterfaceComponents(tm.mementos.list.length, numberOfTimeMaps, 'TimeMap', selectBox);
@@ -446,7 +446,7 @@ function revamp_createUIShowingMementosInTimeMap(tm){
 }
 
 function fetchTimeMap(uri){
-	//if(debug){console.log("Created promise to fetch TimeMap at "+uri);}
+	//if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
 		var prom = new Promise(
 			function(resolve, reject) {
 
@@ -456,7 +456,7 @@ function fetchTimeMap(uri){
 					resolve(tmData);
 				}).fail(function(xhr,status,err){
 					if(debug){
-						console.log("A ajax request within a promise failed!");
+						console.log('A ajax request within a promise failed!');
 						console.log(xhr);
 						console.log(status);
 						console.log(err);
@@ -475,7 +475,7 @@ function revamp_fetchTimeMaps(tms){
 		if(debug){console.log('Fetching ' + tms.length + ' TimeMaps');}
 		Promise.all(tmFetchPromises).then(storeTimeMapData).catch(function(e) {
 			if(debug){
-				console.log("A promise failed: ");
+				console.log('A promise failed: ');
 				console.log(e);
 			}
 		});
@@ -484,7 +484,7 @@ function revamp_fetchTimeMaps(tms){
 }
 
 function countNumberOfMementos(arrayOfTimeMaps){
-		if(debug){console.log("Counting mementos for " + arrayOfTimeMaps.length + ' TimeMaps');}
+		if(debug){console.log('Counting mementos for ' + arrayOfTimeMaps.length + ' TimeMaps');}
 
 		var totalNumberOfMementos = 0;
 		for(var tm = arrayOfTimeMaps.length - 1; tm >= 0; tm--){
@@ -510,7 +510,7 @@ function displayUIBasedOnStoredTimeMapData(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
 			var tms = localStore.timemaps;
-			if(debug){console.log("We got the data from localstorage in "+displayUIBasedOnStoredTimeMapData());}
+			if(debug){console.log('We got the data from localstorage in ' + displayUIBasedOnStoredTimeMapData());}
 			var numberOfMementos = countNumberOfMementos(tms);
 			var tmPlurality = 'TimeMap';
 			if(tms.length > 1) {
@@ -522,7 +522,7 @@ function displayUIBasedOnStoredTimeMapData(){
 			displayMementoCountAtopLogo();
 
 			if(tms[0].mementos.list.length > 500) {
-				$("#largeNumberOfMementoOption1").attr("disabled","disabled").addClass("disabled");
+				$('#largeNumberOfMementoOption1').attr('disabled','disabled').addClass('disabled');
 			}
 
 			logoInFocus = true;
@@ -541,8 +541,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
 
-	if(timemaploc.indexOf("https://") > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
-		//timemaploc = "https"+timemaploc.substr(4);
+	if(timemaploc.indexOf('https://') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
+		//timemaploc = 'https'+timemaploc.substr(4);
 		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
 		chrome.runtime.sendMessage({
 					method: 'getMementosForHTTPSSource',
@@ -630,24 +630,24 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		*/
 	}).fail(function(xhr,textStatus){
 		if(debug){
-			console.log("ERROR");
+			console.log('ERROR');
 			console.log(textStatus);
 			console.log(xhr);
 		}
 		if(xhr.status == 404){
-			if(debug){console.log("404");}
+			if(debug){console.log('404');}
 			//return; //prevent infinite loop. This is probably not the correct way to handle it
 		}
 
 		//check if we're currently viewing an archive
-		if(debug){console.log("Are we viewing the archive? Basis 1: two http[s]*?://");}
+		if(debug){console.log('Are we viewing the archive? Basis 1: two http[s]*?://');}
 
-		var schemeOccurances = (window.location+"").match(/http[s]*:\/\//g);
+		var schemeOccurances = (window.location + '').match(/http[s]*:\/\//g);
 		if(schemeOccurances.length > 1){ //we likely have two URIs in window.location
-			console.log("  It appears we are viewing the archive based on multiple instances of http[s]*:// in window.location");
+			console.log('  It appears we are viewing the archive based on multiple instances of http[s]*:// in window.location');
 			// - Attempt to extract the URI-R
-			var URI_M = (window.location+"").substr((window.location+"").indexOf("http",6)); //exclude the initial scheme, let's figure out where the URI-M starts
-			URI_M = URI_M.replace("http://","http://"); //cross-protocol interaction is a no-no
+			var URI_M = (window.location + '').substr((window.location + '').indexOf('http', 6)); //exclude the initial scheme, let's figure out where the URI-M starts
+			URI_M = URI_M.replace('http://', 'http://'); //cross-protocol interaction is a no-no
 			return getMementosWithTimemap(proxy + URI_M,null,true);
 		}
 
