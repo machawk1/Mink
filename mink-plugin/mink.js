@@ -34,6 +34,26 @@ chrome.runtime.onMessage.addListener(
 				  iconUrl: 'images/icon128.png'
 			  },function() {}
 		   );
+    }else if (request.method == 'refreshAggregatorTimeMap') {
+      var refreshAggregatorTimeMapURI = request.value;
+      $.ajax({
+        method: 'HEAD',
+        url: refreshAggregatorTimeMapURI,
+        beforeSend: function(request) {
+          request.setRequestHeader('cache-control', 'no-cache	')
+        }
+      }).done(function(data, textStatus, xhr) {
+          if (debug) {
+            console.log('success');
+            console.log(data);
+          }
+      }).fail(function(xhr, textStatus, error) {
+          if (debug){
+            console.log('failed');
+            console.log(error);
+            console.log(textStatus);
+          }
+      });
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
