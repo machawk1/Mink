@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
@@ -431,7 +431,6 @@ function revamp_createUIShowingMementosInTimeMap(tm){
 		selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + moment(tm.mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
 	}
 	selectBox += '</select>';
-	if(debug){console.log('Coverage test 44');}
 
 	var numberOfTimeMaps = 1; // TODO: Looks to be an object an not an array, need example where multiple are defined
 	addInterfaceComponents(tm.mementos.list.length, numberOfTimeMaps, 'TimeMap', selectBox);

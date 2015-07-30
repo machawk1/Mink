@@ -1,10 +1,24 @@
 function Timemap(fromString){
-	if(debug){console.log("In timemap");}
+	if(debug){console.log("In timemap.js");}
 	var timemap, timegate, original, url, self;
 	this.str = fromString;
+  if (!this.str) {
+			if (debug) {
+			  console.log('data passed in was null');
+			}
+	}
 
 
 	//parse out timegate
+	//console.log(this.str);
+	// Check if the string passed in is an Object, e.g., https://github.com/
+	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
+	if (strIsAnObject) {
+		if (debug) {
+		  console.log('Handle fromString as an object, akin to github.com');	
+		}
+	//		this = this.str;
+	}
 	var linkHeaderEntries = this.str.split(",");
 
 	var mementoUrlExpression = /<[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?>/gi;
