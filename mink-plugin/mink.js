@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -223,6 +223,19 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders']);
 
 
+function displaySecureSiteMementos(mementos){
+  chrome.tabs.query({
+    'active': true,
+    'currentWindow': true
+  }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      method: 'displaySecureSiteMementos',
+      value: mementos
+    });
+  });
+}
+
+
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.
    Is there a reason that the below should even be in content.js? */
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
@@ -248,15 +261,15 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
 			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
 
-      chrome.tabs.query({
-        'active': true,
-        'currentWindow': true
-      }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          method: 'displaySecureSiteMementos',
-          value: data
-        });
-      });
+      if (numberOfMementos == 0 && numberOfTimeMaps > 0) {
+          if (debug) {console.log('We still need to fetch the TimeMap in mink.js');}
+          revamp_fetchTimeMaps(data.timemap_index, displaySecureSiteMementos);
+
+          return;
+      }
+
+      displaySecureSiteMementos(data);
+
       return;
 		}
 	}).fail(function(xhr,textStatus) {
@@ -282,4 +295,65 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			if(debug){console.log('404'); console.log("report no mementos, show appropriate interface");}
 		}
 	});
+}
+
+/* Redundant of content.js. Does content.js really need this function? */
+function revamp_fetchTimeMaps(tms, cb) {
+  if (debug) {console.log('mink.js revamp_fetchTimeMaps()');}
+		var tmFetchPromises = [];
+		for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
+			tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
+		}
+		if(debug){console.log('Fetching ' + tms.length + ' TimeMaps');}
+		Promise.all(tmFetchPromises).then(function(val){
+        storeTimeMapData(val);
+        var tm = val[0];
+
+        for(var tmI = 0; tmI < val.length; tmI++) {
+          Array.prototype.push.apply(tm.mementos.list, val[tmI].mementos.list);
+        }
+
+        if(cb) {cb(tm);}
+    }).catch(function(e) {
+			if(debug){
+				console.log('A promise failed: ');
+				console.log(e);
+			}
+		});
+
+		return;
+}
+
+/* Redundant of content.js. Does content.js really need this function? */
+function fetchTimeMap(uri) {
+	  if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
+		var prom = new Promise(
+			function(resolve, reject) {
+
+				$.ajax({
+					url: uri
+				}).done(function(tmData){
+					resolve(tmData);
+				}).fail(function(xhr,status,err){
+					if(debug){
+						console.log('A ajax request within a promise failed!');
+						console.log(xhr);
+						console.log(status);
+						console.log(err);
+					}
+				});
+			}
+		);
+		return prom;
+}
+
+/* Redundant of content.js. Does content.js really need this function? */
+function storeTimeMapData(arrayOfTimeMaps, cbIn){
+	//var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
+	if(debug){console.log('executing storeTimeMapData');}
+
+	chrome.storage.local.set({
+			'uri_r': arrayOfTimeMaps[0].original_uri,
+			'timemaps': arrayOfTimeMaps
+	}); //end set
 }

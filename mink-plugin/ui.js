@@ -445,10 +445,6 @@ function showMementoCountsByYear(){
 				setTimeout(updateProgress,3000);
 			}
 
-			//setTimeout(updateProgress,3000);
-			console.log('Mink localstorage contents for this site:');
-			console.log(localStore);
-			console.log("Building Miller columns from " + (localStore.timemaps ? localStore.timemaps.length : 0) + " TimeMaps");
 			$(localStore.timemaps).each(function(tmI,tm){
 				$(tm.mementos.list).each(function(mI,m){
 					var dt = moment(m.datetime);

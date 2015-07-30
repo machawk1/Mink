@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
@@ -266,13 +266,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 
 	if(request.method == 'displaySecureSiteMementos') {
-			if(!(request.value.mementos) || request.value.mementos == []){
+			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
+				console.log('taking initial conditional');
+				console.log(request.value);
 				hideLogo = true;
 				logoInFocus = true;
 			  flip();
 			}else {
-				console.log("TODO: write to localstorage via function");
-
 				storeTimeMapData([request.value])
 				revamp_createUIShowingMementosInTimeMap(request.value);
 
