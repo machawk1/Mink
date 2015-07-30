@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
