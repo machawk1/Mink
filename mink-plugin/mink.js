@@ -2,57 +2,67 @@ var debug = false;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if(request.method == 'store'){
+    if (request.method == 'store') {
     	localStorage.setItem('minkURI',request.value);
     	localStorage.setItem('mementos',request.mementos);
 		localStorage.setItem('memento_datetime',request.memento_datetime);
 
     	sendResponse({value: 'noise'});
-    } else if(request.method == 'retrieve'){
+    } else if (request.method == 'retrieve'){
     	if(debug){console.log('RETRIEVING!');}
 
       sendResponse({value: localStorage.getItem('minkURI'),mementos: localStorage.getItem('mementos'), memento_datetime: localStorage.getItem('memento_datetime')});
-    }else if(request.method == 'nukeFromOrbit'){
+    }else if (request.method == 'nukeFromOrbit') {
     	localStorage.removeItem('minkURI');
-    }else if(request.method == 'notify'){
-		var notify = chrome.notifications.create(
-			'id1',{
-				type:'basic',
-				title:request.title,
-				message:request.body,
-				iconUrl: 'images/icon128.png'
-			},function() {}
-		 );
+    }else if (request.method == 'fetchSecureSitesTimeMap') {
+      var tgURI = request.value;
 
-    }else if(request.method == 'getMementosForHTTPSSource'){
+      $.ajax({
+    		url: tgURI,
+    		type: "GET"
+    	}).done(function(data,textStatus,xhr,a,b){
+        getMementosWithTimemap(data.timemap_uri.json_format);
+    	}).fail(function(xhr, data, error){
+        getMementosWithTimemap(tgURI);
+      });
+    }else if (request.method == 'notify') {
+		  var notify = chrome.notifications.create(
+			  'id1',{
+				  type:'basic',
+				  title:request.title,
+				  message:request.body,
+				  iconUrl: 'images/icon128.png'
+			  },function() {}
+		   );
+    }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
     	var uri = 'http' + request.value.substr(4);
-		$.ajax({
-			url: uri,
-			type: 'GET'
-		}).done(function(data,textStatus,xhr){
-			if(debug){
-				console.log('We should parse and return the mementos here via a response');
-				//console.log(data);
-			}
-			chrome.tabs.query({
-				'active': true,
-				'currentWindow': true
-			}, function (tabs) {
-				chrome.tabs.sendMessage(tabs[0].id, {
-					'method': 'displayThisMementoData',
-					'data': data
-				});
-			});
+		  $.ajax({
+			  url: uri,
+			  type: 'GET'
+		  }).done(function(data,textStatus,xhr){
+			  if(debug){
+				  console.log('We should parse and return the mementos here via a response');
+				  //console.log(data);
+			  }
+			  chrome.tabs.query({
+				  'active': true,
+				  'currentWindow': true
+			  }, function (tabs) {
+				  chrome.tabs.sendMessage(tabs[0].id, {
+					  'method': 'displayThisMementoData',
+					  'data': data
+				  });
+			  });
 
-		}).fail(function(xhr,textStatus,error){
-			if(debug){
-				//console.log('There was an error from mink.js');
-				//console.log(textStatus);
-				//console.log(error);
-			}
-			if(error == 'Not Found'){
+	  	}).fail(function(xhr,textStatus,error){
+			  if(debug){
+			  	//console.log('There was an error from mink.js');
+			  	//console.log(textStatus);
+			  	//console.log(error);
+			  }
+		  	if(error == 'Not Found'){
 				//console.log('We have '+[].length+' mementos from the call to the archives using an HTTPS source!');
 				hideLogo = true;
 				showArchiveNowUI();
@@ -171,3 +181,65 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 
 },
 {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders']);
+
+
+/* Duplicate of code in content.js so https URIs can be used to query timemaps.
+   Is there a reason that the below should even be in content.js? */
+function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
+	if(!timemaploc){ //use the aggregator
+    // Redundant def of content.js constant, which cannot be accessed from here
+    var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
+		timemaploc = aggregator_wdi_json + window.location;
+	}
+
+	if(uri){
+		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
+	}
+
+
+	if(debug){console.log('About to fire off Ajax request for ' + timemaploc);}
+	$.ajax({
+		url: timemaploc,
+		type: 'GET'
+	}).done(function(data,textStatus,xhr){
+		if(xhr.status == 200){
+			if(debug){console.log(data);}
+			var numberOfMementos = data.mementos ? data.mementos.list.length : 0;
+			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
+			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
+
+      chrome.tabs.query({
+        'active': true,
+        'currentWindow': true
+      }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          method: 'displaySecureSiteMementos',
+          value: data
+        });
+      });
+      return;
+		}
+	}).fail(function(xhr,textStatus) {
+		if(debug){
+			console.log('ERROR');
+			console.log(textStatus);
+			console.log(xhr);
+		}
+		if(xhr.status == 404){
+      var tm = new Timemap();
+      tm.original = uri;
+
+      chrome.tabs.query({
+        'active': true,
+        'currentWindow': true
+      }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          method: 'displaySecureSiteMementos',
+          value: tm
+        });
+      });
+
+			if(debug){console.log('404'); console.log("report no mementos, show appropriate interface");}
+		}
+	});
+}

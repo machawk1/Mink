@@ -6,6 +6,7 @@ function Timemap(fromString){
 			if (debug) {
 			  console.log('data passed in was null');
 			}
+			return;
 	}
 
 
@@ -15,7 +16,7 @@ function Timemap(fromString){
 	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
 	if (strIsAnObject) {
 		if (debug) {
-		  console.log('Handle fromString as an object, akin to github.com');	
+		  console.log('Handle fromString as an object, akin to github.com');
 		}
 	//		this = this.str;
 	}

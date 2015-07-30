@@ -477,6 +477,7 @@ function showMementoCountsByYear(){
 				$('#drilldownBox ul#years li').removeClass('selectedOption');
 				$(this).addClass('selectedOption');
 				showMementoCountsByMonths($(this).text().substr(0,$(this).text().indexOf(':')));
+				if(debug) { console.log('coverage test 9943'); }
 			});
 
 			//adjust positional offset of year display box based on contents
