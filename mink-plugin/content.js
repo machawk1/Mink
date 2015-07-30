@@ -267,8 +267,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 	if(request.method == 'displaySecureSiteMementos') {
 			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
-				console.log('taking initial conditional');
-				console.log(request.value);
 				hideLogo = true;
 				logoInFocus = true;
 			  flip();
