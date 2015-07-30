@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
@@ -240,6 +240,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 	if(request.method == 'displayThisMementoData'){
 		//Parse the data received from the secure source and display the number of mementos
+		if(request.data.timemap_uri) { // e.g., twitter.com
+			chrome.runtime.sendMessage({
+				method: 'fetchSecureSitesTimeMap',
+				value: request.data.timemap_uri.json_format
+			}, function(response) {
+				if(debug) {console.log('We have a response!'); } // This will not occur due to async exec in mink.js
+			});
+
+			return;
+		}
 		var tm = new Timemap(request.data);
 		displayUIBasedOnTimemap(tm);
 
@@ -261,7 +271,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 				logoInFocus = true;
 			  flip();
 			}else {
+				console.log("TODO: write to localstorage via function");
+
+				storeTimeMapData([request.value])
 				revamp_createUIShowingMementosInTimeMap(request.value);
+
 				//hideLogo = true;
 				//logoInFocus = true;
 				//flip();
@@ -348,6 +362,7 @@ function displayUIBasedOnTimemap(tm) {
 }
 
 function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
+	console.log('creatTimemapFromURI() - includes write to localstorage');
 	if(!accumulatedArrayOfTimemaps){accumulatedArrayOfTimemaps = [];}
 
 	$.ajax({
@@ -388,7 +403,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 	if(debug){console.log('In getMementos');}
-	chrome.storage.local.get(null,function(keys){
+	chrome.storage.local.get(null, function(keys){
 		if(isEmpty(keys)) { 	// No link headers in the request. :(
 			if(debug){console.log('No URI accessed did not have an HTTP link header');}
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
@@ -411,7 +426,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 
 				if(debug){console.log('Starting call chain to generate dropdown HTML');}
 				getMementosWithTimemap();
-			}else if(keys.timegate){
+			}else if(keys.timegate) {
 				if(debug){
 					console.log('We have a timegate URI, lets fetch it and try to get mementos or a timemap');
 				}
@@ -478,7 +493,7 @@ function revamp_createUIShowingMementosInTimeMap(tm) {
 }
 
 function fetchTimeMap(uri) {
-	//if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
+	  if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
 		var prom = new Promise(
 			function(resolve, reject) {
 
@@ -500,6 +515,7 @@ function fetchTimeMap(uri) {
 }
 
 function revamp_fetchTimeMaps(tms) {
+  if (debug) {console.log('revamp_fetchTimeMaps()');}
 		var tmFetchPromises = [];
 		for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
 			tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
@@ -523,7 +539,7 @@ function countNumberOfMementos(arrayOfTimeMaps) {
 			totalNumberOfMementos += arrayOfTimeMaps[tm].mementos.list.length;
 		}
 
-		if(debug){console.log('Found ' + totalNumberOfMementos);}
+		if(debug){console.log('Found ' + totalNumberOfMementos + ' mementos');}
 		return totalNumberOfMementos;
 }
 
@@ -573,17 +589,15 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
 
-	if(timemaploc.indexOf('https://') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
-		//timemaploc = 'https'+timemaploc.substr(4);
+	if(timemaploc.indexOf('https:') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
 		chrome.runtime.sendMessage({
-					method: 'getMementosForHTTPSSource',
+					method: 'fetchSecureSitesTimeMap',
 					value: timemaploc
 		}, function(response) {});
 		//Cannot use above callback, will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call.
 
 		return;
-
 	}
 
 	if(debug){console.log('About to fire off Ajax request for ' + timemaploc);}

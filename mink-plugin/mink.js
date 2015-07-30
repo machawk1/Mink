@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -9,9 +9,13 @@ chrome.runtime.onMessage.addListener(
 
     	sendResponse({value: 'noise'});
     } else if (request.method == 'retrieve'){
-    	if(debug){console.log('RETRIEVING!');}
+    	if(debug){console.log('Retrieving items from localStorage');}
 
-      sendResponse({value: localStorage.getItem('minkURI'),mementos: localStorage.getItem('mementos'), memento_datetime: localStorage.getItem('memento_datetime')});
+      sendResponse({
+        value: localStorage.getItem('minkURI'),
+        mementos: localStorage.getItem('mementos'),
+        memento_datetime: localStorage.getItem('memento_datetime')
+      });
     }else if (request.method == 'nukeFromOrbit') {
     	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchSecureSitesTimeMap') {
@@ -93,7 +97,7 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-
+if(debug) { // Only show contextual menu items in dev for now.
 chrome.contextMenus.create({
 	'title': 'Add to Mink Blacklist',
 	'contexts': ['image'],
@@ -110,6 +114,17 @@ chrome.contextMenus.create({
   if(err){console.log('error creating second contextmenu');}
 });
 
+chrome.contextMenus.create({
+	'title': 'Clear LocalStorage',
+	'contexts': ['image'],
+	'onclick' : nukeLocalStorage
+	//,'targetUrlPatterns':['*://*/*'] //TODO: filter this solely to the Mink UI
+},function(err){
+  if(err){console.log('error creating second contextmenu');}
+});
+
+}
+
 function hideMinkUI(){
  	chrome.tabs.query({
         'active': true,
@@ -125,6 +140,11 @@ function hideMinkUI(){
 function nukeBlacklistCache(){
   chrome.storage.sync.clear();
   console.log('chrome.storage.sync cleared');
+}
+
+function nukeLocalStorage(){
+  chrome.storage.local.clear();
+  console.log('chrome.storage.local cleared');
 }
 
 function showArchiveNowUI(){

@@ -425,6 +425,7 @@ function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
 			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() != ''){
+				if(debug) {console.log('returning, ui is empty');}
 				$('#drilldownBox').removeClass('hiddenUI');
 				return;
 			}
@@ -445,6 +446,9 @@ function showMementoCountsByYear(){
 			}
 
 			//setTimeout(updateProgress,3000);
+			console.log('Mink localstorage contents for this site:');
+			console.log(localStore);
+			console.log("Building Miller columns from " + (localStore.timemaps ? localStore.timemaps.length : 0) + " TimeMaps");
 			$(localStore.timemaps).each(function(tmI,tm){
 				$(tm.mementos.list).each(function(mI,m){
 					var dt = moment(m.datetime);

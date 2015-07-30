@@ -14,6 +14,8 @@ function Timemap(fromString){
 	//console.log(this.str);
 	// Check if the string passed in is an Object, e.g., https://github.com/
 	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
+	console.log(this.str);
+	console.log(typeof this.str);
 	if (strIsAnObject) {
 		if (debug) {
 		  console.log('Handle fromString as an object, akin to github.com');
@@ -43,8 +45,8 @@ function Timemap(fromString){
 
 	this.mementos = [];
 
-	for(var lhe=0; lhe<linkHeaderEntries.length; lhe++){
-		var partsOfEntry = linkHeaderEntries[lhe].split(";");
+	for(var lhe = 0; lhe < linkHeaderEntries.length; lhe++){
+		var partsOfEntry = linkHeaderEntries[lhe].split(';');
 		var potentialMemento = null;
 
 		for(var partOfEntry=0; partOfEntry<partsOfEntry.length; partOfEntry++){
@@ -97,8 +99,8 @@ function Memento(fromStr){
 
 	if(!fromStr){return;}
 
-	this.uri = this.str.substring(this.str.indexOf("<")+1,this.str.indexOf(">"));
-	this.datetime = this.str.substr(this.str.indexOf("datetime")); //abbreviation to just include datetime string and on
+	this.uri = this.str.substring(this.str.indexOf('<') + 1, this.str.indexOf('>'));
+	this.datetime = this.str.substr(this.str.indexOf('datetime')); // Abbreviation to just include datetime string and on
 	this.datetime = this.datetime.substr(this.datetime.indexOf("\"")).replace(/"/g,"").trim();
 }
 
@@ -108,8 +110,8 @@ function Memento(fromStr){
 
 function sanitizeMementoURI(mURI){
 	var ret = mURI.trim();
-	if(ret.substr(0,1) == "<" && ret.substr(ret.length-1,1) == ">"){
-		ret = ret.substr(1,ret.length-2); //remove first and last characters
+	if(ret.substr(0,1) == '<' && ret.substr(ret.length-1,1) == '>'){
+		ret = ret.substr(1, ret.length-2); //remove first and last characters
 	}
 	return ret;
 }
