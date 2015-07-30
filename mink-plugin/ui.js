@@ -84,6 +84,28 @@ function addArchiveNowButtons(addText){
 
 		);
 
+	function refreshAggregatorsTimeMap(forURI){
+		var refreshAggregatorTimeMapURI = aggregator_wdi_json + forURI;
+		$.ajax({
+			method: 'HEAD',
+			url: refreshAggregatorTimeMapURI,
+			beforeSend: function(request) {
+			  request.setRequestHeader('cache-control', 'no-cache	')
+			}
+		}).done(function(data, textStatus, xhr) {
+			  if (debug) {
+				  console.log('success');
+				  console.log(data);
+				}
+		}).fail(function(xhr, textStatus, error) {
+		    if (debug){
+					console.log('failed');
+				  console.log(error);
+				  console.log(textStatus);
+				}
+		});
+	}
+
 	$('#archiveNow_archivedotorg').click(function(){
 		$.ajax({
 			method: 'GET',
@@ -106,6 +128,9 @@ function addArchiveNowButtons(addText){
 				$('.archiveNowSuccess').click(function(){
 					window.open($(this).attr('title'));
 				});
+				// TODO: submit another Ajax request to the aggregator's TM for the URI to update the TM
+				refreshAggregatorsTimeMap(document.URL);
+
 			}else {
 				//console.log(b);
 
@@ -130,12 +155,10 @@ function addArchiveNowButtons(addText){
 				}, function(response) {});
 				$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
 				$('#archiveNow_archivedotis').html('View on Archive.is');
-				
 
 				var linkHeader = c.getResponseHeader('link');
 				var tmFromLinkHeader = new Timemap(linkHeader);
 				var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
-				
 				//var mm = linkHeader.match("<http://archive.is/20150608165224/http://matkelly.com/>; rel="last memento"
 				//var parsedRawArchivedURI = a.match(/replace\(\"http:\/\/archive.today\/.*\"/g);
 				//var archiveURI = parsedRawArchivedURI[0].substring(9,parsedRawArchivedURI[0].length - 1);
@@ -144,6 +167,7 @@ function addArchiveNowButtons(addText){
 				$('.archiveNowSuccess').click(function(){
 					window.open($(this).attr('title'));
 				});
+				refreshAggregatorsTimeMap(document.URL);
 			}else {
 				console.log(b);
 
