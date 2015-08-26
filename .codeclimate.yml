@@ -15,6 +15,6 @@ exclude_paths:
 - "mink-plugin/highchartsdata.js"
 - "mink-plugin/images/*"
 - "mink-plugin/jQuery-Scoped/*"
-- "mink-plugin/jquery.miller.js"
+- "mink-plugin/jquery.miller.js/*"
 - "mink-plugin/js/jquery-2.1.1.min.js"
 - "mink-plugin/moment-with-langs.min.js"
