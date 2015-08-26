@@ -36,10 +36,10 @@ $('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
 //var shadow = document.querySelector("#minkContainer").createShadowRoot();
 
 
-setTimeout(flip,1000);
+setTimeout(flip, 1000);
 
-$(document).ready(function(){
-	$('#mLogo').click(function(){
+$(document).ready(function() {
+	$('#mLogo').click(function() {
 		showArchiveOptions();
 	});
 	displayUIBasedOnContext();
@@ -60,7 +60,7 @@ function addToHistory(uri_r,memento_datetime,mementos,callback){
 	});
 }
 
-function clearHistory(){
+function clearHistory() {
 	chrome.runtime.sendMessage({method: "nukeFromOrbit", value: "It's the only way to be sure"}, function(response) {});
 }
 
@@ -70,19 +70,19 @@ function clearHistory(){
  */
 function viewDifferentMemento(index){
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
-		if(index == null || index == 0){
+		if(index === null || index === 0){
 			addToHistory(response.value,$('#mdts option:selected').text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
-				function(){window.location = $('#mdts').val();}
+				function() {window.location = $('#mdts').val();}
 			);
-		}else if(index == 1){ //next Memento
+		}else if (index === 1) { //next Memento
 			var nextMemento = $('#mdts option:nth-child(' + (parseInt($('#mdts').attr('alt')) + 2) + ')');
 			addToHistory(response.value,nextMemento.text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
-				function(){window.location = nextMemento.val();}
+				function() {window.location = nextMemento.val();}
 			);
-		}else if(index == -1){ //prev Memento
+		}else if (index === -1) { //prev Memento
 			var prevMemento = $('#mdts option:nth-child(' + (parseInt($('#mdts').attr('alt'))) + ')');
 			addToHistory(response.value,prevMemento.text(),response.mementos, //Save the Memento-Datetime of option chosen to localStorage
-				function(){window.location = prevMemento.val();}
+				function() {window.location = prevMemento.val();}
 			);
 		}else {
 			console.log('Bad index value in viewDifferentMemento, ' + index);
@@ -91,16 +91,16 @@ function viewDifferentMemento(index){
 	});
 }
 
-function ceaseQuery(){ //stop everything (AND DANCE!)
+function ceaseQuery() { //stop everything (AND DANCE!)
 	alert('Halting execution');
 }
 
-function displayUIBasedOnContext(){
+function displayUIBasedOnContext() {
 	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
-		if(response == null || response.value == window.location || response.value == null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
+		if(response === null || response.value === window.location || response.value === null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
 			$('#archiveOptions').html('Fetching Mementos...<!--<button onclick="ceaseQuery();" style="margin-left: 1.0em;">Halt and Catch Fire</button>-->');
 			getMementos();
-		}else if(response && response.value != null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
+		}else if(response && response.value !== null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
 				( ((window.location + '').indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
 				  ((window.location + '').replace('www.','').indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
 				  ((window.location + '').indexOf(response.value.replace('www.','')) > -1) ||
@@ -138,7 +138,7 @@ function isEmpty(o){ //returns if empty object is passed in
 function displayReturnToLiveWebButton(uri){
 		//Display UI For When Browsing An Archive Page
 		$('#archiveOptions').html('<button id="liveWeb">Return to Live Web</button>');
-		$('#liveWeb').click(function(){window.location = (uri ? uri : response.value);});
+		$('#liveWeb').click(function() {window.location = (uri ? uri : response.value);});
 }
 
 
@@ -199,7 +199,7 @@ function addToBlacklist(currentBlacklist, uriIn){
 	}
 
 	chrome.storage.sync.set(save,
-		function(){
+		function() {
 			console.log('done adding ' + uri + ' to blacklist. Prev blacklist:');
 			console.log(currentBlacklist);
 			getBlacklist();
@@ -209,7 +209,7 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if(request.method == 'addToBlacklist'){
+	if(request.method === 'addToBlacklist'){
 		// TODO: convert this to add to blacklist
 
 	//	console.log('adding ' + request.uri + ' to blacklist');
@@ -219,13 +219,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 
-	if(request.method == 'echoBlacklist') {
+	if(request.method === 'echoBlacklist') {
 		console.log('Here is the current blacklist:');
 		console.log(request.blacklist);
 		return;
 	}
 
-	if(request.method == 'showArchiveNowUI'){
+	if(request.method === 'showArchiveNowUI'){
 		if(debug){console.log('Hide logo here');}
 		logoInFocus = true;
 		hideLogo = true;
@@ -233,12 +233,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 
-	if(request.method == 'getMementosFromSecureSource'){
+	if(request.method === 'getMementosFromSecureSource'){
 		logoInFocus = true;
 		hideLogo = true;
 	}
 
-	if(request.method == 'displayThisMementoData'){
+	if(request.method === 'displayThisMementoData'){
 		//Parse the data received from the secure source and display the number of mementos
 		if(request.data.timemap_uri) { // e.g., twitter.com
 			chrome.runtime.sendMessage({
@@ -256,7 +256,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 
-	if(request.method == 'displayUI') {
+	if(request.method === 'displayUI') {
 		if(debug){
 			console.log(request.timegate);
 			console.log(request.timemap);
@@ -265,13 +265,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 	}
 
-	if(request.method == 'displaySecureSiteMementos') {
+	if(request.method === 'displaySecureSiteMementos') {
 			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
 				hideLogo = true;
 				logoInFocus = true;
 			  flip();
 			}else {
-				storeTimeMapData([request.value])
+				storeTimeMapData([request.value]);
 				revamp_createUIShowingMementosInTimeMap(request.value);
 
 				//hideLogo = true;
@@ -287,7 +287,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 function processResponseFromAggregator(xhr) {
 	if(debug){console.log('Done querying timegate');}
-	if(xhr.status == 200){
+	if(xhr.status === 200){
 		var linkHeaderStr = xhr.getResponseHeader('Link');
 		var tm = new Timemap(linkHeaderStr);
 
@@ -301,7 +301,7 @@ function processResponseFromAggregator(xhr) {
 			if(debug){console.log('Recursing to find more TMs, last TM:' + tm.timemap.self);}
 			Promise.resolve(createTimemapFromURI(tm.timemap));
 		}
-	}else if(xhr.status == 302) {
+	}else if(xhr.status === 302) {
 		console.log('Do something with 302 here');
 	}
 }
@@ -327,7 +327,7 @@ function queryTimegate(tgURI) {
 	$.ajax({
 		url: tgURI,
 		type: "HEAD"
-	}).done(function(data,textStatus,xhr,a,b) {
+	}).done(function(data,textStatus,xhr) {
 		processResponseFromAggregator(xhr);
 	});
 }
@@ -352,7 +352,7 @@ function displayUIBasedOnTimemap(tm) {
 
 		console.log('Calling addInterfaceComponents from 1');
 		addInterfaceComponents(tm.mementos.length, 1, ' timemaps', selectBox);
-		$('#viewMementoButton').click(function(){viewDifferentMemento();});
+		$('#viewMementoButton').click(function() {viewDifferentMemento();});
 		setMementoButtonInteractivityBasedOnMementoDropdown();
 		//$('#countOverLogo').text(':)');//tm.mementos.length
 
@@ -367,7 +367,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 		url: uri,
 		type: 'GET' /* The payload is in the response body, not the head */
 	}).done(function(data,textStatus,xhr){
-		if(xhr.status == 200){
+		if(xhr.status === 200){
 			var tm = new Timemap(data);
 			// Move data from tm.mementos as array to tm.mementos as an object and
 			//  tm.mementos.list as array to conform to JSON API from LANL aggregator
@@ -377,7 +377,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 			tm.mementos.list = mementosFromTimeMap;
 
 			//delete tm.mementos;
-			if(tm.timemap && tm.self && tm.timemap != tm.self){ // Paginated TimeMaps likely
+			if(tm.timemap && tm.self && tm.timemap !== tm.self){ // Paginated TimeMaps likely
 				//Recursing to find more TMs
 				return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
 			}
@@ -416,7 +416,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
 				if(debug){
 					console.log('We have a timemap, lets do more! The timemap:');
-					console.log(keys.timemap);;
+					console.log(keys.timemap);
 					console.log('We will need to call getMementosWithTimemap() here if we want the dropdown to be generated');
 				}
 
@@ -458,7 +458,7 @@ function createSelectBoxContents(tms) {
 	return selectBox;
 
 	// Chrome does not like very large strings
-	console.log(tms[0]);
+/*	console.log(tms[0]);
 	for(var tm = 0; tm < tms.length; m++) {
 
 		for(var m = 0; m < tms[tm].mementos.list.length; m++){
@@ -469,6 +469,7 @@ function createSelectBoxContents(tms) {
 	selectBox += '</select>';
 
 	return selectBox;
+	*/
 }
 
 function revamp_createUIShowingMementosInTimeMap(tm) {
@@ -551,7 +552,7 @@ function storeTimeMapData(arrayOfTimeMaps, cbIn){
 	}, cb); //end set
 }
 
-function displayUIBasedOnStoredTimeMapData(){
+function displayUIBasedOnStoredTimeMapData() {
 	// Only executed with indexed TimeMaps
 	chrome.storage.local.get('timemaps',
 		function(localStore){
@@ -603,14 +604,14 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		url: timemaploc,
 		type: 'GET'
 	}).done(function(data,textStatus,xhr){
-		if(xhr.status == 200){
+		if(xhr.status === 200){
 			if(debug){console.log(data);}
 			var numberOfMementos = data.mementos ? data.mementos.list.length : 0;
 			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
 			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
 
 			if(numberOfMementos > 0) {
-				storeTimeMapData([data],function(){revamp_createUIShowingMementosInTimeMap(data);});
+				storeTimeMapData([data],function() {revamp_createUIShowingMementosInTimeMap(data);});
 				//storeTimeMapData([data]);
 				//displayUIBasedOnTimemap(data);
 			}else if(numberOfTimeMaps > 0){
@@ -623,9 +624,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		}
 
 /* TODO: tie the history manipulation into the revamp design
-			$("#viewMementoButton").click(function(){
+			$("#viewMementoButton").click(function() {
 				addToHistory(window.location,$("#mdts option:selected").text(),null,//save the URI-R and Memento-Datetime of option chosen to localStorage
-					function(){
+					function() {
 						window.location = $("#mdts").val();
 					}
 				);
@@ -638,7 +639,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			console.log(textStatus);
 			console.log(xhr);
 		}
-		if(xhr.status == 404){
+		if(xhr.status === 404){
 			if(debug){console.log('404');}
 			//return; //prevent infinite loop. This is probably not the correct way to handle it
 		}
