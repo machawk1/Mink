@@ -1,0 +1,20 @@
+languages:
+   Ruby: false
+   JavaScript: true
+   Python: false
+   PHP: false
+exclude_paths:
+- "meta/*"
+- "mink-plugin/Highcharts-4.0.3/*"
+- "mink-plugin/bootstrap/*"
+- "mink-plugin/bootstrap-daterangepicker/*"
+- "mink-plugin/d3.makechart.js"
+- "mink-plugin/d3.v3/*"
+- "mink-plugin/dimple.v1.1.2.min.js"
+- "mink-plugin/font-awesome-4.0.3/*"
+- "mink-plugin/highchartsdata.js"
+- "mink-plugin/images/*"
+- "mink-plugin/jQuery-Scoped/*"
+- "mink-plugin/jquery.miller.js"
+- "mink-plugin/js/jquery-2.1.1.min.js"
+- "mink-plugin/moment-with-langs.min.js"
