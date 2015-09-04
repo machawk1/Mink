@@ -209,6 +209,11 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if(request.method == "hideUI"){
+		$("#minkContainer").fadeOut();
+		return;
+	}
+	
 	if(request.method === 'addToBlacklist'){
 		// TODO: convert this to add to blacklist
 
