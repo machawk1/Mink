@@ -70,11 +70,21 @@
 
 
 
-#drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; position: absolute; z-index: 1; left: 125px; background-color: white; font-family: Arial, sans-serif;}
-#drilldownBox ul {list-style-type: none; width: 145px; float: left; margin: 0; padding: 0;}
-#drilldownBox ul li {list-style-type: none; padding: 0; margin: 0;}
+#drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; position: absolute; z-index: 1; left: 125px; font-family: Arial, sans-serif; background-color: white;}
+#drilldownBox ul {list-style-type: none; width: 90px; float: left;  padding: 0; background-color: white; max-height: 500px; overflow-x: hidden; overflow-y: auto;}
+#drilldownBox ul li {list-style-type: none; padding: 0; margin: 0; width: 90px;}
 #drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
 #drilldownBox ul li.selectedOption {background-color: #ddddff;}
+#drilldownBox ul li span.memCount {float: right;  font-family: Monaco, Courier, sans-serif; padding: 0px 3px; margin-right: 5px; border-radius: 2px; font-size: 10px; margin-top: 3px; line-height: 10px;}
+
+/*
+#drilldownBox ul li span.memCount {
+    font-size: 9px;
+    line-height: 9px;
+    margin-top: 5px;
+    margin-right: 2px;
+}
+*/
 
 /* Do not display UI elements for non-selected view of list of mementos */
 .hiddenUI {display: none;}
