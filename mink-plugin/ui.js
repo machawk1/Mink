@@ -460,9 +460,7 @@ function showMementoCountsByYear(){
 
 			var memCountList = '<ul id="years">';
 			for(var year in years){
-				var mString = 'mementos';
-				if(years[year].length == 1){mString = mString.slice(0,-1);}
-				memCountList += '<li>' + year + ': ' + years[year].length + ' ' + mString + '</li>\r\n';
+				memCountList += '<li>' + year + ' (' + years[year].length + ')</li>\r\n';
 			}
 
 			memCountList += '</ul>';
@@ -519,9 +517,7 @@ function showMementoCountsByMonths(year){
 	}
 
 	for(month in months){
-		var mString = 'mementos';
-		if(months[month].length == 1){mString = mString.slice(0,-1);}
-		memCountList += '<li>' + month + ': '+months[month].length + ' ' + mString + '</li>\r\n';
+		memCountList += '<li>' + month + ' ('+months[month].length + ')</li>\r\n';
 	}
 
 	memCountList += '</ul>';
@@ -553,9 +549,7 @@ function showMementoCountsByDays(mementos){
 	}
 	var memCountList = '<ul id="day">';
 	for(day in days){
-		var mString = 'mementos';
-		if(days[day].length == 1){mString = mString.slice(0,-1);}
-		memCountList += '<li>' + day + ': ' + days[day].length + ' ' + mString + '</li>\r\n';
+		memCountList += '<li>' + day + ' (' + days[day].length + ')</li>\r\n';
 	}
 
 	memCountList += '</ul>';
@@ -587,9 +581,7 @@ function showMementoCountsByTime(mementos){
 	}
 	var memCountList = '<ul id="time">';
 	for(time in times){
-		var mString = 'mementos';
-		if(times[time].length == 1){mString = mString.slice(0,-1);}
-		memCountList += '<li title="' + uris[time] + '">' + time + '</li>\r\n';//: "+times[time].length+" "+mString+"</li>\r\n";
+		memCountList += '<li title="' + uris[time] + '">' + time + '</li>\r\n';
 	}
 
 	memCountList += '</ul>';
