@@ -606,14 +606,18 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		return;
 	}
 
-	if(debug){console.log('About to fire off Ajax request for ' + timemaploc);}
+	if(debug){console.log('Content.js: About to fire off Ajax request for ' + timemaploc);}
 	$.ajax({
 		url: timemaploc,
 		type: 'GET'
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status === 200){
 			if(debug){console.log(data);}
-			var numberOfMementos = data.mementos ? data.mementos.list.length : 0;
+			if(debug){console.log(xhr.getAllResponseHeaders());}
+			if(debug){console.log(xhr.getResponseHeader('X-Memento-Count'));}
+			var memCount = xhr.getResponseHeader('X-Memento-Count');
+			
+			var numberOfMementos = memCount ? memCount : 0;
 			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
 			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
 

@@ -269,7 +269,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	}
 
 
-	if(debug){console.log('About to fire off Ajax request for ' + timemaploc);}
+	if(debug){console.log('Mink.js: About to fire off Ajax request for ' + timemaploc);}
 	$.ajax({
 		url: timemaploc,
 		type: 'GET'
