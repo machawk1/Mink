@@ -258,9 +258,10 @@ function displaySecureSiteMementos(mementos){
    Is there a reason that the below should even be in content.js? */
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	if(!timemaploc){ //use the aggregator
-    // Redundant def of content.js constant, which cannot be accessed from here
-    var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
-		timemaploc = aggregator_wdi_json + window.location;
+        // Redundant def of content.js constant, which cannot be accessed from here
+        //var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
+        var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
+		timemaploc = memgator_json + window.location;
 	}
 
 	if(uri){

@@ -1,10 +1,12 @@
 var debug = false;
 
-var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
-var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
+//var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
+var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/';
+//var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
 var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
-var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/';
-var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/';
+var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
+//var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/';
+//var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/';
 var numberOfTimemaps = 0;
 
 var embeddedTimemapRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g;
@@ -322,7 +324,7 @@ function queryTimegate(tgURI) {
 
 			chrome.runtime.sendMessage({
 				method: 'fetchSecureSitesTimeMap',
-				value: aggregator_wdi_json + tgURI.substr(tgURI.indexOf('https:'))
+				value: memgator_json + tgURI.substr(tgURI.indexOf('https:'))
 			}, function(response) {
 				if(debug) {console.log('We have a response!'); } // This will not occur due to async exec in mink.js
 			});
@@ -586,7 +588,7 @@ function displayUIBasedOnStoredTimeMapData() {
 
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	if(!timemaploc){ //use the aggregator
-		timemaploc = aggregator_wdi_json + window.location;
+		timemaploc = memgator_json + window.location;
 	}
 
 	if(uri){
@@ -658,7 +660,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			// - Attempt to extract the URI-R
 			var URI_M = (window.location + '').substr((window.location + '').indexOf('http', 6)); //exclude the initial scheme, let's figure out where the URI-M starts
 			URI_M = URI_M.replace('http://', 'http://'); //cross-protocol interaction is a no-no
-			return getMementosWithTimemap(proxy + URI_M, null, true);
+			return getMementosWithTimemap(memgator_proxy + URI_M, null, true);
 		}
 
 		// hide the Memento logo
