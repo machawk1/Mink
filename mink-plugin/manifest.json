@@ -9,6 +9,10 @@
        "scripts": ["js/jquery-2.1.1.min.js","timemap.js","mink.js"],
        "persistent": true
    },
+   "browser_action": {
+     "default_title": "Mink - Integrating the Live and Archived Web"
+   },
+   
    "icons": { "128": "images/minkLogo_128.png"},
    "permissions": [
        "webRequest",
@@ -19,7 +23,8 @@
        "unlimitedStorage",
        "cookies",
        "notifications",
-       "contextMenus"
+       "contextMenus",
+       "activeTab"
     ],
     "content_scripts": [
     {
@@ -55,6 +60,8 @@
     	"images/archives/ia.png",
     	"style.css",
     	"js/jquery-2.1.1.min.js","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
+
+"js/displayMinkUI.js", "minkui.html", "css/minkui.css",
     	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
     	"bootstrap/css/bootstrap.min.css","bootstrap/css/bootstrap-theme.min.css",

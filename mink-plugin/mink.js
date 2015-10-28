@@ -1,5 +1,13 @@
 var debug = false;
 
+chrome.browserAction.onClicked.addListener(function(tab) {
+  console.log('Mink test!');
+  chrome.tabs.executeScript(null, {
+    file: "js/displayMinkUI.js"
+  });
+});
+
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.method == 'store') {
