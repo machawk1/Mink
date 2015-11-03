@@ -61,7 +61,7 @@
     	"style.css",
     	"js/jquery-2.1.1.min.js","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
 
-"js/displayMinkUI.js", "minkui.html", "css/minkui.css",
+"js/displayMinkUI.js", "minkui.html", "css/minkui.css", "images/minkLogo_300.png",
     	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
     	"bootstrap/css/bootstrap.min.css","bootstrap/css/bootstrap-theme.min.css",

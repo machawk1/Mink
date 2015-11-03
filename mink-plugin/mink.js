@@ -1,8 +1,11 @@
-var debug = false;
+var debug = true;
 
 chrome.browserAction.onClicked.addListener(function(tab) {
   console.log('Mink test!');
   chrome.tabs.executeScript(null, {
+  // TODO: Account for data: URIs like the "connection unavailable" page.
+  //   Currently, because this scheme format is not in the manifest, an exception is   
+  //     thrown. Handle this more gracefully.
     file: "js/displayMinkUI.js"
   });
 });
@@ -270,9 +273,15 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
         //var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
         var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
 		timemaploc = memgator_json + window.location;
+		if(debug) {
+		  console.log('In getMementosWithTimemap');
+		}
 	}
 
 	if(uri){
+	    if(debug) {
+	      console.log('in uri ' + uri);
+	    }
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
 
@@ -284,11 +293,16 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status == 200){
 			if(debug){console.log(data);}
-			var numberOfMementos = data.mementos ? data.mementos.list.length : 0;
-			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
-			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
+			if(debug){console.log(xhr.getAllResponseHeaders());}
+			
+			var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
 
-      if (numberOfMementos == 0 && numberOfTimeMaps > 0) {
+	         // The MemGator service currently returns a 404 w/ no X-Memento-Count 
+	         //    HTTP Header
+	         //  Q: Does a 404 cause the above AJAX to invoke this "fail" handler
+			if(debug){console.log(numberOfMementos + ' mementos available');}
+
+      if (numberOfMementos == 0) {
           if (debug) {console.log('We still need to fetch the TimeMap in mink.js');}
           revamp_fetchTimeMaps(data.timemap_index, displaySecureSiteMementos);
 
@@ -300,6 +314,15 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
       return;
 		}
 	}).fail(function(xhr,textStatus) {
+	    // TODO: Handler the scenario when the user does not have an internet connection 
+	    //   Also, Timeout from server
+	    if(debug) {
+	      console.log('we encountered an error');
+	      console.log(xhr);
+	      console.log(xhr.getResponseHeader('X-Memento-Count'));
+	      console.log('fin');
+	      return;
+	    }
 		if(debug){
 			console.log('ERROR');
 			console.log(textStatus);

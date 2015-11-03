@@ -3,8 +3,37 @@
 <img id="minkLogo" alt="Mink logo" />
 <h1 id="mementosAvailable">mementos available.</h1>
 
+<select>
+  <option>Select a Foo</option>
+  <option>Test</option>
+  <option>Test</option>
+  <option>Test</option>
+  <option>Test</option>
+  <option>Test</option>
+  <option>Test</option>
+</select>
+
+<div id="minkStatus">
+  <ul id="steps">
+    <li data-status="waiting"><span>Querying Aggregator</span></li>
+    <li data-status="waiting"><span>Waiting for Archives' Response</span></li>
+    <li data-status="waiting"><span>Parsing Datetimes</span></li>
+    <li data-status="waiting"><span>Building Interface</span></li>
+  </ul>
+</div>
+
 <script>
-document.getElementById('minkLogo').src = chrome.extension.getURL('./images/icon128.png');
+document.getElementById('minkLogo').src = chrome.extension.getURL('./images/minkLogo_300.png');
+
+$('#steps li').click(function(){
+ if($(this).attr('data-status') == 'waiting') {
+   $(this).attr('data-status','processing');
+ }else if($(this).attr('data-status') == 'processing') {
+   $(this).attr('data-status','complete');
+ }else if($(this).attr('data-status') == 'complete') {
+   $(this).attr('data-status','waiting');
+ }
+});
 </script>
 </div>
 </div>

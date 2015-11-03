@@ -1,3 +1,10 @@
-#minkuiX {width: 100%; height: 80px; background-color: #eef; margin: 0; top: 0; position: fixed; padding: 5px; border-bottom: 3px double #ccf; z-index:99999;}
-#minkuiX #minkLogo {height: 100%; float: left;}
+#minkWrapper {margin: 0; padding: 0;}
+#minkuiX {width: 100%; height: 80px; background-color: #eef; margin: 0; top: 0; position: fixed; padding: 5px;  z-index:99999;}
+#minkuiX #minkLogo {height: 100%; float: left; z-index: 2; position: relative;}
+#minkuiX #minkStatus {width: 100%; position: absolute; bottom: 0; left: 0; margin: 0; padding: 0; background-color: #ccf; z-index: 1; height: 1.2em; border-bottom: 2px solid #aaf; border-top: 1px solid #bbf;}
+#minkuiX #minkStatus ul {list-style-type: none; margin: 0; padding: 0;}
+#minkuiX #minkStatus li {width: 24%; float: left; text-align: right; vertical-align: middle; padding: 0; margin: 0;}
+#minkuiX #minkStatus li span {border-radius: 10px; padding: 2px 8px 2px 8px; margin: 2px 0px 0px 0px;}
+
+
 h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-serif;}

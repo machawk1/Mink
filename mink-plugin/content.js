@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 //var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/';
@@ -358,11 +358,9 @@ function displayUIBasedOnTimemap(tm) {
 		selectBox += '</select>';
 
 		console.log('Calling addInterfaceComponents from 1');
-		addInterfaceComponents(tm.mementos.length, 1, ' timemaps', selectBox);
-		$('#viewMementoButton').click(function() {viewDifferentMemento();});
-		setMementoButtonInteractivityBasedOnMementoDropdown();
-		//$('#countOverLogo').text(':)');//tm.mementos.length
-
+		//addInterfaceComponents(tm.mementos.length, 1, ' timemaps', selectBox);
+		//$('#viewMementoButton').click(function() {viewDifferentMemento();});
+		//setMementoButtonInteractivityBasedOnMementoDropdown();
 	}
 }
 
@@ -480,6 +478,8 @@ function createSelectBoxContents(tms) {
 }
 
 function revamp_createUIShowingMementosInTimeMap(tm) {
+    console.log('Hitting revamp_createUIShowingMementoInTimeMap');
+    return;
 	var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
 	for(var m=0; m<tm.mementos.list.length; m++){
 		selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + moment(tm.mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
