@@ -6,13 +6,16 @@
 <select id="mementosDropdown">
   <option>Select a Memento</option>
 </select>
+<input type="button" value="View" id="viewMementoButton" disabled="disabled" />
+<input type="button" value="Archive Page To..." id="archiveNow" />
+<input type="button" value="?" id="helpButton" />
 
 <div id="minkStatus">
   <ul id="steps">
-    <li data-status="waiting"><span>Querying Aggregator</span></li>
-    <li data-status="waiting"><span>Waiting for Archives' Response</span></li>
-    <li data-status="waiting"><span>Parsing Datetimes</span></li>
-    <li data-status="waiting"><span>Building Interface</span></li>
+    <li data-status="waiting" id="stepsTitle"><span>List mementos by:</span></li>
+    <li data-status="waiting"><span>Dropdown</span></li>
+    <li data-status="waiting"><span>Drill Down</span></li>
+    <li data-status="waiting"><span>Foo Method</span></li>
   </ul>
 </div>
 
@@ -28,6 +31,24 @@ $('#steps li').click(function(){
    $(this).attr('data-status','waiting');
  }
 });
+
+
+var viewButton = $("#viewMementoButton");
+
+$('#mementosDropdown').change(function() {
+	if($(this)[0].selectedIndex == 0){
+		$(viewButton).attr('disabled','disabled');
+		$(viewButton).removeAttr('alt');
+	}else {
+		$(viewButton).removeAttr('disabled');
+		$(viewButton).attr('alt',$(this).find('option:selected').data('uri'));
+	}
+});
+
+$('#viewMementoButton').click(function() {
+  window.location = $(this).attr('alt');
+});
+
 </script>
 </div>
 </div>

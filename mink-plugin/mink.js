@@ -86,7 +86,13 @@ chrome.runtime.onMessage.addListener(
        console.log('starting animation.....');
        iconState = 0;
         setTimeout(nextAnimationStep, 250);
-        chrome.pageAction.setIcon({tabId: tab.id, path: {'38':'images/minkLogo38_working.png'}});
+        /*chrome.tabs.getSelected(null, function (tab) {
+		  chrome.tabs.sendMessage(tab.id, {
+            "method": 'changeIcon'
+           });
+		});*/
+        
+        
     }else if(request.method == 'setBadgeText') {
         
         chrome.tabs.getSelected(null, function(tab) {
@@ -99,14 +105,7 @@ chrome.runtime.onMessage.addListener(
           value: 'stopAnimation'
       });
     }else if(request.method == 'setDropdownContents') {
-      console.log('999');
-      console.log(request.value);
-
       tmData = request.value;
-      //for(var mm = 0; mm < request.value.mementos.list.length; mm++) {
-      
-      //}
-    
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue

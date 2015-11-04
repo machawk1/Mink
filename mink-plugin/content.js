@@ -271,7 +271,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.log('-----');
 		}
 	}
-
+    
 	if(request.method === 'displaySecureSiteMementos') {
 			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
 				hideLogo = true;
