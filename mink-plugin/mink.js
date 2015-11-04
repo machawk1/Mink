@@ -3,17 +3,32 @@ var iconState = -1;
 var tmData;
 
 chrome.browserAction.onClicked.addListener(function(tab) {
-  console.log('Mink test!');
-  chrome.tabs.executeScript(tab.id, {code: "var tmData = " + JSON.stringify(tmData)}, 
+    chrome.tabs.getSelected(null, function(tab) {
+		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
+		  if(!result.length && !Number.isInteger(result)) {		              
+			chrome.tabs.getSelected(null, function(tab) {
+				chrome.browserAction.setBadgeText({text: "WAIT", tabId: tab.id});
+			});
+		    return; // Badge has not yet been set
+		  }
+		  displayMinkUI(tab.id);
+		  
+		});
+	});
+});
+
+function displayMinkUI(tabId) {
+  chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData)}, 
     function() {
-	  chrome.tabs.executeScript(tab.id, {
+	  chrome.tabs.executeScript(tabId, {
 	  // TODO: Account for data: URIs like the "connection unavailable" page.
 	  //   Currently, because this scheme format is not in the manifest, an exception is   
 	  //     thrown. Handle this more gracefully.
 		file: "js/displayMinkUI.js"
 	  });
   });
-});
+
+}
 
 
 chrome.runtime.onMessage.addListener(
@@ -97,6 +112,7 @@ chrome.runtime.onMessage.addListener(
         
         chrome.tabs.getSelected(null, function(tab) {
 			chrome.browserAction.setBadgeText({text: request.value, tabId: tab.id});
+			chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tab.id});
 		});
 		//TODO: stop spinning
 		//stopSpinningActionButton()

@@ -412,11 +412,12 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
 		}else {				//we have link headers!
 			if(keys.datetime){ //isA memento
-				if(debug){console.log('We are a memento!');}
+				if(debug){console.log('XWe are a memento!');}
 				logoInFocus = true;
 				if(debug){console.log(keys);}
 				//Display UI For When Browsing An Archive Page
-				displayReturnToLiveWebButton(keys.original);
+				console.log('Display "in the archives" interface');
+				//displayReturnToLiveWebButton(keys.original);
 			}else if(keys.timemap) {
 				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
 				if(debug){
@@ -636,11 +637,6 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			if(debug){console.log(numberOfMementos + ' mementos');}
 
 			if(numberOfMementos > 0) {
-				//storeTimeMapData(data,function() {revamp_createUIShowingMementosInTimeMap(data);});
-				//storeTimeMapData(data);
-				//displayUIBasedOnTimemap(data);
-				console.log('TODO: Showing memento count badge');
-				
 				chrome.runtime.sendMessage({method: "setBadgeText", value: numberOfMementos}, function(response) {
 				    console.log('Badge text set!');
 				    logoInFocus = true;
