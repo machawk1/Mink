@@ -1,12 +1,17 @@
 var debug = true;
+var iconState = -1;
+var tmData;
 
 chrome.browserAction.onClicked.addListener(function(tab) {
   console.log('Mink test!');
-  chrome.tabs.executeScript(null, {
-  // TODO: Account for data: URIs like the "connection unavailable" page.
-  //   Currently, because this scheme format is not in the manifest, an exception is   
-  //     thrown. Handle this more gracefully.
-    file: "js/displayMinkUI.js"
+  chrome.tabs.executeScript(tab.id, {code: "var tmData = " + JSON.stringify(tmData)}, 
+    function() {
+	  chrome.tabs.executeScript(tab.id, {
+	  // TODO: Account for data: URIs like the "connection unavailable" page.
+	  //   Currently, because this scheme format is not in the manifest, an exception is   
+	  //     thrown. Handle this more gracefully.
+		file: "js/displayMinkUI.js"
+	  });
   });
 });
 
@@ -20,6 +25,14 @@ chrome.runtime.onMessage.addListener(
 
     	sendResponse({value: 'noise'});
     } else if (request.method == 'retrieve'){
+    	if(debug){console.log('Retrieving items from localStorage');}
+
+      sendResponse({
+        value: localStorage.getItem('minkURI'),
+        mementos: localStorage.getItem('mementos'),
+        memento_datetime: localStorage.getItem('memento_datetime')
+      });
+    } else if (request.method == 'retrieveFromLocalStorage'){
     	if(debug){console.log('Retrieving items from localStorage');}
 
       sendResponse({
@@ -69,6 +82,31 @@ chrome.runtime.onMessage.addListener(
             console.log(textStatus);
           }
       });
+    }else if(request.method == 'startSpinningActionButton') {
+       console.log('starting animation.....');
+       iconState = 0;
+        setTimeout(nextAnimationStep, 250);
+        chrome.pageAction.setIcon({tabId: tab.id, path: {'38':'images/minkLogo38_working.png'}});
+    }else if(request.method == 'setBadgeText') {
+        
+        chrome.tabs.getSelected(null, function(tab) {
+			chrome.browserAction.setBadgeText({text: request.value, tabId: tab.id});
+		});
+		//TODO: stop spinning
+		//stopSpinningActionButton()
+		
+        sendResponse({
+          value: 'stopAnimation'
+      });
+    }else if(request.method == 'setDropdownContents') {
+      console.log('999');
+      console.log(request.value);
+
+      tmData = request.value;
+      //for(var mm = 0; mm < request.value.mementos.list.length; mm++) {
+      
+      //}
+    
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
@@ -114,6 +152,25 @@ chrome.contextMenus.create({
 	"onclick" : hideMinkUI
 	//,"targetUrlPatterns":["*://*/*"] //TODO: filter this solely to the Mink UI
 });
+
+function nextAnimationStep() {
+	  if(iconState <= 0) {
+		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-37_5'}});
+		iconState = 1;
+		console.log('1');
+	  }else if(iconState == 1) {
+		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-45.png'}});  
+		iconState = 2;
+		console.log('2');
+	  }else {
+		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-30.png'}}); 
+		iconState = 0;
+		console.log('0');
+	  }
+	  
+	  if(iconState == -1){ return;}
+	  //setTimeout(nextAnimationStep, 250);
+}
 
 function hideMinkUI(){
  	chrome.tabs.query({

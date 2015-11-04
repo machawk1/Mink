@@ -10,7 +10,10 @@
        "persistent": true
    },
    "browser_action": {
-     "default_title": "Mink - Integrating the Live and Archived Web"
+     "default_title": "Mink - Integrating the Live and Archived Web",
+     "default_icon": {
+     	"19": "images/minkLogo19.png",
+     	"38": "images/minkLogo38.png"}
    },
    
    "icons": { "128": "images/minkLogo_128.png"},
@@ -56,7 +59,8 @@
       "chrome_style": false
     },
     "web_accessible_resources": [
-    	"images/icon-on-19.png","images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
+    	
+"images/mementoLogo-19px-30.png", "images/mementoLogo-19px-37_5.png", "images/mementoLogo-19px-45.png", "images/mementoLogo38_working.png",       	"images/icon-on-19.png","images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
     	"images/archives/ia.png",
     	"style.css",
     	"js/jquery-2.1.1.min.js","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",

@@ -38,7 +38,7 @@ $('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
 //var shadow = document.querySelector("#minkContainer").createShadowRoot();
 
 
-setTimeout(flip, 1000);
+//setTimeout(flip, 1000);
 
 $(document).ready(function() {
 	$('#mLogo').click(function() {
@@ -276,7 +276,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
 				hideLogo = true;
 				logoInFocus = true;
-			  flip();
+			  //flip();
 			}else {
 				storeTimeMapData([request.value]);
 				revamp_createUIShowingMementosInTimeMap(request.value);
@@ -478,7 +478,9 @@ function createSelectBoxContents(tms) {
 }
 
 function revamp_createUIShowingMementosInTimeMap(tm) {
-    console.log('Hitting revamp_createUIShowingMementoInTimeMap');
+    console.log('Hitting revamp_createUIShowingMementoInTimeMap, returning because we are implementing browserActions.');
+    console.log("We have "+ tm.mementos.list.length + mementos);
+    logoInFocus = false;
     return;
 	var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
 	for(var m=0; m<tm.mementos.list.length; m++){
@@ -549,13 +551,13 @@ function countNumberOfMementos(arrayOfTimeMaps) {
 		return totalNumberOfMementos;
 }
 
-function storeTimeMapData(arrayOfTimeMaps, cbIn){
+function storeTimeMapData(tmData, cbIn){
 	var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
-	if(debug){console.log('executing storeTimeMapData');}
+	if(debug){console.log('executing storeTimeMapData');console.log(tmData);}
 
 	chrome.storage.local.set({
-			'uri_r': arrayOfTimeMaps[0].original_uri,
-			'timemaps': arrayOfTimeMaps
+			'uri_r': tmData.original_uri,
+			'timemaps': tmData
 	}, cb); //end set
 }
 
@@ -587,6 +589,13 @@ function displayUIBasedOnStoredTimeMapData() {
 
 
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
+	chrome.runtime.sendMessage({method: "startSpinningActionButton"}, function(response) {
+		console.log('Animation started');
+		//if(callback){
+		//	callback();
+		//}
+	});
+
 	if(!timemaploc){ //use the aggregator
 		timemaploc = memgator_json + window.location;
 	}
@@ -607,6 +616,11 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	}
 
 	if(debug){console.log('Content.js: About to fire off Ajax request for ' + timemaploc);}
+	
+	
+
+
+	
 	$.ajax({
 		url: timemaploc,
 		type: 'GET'
@@ -615,16 +629,36 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			if(debug){console.log(data);}
 			if(debug){console.log(xhr.getAllResponseHeaders());}
 			if(debug){console.log(xhr.getResponseHeader('X-Memento-Count'));}
+
 			var memCount = xhr.getResponseHeader('X-Memento-Count');
 			
 			var numberOfMementos = memCount ? memCount : 0;
-			var numberOfTimeMaps = data.timemap_index ? data.timemap_index.length : 0;
-			if(debug){console.log(numberOfMementos + ' mementos, ' + numberOfTimeMaps + ' timemaps');}
+			if(debug){console.log(numberOfMementos + ' mementos');}
 
 			if(numberOfMementos > 0) {
-				storeTimeMapData([data],function() {revamp_createUIShowingMementosInTimeMap(data);});
-				//storeTimeMapData([data]);
+				//storeTimeMapData(data,function() {revamp_createUIShowingMementosInTimeMap(data);});
+				//storeTimeMapData(data);
 				//displayUIBasedOnTimemap(data);
+				console.log('TODO: Showing memento count badge');
+				
+				chrome.runtime.sendMessage({method: "setBadgeText", value: numberOfMementos}, function(response) {
+				    console.log('Badge text set!');
+				    logoInFocus = true;
+				    hideLogo = true;
+				    console.log('TODO: populate the actionButton dropdown contents here.');
+				    //console.log(data);
+				    //console.log($('#mementosDropdown').html());
+				    
+				    chrome.runtime.sendMessage({method: "setDropdownContents", value: data}, function(response) {
+				      console.log('done?');
+				      console.log(response);
+				    });
+				    
+					//if(callback){
+					//	callback();
+					//}
+				});
+				
 			}else if(numberOfTimeMaps > 0){
 			  if(debug){console.log('Show indexed TimeMap interface here');}
 			  revamp_fetchTimeMaps(data.timemap_index);
