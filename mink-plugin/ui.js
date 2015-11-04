@@ -350,6 +350,8 @@ function addExtraButtonBehaviors(){
 }
 
 function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
+    alert('old UI!');
+    /*
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
 	var helpButton = '<input type="button" value="?" id="helpButton" />';
@@ -414,7 +416,7 @@ function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
 
 		}
 	}
-
+    */
 }
 
 function destroyMementoCountsByYear(){

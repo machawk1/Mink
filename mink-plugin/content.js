@@ -20,30 +20,10 @@ var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g;
 if(debug){console.log('blacklist test');}
 //getBlacklist();
 
-
-//PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
-
-$('body').append('<div id="minkContainer"></div>');
-//PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
-$('#minkContainer').append('<style type="text/css" scoped="scoped">\r\n' +
-	'#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n' +
-	'#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n' +
-	'#minkContainer input[type=button]:enabled:hover {cursor: pointer; background-color: #ccc; }' +
-	'#minkContainer input[type=button]:disabled:hover {cursor: not-allowed; }' +
-	'#minkContainer input[type=button]:disabled {opacity: 0.25; }' +
-'</style>');
-//$.scoped();
-$('#minkContainer').append('<div id="archiveOptions"></div>');
-$('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
-//var shadow = document.querySelector("#minkContainer").createShadowRoot();
-
-
-//setTimeout(flip, 1000);
-
 $(document).ready(function() {
-	$('#mLogo').click(function() {
-		showArchiveOptions();
-	});
+	//$('#mLogo').click(function() {
+	//	showArchiveOptions();
+	//});
 	displayUIBasedOnContext();
 
 });
@@ -98,33 +78,11 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 }
 
 function displayUIBasedOnContext() {
-	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
-		if(response === null || response.value === window.location || response.value === null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
-			$('#archiveOptions').html('Fetching Mementos...<!--<button onclick="ceaseQuery();" style="margin-left: 1.0em;">Halt and Catch Fire</button>-->');
-			getMementos();
-		}else if(response && response.value !== null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
-				( ((window.location + '').indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
-				  ((window.location + '').replace('www.','').indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
-				  ((window.location + '').indexOf(response.value.replace('www.','')) > -1) ||
-				  ((window.location + '').replace('www.','').indexOf(response.value.replace('www.', '')) > -1)
-				) 																	// There were memento HTTP headers
-			){
-			logoInFocus = true;
+    getMementos();
 
-			//Display UI For When Browsing An Archive Page
-			displayReturnToLiveWebButton(response.value);
+//  Pull data from localStorage cache
+//	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {});  
 
-			//$('#archiveOptions').append(getMementosNavigationBasedOnJSON(response.mementos,response.memento_datetime));
-			//$('#viewMementoButton').click(viewDifferentMemento); //this is different from the live web context, as we don't store the URI-M in localStorage but instead, remember the URI-R there
-
-			//setMementoButtonInteractivityBasedOnMementoDropdown();
-		}else {
-			if(debug){console.log('There is no else, only if');}
-			//ugh, we don't want to be here, let's nuke the localStorage
-			clearHistory();
-			displayUIBasedOnContext();
-		}
-	  });
 }
 
 function isEmpty(o){ //returns if empty object is passed in
@@ -257,10 +215,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 			return;
 		}
+		
+		alert('blacrfc');
+        return;
+        
+        /*		
 		var tm = new Timemap(request.data);
 		displayUIBasedOnTimemap(tm);
 
-		return;
+		return;*/
 	}
 
 	if(request.method === 'displayUI') {
@@ -287,7 +250,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			}
 			return;
 	}
-
+ 
+    console.log('bar');
 	displayUIBasedOnContext();
 });
 
@@ -341,6 +305,10 @@ function queryTimegate(tgURI) {
 
 function displayUIBasedOnTimemap(tm) {
 	console.log('likely obsolete interface');
+	alert('old interface');
+	return;
+	/*
+	
 
 	if(tm.mementos.length > 0) {
 		logoInFocus = true; //stop rotating the logo, we have a list of mementos
@@ -362,6 +330,7 @@ function displayUIBasedOnTimemap(tm) {
 		//$('#viewMementoButton').click(function() {viewDifferentMemento();});
 		//setMementoButtonInteractivityBasedOnMementoDropdown();
 	}
+	*/
 }
 
 function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
@@ -607,6 +576,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 	if(timemaploc.indexOf('https:') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
+		console.warn('Trying ' + timemaploc);
 		chrome.runtime.sendMessage({
 					method: 'fetchSecureSitesTimeMap',
 					value: timemaploc

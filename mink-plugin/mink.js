@@ -1,13 +1,15 @@
 var debug = true;
 var iconState = -1;
 var tmData;
+var maxBadgeDisplay = '999+';
+var stillProcessingBadgeDisplay = 'WAIT';
 
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.getSelected(null, function(tab) {
 		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
-		  if(!result.length && !Number.isInteger(result)) {		              
+		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
 			chrome.tabs.getSelected(null, function(tab) {
-				chrome.browserAction.setBadgeText({text: "WAIT", tabId: tab.id});
+				chrome.browserAction.setBadgeText({text: stillProcessingBadgeDisplay, tabId: tab.id});
 			});
 		    return; // Badge has not yet been set
 		  }
@@ -59,14 +61,26 @@ chrome.runtime.onMessage.addListener(
     	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchSecureSitesTimeMap') {
       var tgURI = request.value;
-
+      
+      
+      console.log('about to fetch secure sites mementos');
       $.ajax({
     		url: tgURI,
     		type: "GET"
     	}).done(function(data,textStatus,xhr,a,b){
-        getMementosWithTimemap(data.timemap_uri.json_format);
+    	  console.log('success querying w/ secure URI');
+          getMementosWithTimemap(data.timemap_uri.json_format);
+          
     	}).fail(function(xhr, data, error){
-        getMementosWithTimemap(tgURI);
+    	  console.log('querying secure FAILED, mitigating');
+    	  if(xhr.status === 404) {
+    	    console.log('Display zero mementos here!');
+    	    showInterfaceForZeroMementos();
+    	    return;
+    	  }
+    	  
+    	  // Should only get here if there is some sort of weird cross-scheme issue
+          getMementosWithTimemap(tgURI);
       });
     }else if (request.method == 'notify') {
 		  var notify = chrome.notifications.create(
@@ -111,7 +125,13 @@ chrome.runtime.onMessage.addListener(
     }else if(request.method == 'setBadgeText') {
         
         chrome.tabs.getSelected(null, function(tab) {
-			chrome.browserAction.setBadgeText({text: request.value, tabId: tab.id});
+            var badgeValue = request.value;
+
+            if(parseInt(badgeValue) > 999) {
+                badgeValue = maxBadgeDisplay
+            }
+
+			chrome.browserAction.setBadgeText({text: badgeValue, tabId: tab.id});
 			chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tab.id});
 		});
 		//TODO: stop spinning
@@ -337,9 +357,25 @@ function displaySecureSiteMementos(mementos){
 }
 
 
+function showInterfaceForZeroMementos() {
+  console.log('Displaying zero mementos');
+  tmData = {};
+  tmData.mementos = {};
+  tmData.mementos.list = [];
+  tmData.original_uri = 'doWeKnowThisHere';
+  
+  
+  // TODO: Also set the badge icon to the red memento icon (or something else indicative)
+  chrome.tabs.getSelected(null, function(tab) {
+    chrome.browserAction.setBadgeText({text: '' + tmData.mementos.list.length, tabId: tab.id});
+  });
+  
+}
+
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.
    Is there a reason that the below should even be in content.js? */
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
+    console.log('access test');
 	if(!timemaploc){ //use the aggregator
         // Redundant def of content.js constant, which cannot be accessed from here
         //var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
