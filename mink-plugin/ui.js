@@ -112,7 +112,7 @@ function addArchiveNowButtons(addText){
 				}
 		});
 	}
-
+/*
 	$('#archiveNow_archivedotorg').click(function(){
 		$.ajax({
 			method: 'GET',
@@ -181,7 +181,7 @@ function addArchiveNowButtons(addText){
 		$('#archiveNow_archivedotis').trigger('click');
 		$(this).html('View All');
 		$(this).addClass('archiveNowSuccess');
-	});
+	});*/
 
 }
 

@@ -8,7 +8,12 @@
 </select>
 <input type="button" value="View" id="viewMementoButton" disabled="disabled" />
 <input type="button" value="Archive Page To..." id="archiveNow" />
-<input type="button" value="?" id="helpButton" />
+<span class="archiveNowInterface hidden">Archive Page To...</span>
+<img src="images/iaLogo.png" alt="Internet Archive" id="archivelogo_ia" class="archiveNowInterface hidden archiveLogo" />
+<img src="images/archiveisLogo.png" alt="Archive.is" id="archivelogo_ais" class="archiveNowInterface hidden archiveLogo" />
+<img src="images/allListedArchives.png" alt="All Listed Archives" id="archivelogo_ala" class="archiveNowInterface hidden archiveLogo" />
+<!--<input type="button" value="?" id="helpButton" />-->
+
 
 <div id="minkStatus">
   <ul id="steps">
@@ -21,6 +26,10 @@
 
 <script>
 document.getElementById('minkLogo').src = chrome.extension.getURL('./images/minkLogo_300.png');
+
+document.getElementById('archivelogo_ia').src = chrome.extension.getURL('./images/archives/iaLogo.png');
+document.getElementById('archivelogo_ais').src = chrome.extension.getURL('./images/archives/archiveisLogo.png');
+document.getElementById('archivelogo_ala').src = chrome.extension.getURL('./images/archives/allListedArchives.png');
 
 $('#steps li').click(function(){
  if($(this).attr('data-status') == 'waiting') {
@@ -47,6 +56,33 @@ $('#mementosDropdown').change(function() {
 
 $('#viewMementoButton').click(function() {
   window.location = $(this).attr('alt');
+});
+
+function changeIconFor(obj, src) {
+  $(obj).attr('src', src);
+}
+
+
+$(document).ready(function() {
+  console.log($('#mementosAvailable span').text() + ' X ');
+  
+  console.log($('#minkuiX #archiveNow').click(function(){$("#minkuiX #archiveNow").html();}));
+  
+  $('.archiveLogo').click(function() {
+    var that = this;
+    var newSrc = $(this).attr('src').replace('.png', '_success.png');
+    $(this).attr('src',chrome.extension.getURL('./images/spinner.gif'));
+    
+    var cb = function(){changeIconFor(that, newSrc);};
+    if($(this).attr('id') === 'archivelogo_ia') {
+        archiveURI_archiveOrg(cb);
+    }else if($(this).attr('id') === 'archivelogo_ia') {
+        archiveURI_archiveDotIs(cb);
+    }else if($(this).attr('id') === 'archivelogo_ala') {
+        archiveURI_archiveOrg(); 
+        archiveURI_archiveDotIs();   
+    }
+  });
 });
 
 </script>

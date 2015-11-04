@@ -26,8 +26,20 @@ function appendHTMLToShadowDOM() {
    $('#mementosDropdown').append(mementoSelections);
    $('#mementosAvailable span').html(mementos.length);
    
+   if(mementos.length === 0) {
+     switchToArchiveNowInterface();
+   }
+   
    appendCSSToShadowDOM();
   });
+}
+
+function switchToArchiveNowInterface() {
+  $('#mementosDropdown').addClass('noMementos');
+  $('#viewMementoButton').addClass('noMementos');
+  $('#minkStatus #steps').addClass('noMementos');
+  $('#archiveNow').addClass('noMementos');
+  $('.archiveNowInterface').removeClass('hidden');
 }
  
 function appendCSSToShadowDOM() {
@@ -37,6 +49,80 @@ function appendCSSToShadowDOM() {
     $('#minkuiX').append(styleElement);
     createShadowDOM();
   });
+}
+
+function archiveURI_archiveOrg(cb) {
+	$.ajax({
+		method: 'GET',
+		url: 'https://web.archive.org/save/' + document.URL
+	})
+	.done(function(a,b,c){
+		if(b == 'success'){
+			chrome.runtime.sendMessage({
+				method: 'notify',
+				title: 'Mink',
+				body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
+			}, function(response) {});
+			cb();
+			
+			
+			$('#archivelogo_ia').addClass('archiveNowSuccess');
+			$('#archiveNow_archivedotorg').html('View on Archive.org');
+			var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
+			var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
+			//console.log(archiveURI);
+			$('#archiveNow_archivedotorg').attr('title', archiveURI);
+			$('.archiveNowSuccess').click(function(){
+				window.open($(this).attr('title'));
+			});
+
+			refreshAggregatorsTimeMap(document.URL);
+		}
+	});
+}
+
+function archiveURI_archiveDotIs() {
+	$.ajax({
+		method: 'POST',
+		url: 'http://archive.is/submit/',
+		data: { coo: '', url: document.URL}
+	})
+	.done(function(a,b,c){
+		//console.log(a);
+		if(b == 'success'){
+			chrome.runtime.sendMessage({
+				method: 'notify',
+				title: 'Mink',
+				body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
+			}, function(response) {});
+			$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
+			$('#archiveNow_archivedotis').html('View on Archive.is');
+
+			var linkHeader = c.getResponseHeader('link');
+			var tmFromLinkHeader = new Timemap(linkHeader);
+			var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
+
+			$('#archiveNow_archivedotis').attr('title', archiveURI);
+			$('.archiveNowSuccess').click(function(){
+				window.open($(this).attr('title'));
+			});
+
+			refreshAggregatorsTimeMap(document.URL);
+		}else {
+			console.log(b);
+
+		}
+		//console.log(c);
+	});
+}
+
+function archiveURI_allServices() {
+	$('#archiveNow_all').click(function(){
+		$('#archiveNow_archivedotorg').trigger('click');
+		$('#archiveNow_archivedotis').trigger('click');
+		$(this).html('View All');
+		$(this).addClass('archiveNowSuccess');
+	});
 }
 
 if($('#minkWrapper').length == 0) {

@@ -236,13 +236,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
     
 	if(request.method === 'displaySecureSiteMementos') {
+	   console.log('trying to catch displaySecureSiteMementos');
 			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
 				hideLogo = true;
 				logoInFocus = true;
 			  //flip();
 			}else {
 				storeTimeMapData([request.value]);
-				revamp_createUIShowingMementosInTimeMap(request.value);
+				//revamp_createUIShowingMementosInTimeMap(request.value);
 
 				//hideLogo = true;
 				//logoInFocus = true;
@@ -335,6 +336,7 @@ function displayUIBasedOnTimemap(tm) {
 
 function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 	console.log('creatTimemapFromURI() - includes write to localstorage');
+	return;
 	if(!accumulatedArrayOfTimemaps){accumulatedArrayOfTimemaps = [];}
 
 	$.ajax({
@@ -375,11 +377,15 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 	if(debug){console.log('In getMementos');}
-	chrome.storage.local.get(null, function(keys){
-		if(isEmpty(keys)) { 	// No link headers in the request. :(
-			if(debug){console.log('No URI accessed did not have an HTTP link header');}
-			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
-		}else {				//we have link headers!
+	//chrome.storage.local.get(null, function(keys){
+	//	if(isEmpty(keys)) { 	// No link headers in the request. :(
+	
+	
+	if(debug){console.log('No URI accessed did not have an HTTP link header');}
+	getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
+	
+	
+	/*	}else {				//we have link headers!
 			if(keys.datetime){ //isA memento
 				if(debug){console.log('XWe are a memento!');}
 				logoInFocus = true;
@@ -424,7 +430,8 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 			  console.log('TODO, change the timegate/map to that which was specified in the link headers.');
 			}
 		}
-	});
+		
+	});*/
 }
 
 
@@ -448,11 +455,14 @@ function createSelectBoxContents(tms) {
 }
 
 function revamp_createUIShowingMementosInTimeMap(tm) {
+    console.log('old revamp flow');
+    return;
+    
     console.log('Hitting revamp_createUIShowingMementoInTimeMap, returning because we are implementing browserActions.');
     console.log("We have "+ tm.mementos.list.length + mementos);
     logoInFocus = false;
     return;
-	var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
+	/*var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
 	for(var m=0; m<tm.mementos.list.length; m++){
 		selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + moment(tm.mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
 	}
@@ -468,6 +478,7 @@ function revamp_createUIShowingMementosInTimeMap(tm) {
 			logoInFocus = false;
 			flip();
 		});
+	*/
 }
 
 function fetchTimeMap(uri) {
@@ -522,6 +533,7 @@ function countNumberOfMementos(arrayOfTimeMaps) {
 }
 
 function storeTimeMapData(tmData, cbIn){
+    console.log('storing tm data');
 	var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
 	if(debug){console.log('executing storeTimeMapData');console.log(tmData);}
 
@@ -532,6 +544,9 @@ function storeTimeMapData(tmData, cbIn){
 }
 
 function displayUIBasedOnStoredTimeMapData() {
+    console.log('displayUIBasedOnStoredTimeMapData');
+    return;
+
 	// Only executed with indexed TimeMaps
 	chrome.storage.local.get('timemaps',
 		function(localStore){
@@ -543,7 +558,7 @@ function displayUIBasedOnStoredTimeMapData() {
 				tmPlurality += 's';
 			}
 			var selectBoxContents = createSelectBoxContents(tms);
-
+             console.log('testX');
 			addInterfaceComponents(numberOfMementos, tms.length, tmPlurality, selectBoxContents);
 			displayMementoCountAtopLogo();
 
@@ -611,18 +626,12 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				    console.log('Badge text set!');
 				    logoInFocus = true;
 				    hideLogo = true;
-				    console.log('TODO: populate the actionButton dropdown contents here.');
-				    //console.log(data);
-				    //console.log($('#mementosDropdown').html());
+
 				    
 				    chrome.runtime.sendMessage({method: "setDropdownContents", value: data}, function(response) {
 				      console.log('done?');
 				      console.log(response);
 				    });
-				    
-					//if(callback){
-					//	callback();
-					//}
 				});
 				
 			}else if(numberOfTimeMaps > 0){

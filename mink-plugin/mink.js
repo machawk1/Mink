@@ -123,23 +123,14 @@ chrome.runtime.onMessage.addListener(
         
         
     }else if(request.method == 'setBadgeText') {
-        
-        chrome.tabs.getSelected(null, function(tab) {
-            var badgeValue = request.value;
+        setBadgeText(request.value)
 
-            if(parseInt(badgeValue) > 999) {
-                badgeValue = maxBadgeDisplay
-            }
-
-			chrome.browserAction.setBadgeText({text: badgeValue, tabId: tab.id});
-			chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tab.id});
-		});
 		//TODO: stop spinning
 		//stopSpinningActionButton()
 		
         sendResponse({
           value: 'stopAnimation'
-      });
+        });
     }else if(request.method == 'setDropdownContents') {
       tmData = request.value;
     }else if(request.method == 'getMementosForHTTPSSource') {
@@ -180,6 +171,21 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+
+function setBadgeText(value) {
+        chrome.tabs.getSelected(null, function(tab) {
+            var badgeValue = value;
+
+            if(parseInt(badgeValue) > 999) {
+                badgeValue = maxBadgeDisplay
+            }
+
+			chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tab.id});
+			chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tab.id});
+		});
+		//TODO: stop spinning
+		//stopSpinningActionButton()
+}
 
 chrome.contextMenus.create({
 	"title": "Hide Mink until reload",
@@ -345,15 +351,21 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 
 
 function displaySecureSiteMementos(mementos){
-  chrome.tabs.query({
-    'active': true,
-    'currentWindow': true
-  }, function (tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      method: 'displaySecureSiteMementos',
-      value: mementos
-    });
-  });
+  console.log('in displaySecureSiteMementos()');
+  console.log(mementos);
+  setBadgeText(mementos.length);
+		
+//		chrome.runtime.sendMessage({method: "setDropdownContents", value: mementos}, function(response) {
+//		  console.log('done?');
+//		  console.log(response);
+//		});
+//	});
+  
+    //chrome.tabs.sendMessage(tab.id, {
+    //  method: 'displaySecureSiteMementos',
+    //  value: mementos
+    //});
+  //});
 }
 
 
@@ -410,14 +422,14 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	         //  Q: Does a 404 cause the above AJAX to invoke this "fail" handler
 			if(debug){console.log(numberOfMementos + ' mementos available');}
 
-      if (numberOfMementos == 0) {
-          if (debug) {console.log('We still need to fetch the TimeMap in mink.js');}
-          revamp_fetchTimeMaps(data.timemap_index, displaySecureSiteMementos);
+			if (numberOfMementos == 0) {
+				  if (debug) {console.log('We still need to fetch the TimeMap in mink.js');}
+				  revamp_fetchTimeMaps(data.timemap_index, displaySecureSiteMementos);
 
-          return;
-      }
-
-      displaySecureSiteMementos(data);
+				  return;
+			}
+           tmData = data;
+           displaySecureSiteMementos(data.mementos.list);
 
       return;
 		}
@@ -509,9 +521,10 @@ function fetchTimeMap(uri) {
 function storeTimeMapData(arrayOfTimeMaps, cbIn){
 	//var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
 	if(debug){console.log('executing storeTimeMapData');}
-
+/*
 	chrome.storage.local.set({
 			'uri_r': arrayOfTimeMaps[0].original_uri,
 			'timemaps': arrayOfTimeMaps
 	}); //end set
+*/
 }
