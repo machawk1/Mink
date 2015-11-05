@@ -5,6 +5,7 @@ var iconUrl = chrome.extension.getURL('images/icon128.png');
 var iconUrlFlipped = chrome.extension.getURL('images/icon128flipped.png');
 var previousPanelHTML = ''; //a means of saving the UI to revert to once in the archiveNow panel
 
+
 function setMementoButtonInteractivityBasedOnMementoDropdown(){
 	$('#mdts').change(function(){
 		// If we're on the select box title or the original value, disable view button

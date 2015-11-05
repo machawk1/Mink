@@ -4,6 +4,24 @@ var tmData;
 var maxBadgeDisplay = '999+';
 var stillProcessingBadgeDisplay = 'WAIT';
 
+
+/*
+chrome.webNavigation.onCommitted.addListener(function(e) {
+    if(e.frameId !== 0) { // Not main frame
+      return;
+    }
+    console.log("StartingX");
+ 
+
+	 chrome.runtime.sendMessage({
+	   'method': 'startMinkExecution'
+	 });
+   
+    
+    //displayUIBasedOnContext();
+});*/
+
+
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.getSelected(null, function(tab) {
 		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
@@ -50,7 +68,7 @@ chrome.runtime.onMessage.addListener(
         memento_datetime: localStorage.getItem('memento_datetime')
       });
     } else if (request.method == 'retrieveFromLocalStorage'){
-    	if(debug){console.log('Retrieving items from localStorage');}
+    	if(debug){console.log('Retrieving items from localStorageX');}
 
       sendResponse({
         value: localStorage.getItem('minkURI'),
@@ -170,6 +188,8 @@ chrome.runtime.onMessage.addListener(
 			}
 
 		});
+    }else {
+      if(debug){console.log('Message sent using chrome.runtime not caught: ' + request.method);}
     }
   }
 );

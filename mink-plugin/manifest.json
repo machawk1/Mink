@@ -19,6 +19,7 @@
    "icons": { "128": "images/minkLogo_128.png"},
    "permissions": [
        "webRequest",
+       "webNavigation",
        "<all_urls>",
        "webRequestBlocking",
        "tabs",
