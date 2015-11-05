@@ -133,6 +133,8 @@ chrome.runtime.onMessage.addListener(
         });
     }else if(request.method == 'setDropdownContents') {
       tmData = request.value;
+    }else if(request.method == 'setBadge') {
+      setBadge(request.text, request.iconPath);
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
@@ -186,6 +188,16 @@ function setBadgeText(value) {
 		//TODO: stop spinning
 		//stopSpinningActionButton()
 }
+
+function setBadge(value, icon) {
+        chrome.tabs.getSelected(null, function(tab) {
+			chrome.browserAction.setBadgeText({text: value + '', tabId: tab.id});
+			chrome.browserAction.setIcon({tabId: tab.id, path: {'38': icon}});  
+		});
+		//TODO: stop spinning
+		//stopSpinningActionButton()
+}
+
 
 chrome.contextMenus.create({
 	"title": "Hide Mink until reload",
@@ -380,6 +392,7 @@ function showInterfaceForZeroMementos() {
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   chrome.tabs.getSelected(null, function(tab) {
     chrome.browserAction.setBadgeText({text: '' + tmData.mementos.list.length, tabId: tab.id});
+    chrome.browserAction.setIcon({tabId: tab.id, path: 'images/minkLogo38_noMementos.png'});
   });
   
 }

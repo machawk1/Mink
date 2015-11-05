@@ -251,7 +251,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			}
 			return;
 	}
- 
+    
+    
     console.log('bar');
 	displayUIBasedOnContext();
 });
@@ -572,6 +573,11 @@ function displayUIBasedOnStoredTimeMapData() {
 
 }
 
+function displayCurrentViewingMementoUI() {
+    console.log('displayCurrentlyViewingMementoUI');
+    //displayUIBasedOnContext();
+}
+
 
 function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	chrome.runtime.sendMessage({method: "startSpinningActionButton"}, function(response) {
@@ -581,6 +587,24 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		//}
 	});
 
+    
+    var isAMemento = false;
+    $.ajax({
+      url: window.location,
+      type: 'HEAD',
+      async: false
+    }).done(function(data, status, xhr) {
+      isAMemento = xhr.getResponseHeader('Memento-Datetime') !== null;
+      console.log('testss' + xhr.getResponseHeader('Memento-Datetime'));
+    });
+    
+    console.log('is a memento: '+isAMemento);
+    if(isAMemento) {
+        chrome.runtime.sendMessage({method: "setBadge", text: "", iconPath: 'images/minkLogo38_noMementos.png'}, function(response) {
+		});
+		return;
+    }
+    
 	if(!timemaploc){ //use the aggregator
 		timemaploc = memgator_json + window.location;
 	}
@@ -603,10 +627,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 	if(debug){console.log('Content.js: About to fire off Ajax request for ' + timemaploc);}
 	
-	
 
-
-	
 	$.ajax({
 		url: timemaploc,
 		type: 'GET'
@@ -666,7 +687,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 		//check if we're currently viewing an archive
 		if(debug){console.log('Are we viewing the archive? Basis 1: two http[s]*?://');}
-
+        if(debug){console.log("Memento-Datetime: " + xhr.getResponseHeader('Memento-Datetime'));}
+                
 		var schemeOccurances = (window.location + '').match(/http[s]*:\/\//g);
 		if(schemeOccurances.length > 1){ //we likely have two URIs in window.location
 			console.log('  It appears we are viewing the archive based on multiple instances of http[s]*:// in window.location');

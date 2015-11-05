@@ -1,3 +1,5 @@
+var MAX_MEMENTOS_IN_DROPDOWN = 500;
+
 function createShadowDOM() {
    var selector = '#minkuiX';
    
@@ -18,20 +20,28 @@ function appendHTMLToShadowDOM() {
    
    var mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
    
+   if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
+     // TODO: call Miller column builder here
+     console.log('TODO: call Miller column builder here');
+     $('.dropdown').hide();
+   }else if(mementos.length === 0) {
+     switchToArchiveNowInterface();     
+   }else {
+     buildDropDown(mementos);
+   }
+   
+   $('#mementosAvailable span').html(mementos.length);
+   appendCSSToShadowDOM();
+  });
+}
+
+function buildDropDown(mementos) {
    var mementoSelections = '';
    for(var mm = 0; mm < mementos.length; mm++) {
      mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="'+ mementos[mm].datetime + '">' + mementos[mm].datetime + '</option>';
    }
-   
+
    $('#mementosDropdown').append(mementoSelections);
-   $('#mementosAvailable span').html(mementos.length);
-   
-   if(mementos.length === 0) {
-     switchToArchiveNowInterface();
-   }
-   
-   appendCSSToShadowDOM();
-  });
 }
 
 function switchToArchiveNowInterface() {
@@ -39,7 +49,7 @@ function switchToArchiveNowInterface() {
   $('#viewMementoButton').addClass('noMementos');
   $('#minkStatus #steps').addClass('noMementos');
   $('#archiveNow').addClass('noMementos');
-  $('.archiveNowInterface').removeClass('hidden');
+  $('.archiveNowInterface').removeClass('hidden');  
 }
  
 function appendCSSToShadowDOM() {
