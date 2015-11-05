@@ -35,12 +35,6 @@ $('#minkContainer').append('<style type="text/css" scoped="scoped">\r\n' +
 //$.scoped();
 $('#minkContainer').append('<div id="archiveOptions"></div>');
 $('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
-//var shadow = document.querySelector("#minkContainer").createShadowRoot();
-
-
-//setTimeout(flip, 1000);
-
-//console.log('url: ' + $(location).attr('href'));
 
 /*
 $(document).ready(function() {
@@ -628,10 +622,9 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 			var memCount = xhr.getResponseHeader('X-Memento-Count');
 			
 			var numberOfMementos = memCount ? memCount : 0;
-			if(debug){console.log(numberOfMementos + ' mementos...should update pageAction here.');}
+
 			chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + memCount}, function(response) {});
 			chrome.runtime.sendMessage({method: 'setDropdownContents', value: data}, function(response) {});
-
 		}
 	}).fail(function(xhr,textStatus) {
 		if(debug){

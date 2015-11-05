@@ -22,17 +22,61 @@ function appendHTMLToShadowDOM() {
    
    if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
      // TODO: call Miller column builder here
-     console.log('TODO: call Miller column builder here');
+     console.log('TODO: call Miller column builder here, there are too many mementos for a dropdown');
      $('.dropdown').hide();
+     buildDrilldown();
    }else if(mementos.length === 0) {
      switchToArchiveNowInterface();     
    }else {
      buildDropDown(mementos);
+     buildDrilldown(mementos);
    }
    
    $('#mementosAvailable span').html(mementos.length);
    appendCSSToShadowDOM();
   });
+}
+
+function addZ(n){
+   return n<10? '0'+n:''+n;
+}
+
+function buildDrilldown(mementos) {
+  //console.log(moment(mementos[0].datetime).date());
+  showMementoCountsByYear(mementos);
+}
+
+function buildBreadcrumbs(mementos) {
+   var years = {};
+
+   for(var m = 0; m < mementos.length; m++) { 
+       console.log(m);  
+	   var dr = Date.parse(mementos[0].datetime);
+	   var dt = new Date(dr);
+	   var year = addZ(dt.getFullYear());
+	   var month = addZ(dt.getMonth() + 1);
+	   var day = addZ(dt.getDate());
+   
+	   var hr = addZ(dt.getHours());
+	   var min = addZ(dt.getMinutes());
+	   var sec = addZ(dt.getSeconds());
+	   
+	   var time = hr + ':' + min + ':' + sec;
+   
+
+       if(!(year in years)) {
+          years.year = {};
+       }
+       if(!(month in years.year)) {
+          years.year.month = {};
+       }
+       if(!(day in years.year.month)) {
+          years.year.month.day = [];
+       }
+       
+       years.year.month.day.push(time);
+   }
+   console.log(years);
 }
 
 function buildDropDown(mementos) {
@@ -134,6 +178,147 @@ function archiveURI_allServices() {
 		$(this).addClass('archiveNowSuccess');
 	});
 }
+
+
+
+/* ********************* */
+
+var years = {};
+var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function showMementoCountsByYear(mementos){
+	years = null;
+	years = {};
+	var yearDataFromLastIteration = '';
+
+	$(mementos).each(function(mI,m){
+		var dt = moment(m.datetime);
+		if(!years[dt.year()]){years[dt.year()] = [];}
+		years[dt.year()].push(m);
+	})
+
+	var memCountList = '<ul id="years">';
+	for(var year in years){
+		memCountList += '<li data-year="' + year + '">' + year + '<span class="memCount">' + years[year].length + '</span></li>\r\n';
+	}
+
+	memCountList += '</ul>';
+
+	$('body /deep/ #drilldownBox').append(memCountList);
+
+	$('body /deep/ #drilldownBox ul#years li').click(function(){
+		$('body /deep/ #month,body /deep/ #day,body /deep/ #time').remove();
+		$('body /deep/ #drilldownBox ul#years li').removeClass('selectedOption');
+		$(this).addClass('selectedOption');
+		showMementoCountsByMonths($(this).data('year'));
+		if(debug) { console.log('coverage test 9943'); console.log($(this).data('year')); }
+	});
+console.log('done');
+	//adjustDrilldownPositionalOffset();
+}
+
+function showMementoCountsByMonths(year){
+	$('body /deep/ #months,body /deep/ #day,body /deep/ #time').remove();
+
+console.log('testX');
+
+	var memCountList = '<ul id="months">';
+	var months = {}
+
+
+	for(memento in years[year]){
+
+		var monthName = monthNames[moment(years[year][memento].datetime).month()];
+		if(!months[monthName]){
+			months[monthName] = [];
+		}
+		months[monthName].push(years[year][memento]);
+	}
+
+	for(month in months){
+		memCountList += '<li data-month="' + month + '">' + month + '<span class="memCount">' + months[month].length + '</span></li>\r\n';
+	}
+
+	memCountList += '</ul>';
+	$('body /deep/ #drilldownBox').append(memCountList);
+
+	$('body /deep/ #drilldownBox ul#months li').click(function(){
+		$('body /deep/ #day,body /deep/ #time').remove();
+		$('body /deep/ #drilldownBox ul#months li').removeClass('selectedOption');
+		$(this).addClass('selectedOption');
+
+		showMementoCountsByDays(months[$(this).data('month')]);
+	});
+
+	//adjustDrilldownPositionalOffset();
+}
+
+function showMementoCountsByDays(mementos){
+	var days = {};
+	var dayNames = ['NA','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
+					'11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
+					'21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th','31st'];
+
+	for(memento in mementos){
+		var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
+		if(!days[dayNumber]){
+			days[dayNumber] = [];
+		}
+		days[dayNumber].push(mementos[memento]);
+	}
+	var memCountList = '<ul id="day">';
+	for(day in days){
+		memCountList += '<li data-day="' + day + '">' + day + '<span class="memCount">' + days[day].length + '</span></li>\r\n';
+	}
+
+	memCountList += '</ul>';
+	$('body /deep/ #drilldownBox').append(memCountList);
+	$('body /deep/ #drilldownBox ul#day li').click(function(){
+		$('body /deep/ #time').remove();
+		$('body /deep/ #drilldownBox ul#day li').removeClass('selectedOption');
+		$(this).addClass('selectedOption');
+
+		showMementoCountsByTime(days[$(this).data('day')]);
+	});
+
+	//adjustDrilldownPositionalOffset();
+}
+
+function showMementoCountsByTime(mementos){
+	var times = {};
+	var uris = {};
+	for(memento in mementos){
+		var mom = moment(mementos[memento].datetime);
+		var time = mom.format('HH:mm:ss');
+
+		if(!times[time]){
+			times[time] = [];
+			uris[time] = [];
+		}
+		times[time].push(mementos[memento]);
+		uris[time] = mementos[memento].uri;
+	}
+	var memCountList = '<ul id="time">';
+	for(time in times){
+		memCountList += '<li data-time="' + uris[time]+ '">' + time + '</li>\r\n';
+	}
+
+	memCountList += '</ul>';
+	$('body /deep/ #drilldownBox').append(memCountList);
+	$('body /deep/ #drilldownBox ul#time li').click(function(){
+		window.location = $(this).data('time');
+		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(':'))]);
+	});
+
+	//adjustDrilldownPositionalOffset();
+}
+
+function adjustDrilldownPositionalOffset(){
+	var h = $('body /deep/ #drilldownBox').css('height').substr(0,$('body /deep/ #drilldownBox').css('height').indexOf('px'));
+	$('body /deep/ #drilldownBox').css('top',((h*-1)-30)+'px');
+}
+
+
 
 if($('#minkWrapper').length == 0) {
   appendHTMLToShadowDOM();

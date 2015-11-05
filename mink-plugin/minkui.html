@@ -3,6 +3,7 @@
 <img id="minkLogo" alt="Mink logo" />
 <h1 id="mementosAvailable"><span></span> mementos available.</h1>
 
+<div id="drilldownBox"></div>
 <select id="mementosDropdown" class="dropdown">
   <option>Select a Memento</option>
 </select>
@@ -19,10 +20,12 @@
   <ul id="steps">
     <li data-status="waiting" id="stepsTitle"><span>List mementos by:</span></li>
     <li data-status="waiting"><span>Dropdown</span></li>
-    <li data-status="waiting"><span>Drill Down</span></li>
-    <li data-status="waiting"><span>Foo Method</span></li>
+    <li data-status="waiting"><span>Drilldown</span></li>
+    <li data-status="waiting"><span>Datepicker</span></li>
   </ul>
 </div>
+
+
 
 <script>
 document.getElementById('minkLogo').src = chrome.extension.getURL('./images/minkLogo_300.png');
