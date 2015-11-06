@@ -392,6 +392,11 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 				return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
 			}
 			if(debug){console.log('Executing set of promises');}
+			
+			return;
+			
+			
+			
 			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm)).then(function(tms){
 				storeTimeMapData(tms,displayUIBasedOnStoredTimeMapData);
 			});
@@ -411,6 +416,9 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
  */
 function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 	if(debug){console.log('In getMementos');}
+	getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
+	return;
+	
 	chrome.storage.local.get(null, function(keys){
 		if(isEmpty(keys)) { 	// No link headers in the request. :(
 			if(debug){console.log('No URI accessed did not have an HTTP link header');}
@@ -431,7 +439,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 				}
 
 				createTimemapFromURI(keys.timemap);
-
+                console.log('This part of the code is dependent ont he cache/localStorage');
 				if(debug){console.log('Starting call chain to generate dropdown HTML');}
 				getMementosWithTimemap();
 			}else if(keys.timegate) {
@@ -563,6 +571,8 @@ function storeTimeMapData(arrayOfTimeMaps, cbIn){
 }
 
 function displayUIBasedOnStoredTimeMapData() {
+    alert('displayUIBasedOnStoredTImeMapData');
+    return;
 	// Only executed with indexed TimeMaps
 	chrome.storage.local.get('timemaps',
 		function(localStore){
@@ -599,6 +609,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
 
+    // HTTPS URI-Rs must go to a background script to call the aggregator due to Cross-scheme JS restrictions
 	if(timemaploc.indexOf('https:') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
 		chrome.runtime.sendMessage({
@@ -609,6 +620,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 
 		return;
 	}
+
 
 	if(debug){console.log('Content.js: About to fire off Ajax request for ' + timemaploc);}
 	$.ajax({

@@ -351,7 +351,7 @@ function addExtraButtonBehaviors(){
 }
 
 function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
-    alert('old UI!');
+    alert('old UI! addInterfaceComponents()');
     /*
 	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
 	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';

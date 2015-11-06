@@ -7,8 +7,13 @@ function createShadowDOM() {
    var template = document.querySelector(selector);
    //var clone = document.importNode(template, true);
    shadow.appendChild(template);
+   
+   setupDrilldownInteractions();
 }
 
+function setupDrilldownInteractions() {
+  setupDrilldownInteraction_Year();
+}
 
 
 function appendHTMLToShadowDOM() {
@@ -29,7 +34,7 @@ function appendHTMLToShadowDOM() {
      switchToArchiveNowInterface();     
    }else {
      buildDropDown(mementos);
-     buildDrilldown(mementos);
+     buildDrilldown_Year(mementos);
    }
    
    $('#mementosAvailable span').html(mementos.length);
@@ -39,11 +44,6 @@ function appendHTMLToShadowDOM() {
 
 function addZ(n){
    return n<10? '0'+n:''+n;
-}
-
-function buildDrilldown(mementos) {
-  //console.log(moment(mementos[0].datetime).date());
-  showMementoCountsByYear(mementos);
 }
 
 function buildBreadcrumbs(mementos) {
@@ -186,7 +186,9 @@ function archiveURI_allServices() {
 var years = {};
 var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-function showMementoCountsByYear(mementos){
+function buildDrilldown_Year(mementos){
+// NOTE: Shadow DOM not yet built. Do so after this function
+
 	years = null;
 	years = {};
 	var yearDataFromLastIteration = '';
@@ -204,20 +206,78 @@ function showMementoCountsByYear(mementos){
 
 	memCountList += '</ul>';
 
-	$('body /deep/ #drilldownBox').append(memCountList);
+    var drilldown = document.getElementById('drilldownBox');
+	$('body #drilldownBox').append(memCountList);
+}
 
-	$('body /deep/ #drilldownBox ul#years li').click(function(){
-		$('body /deep/ #month,body /deep/ #day,body /deep/ #time').remove();
+function setupDrilldownInteraction_Year() {
+    var mementos = tmData.mementos.list;
+    console.log('setting up...');
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+
+    var yearsNode = shadow.getElementById('years');
+    console.log(yearsNode);
+    var years = shadow.getElementById('years').childNodes;
+    console.log(years.length);
+    for(var year=0; year<years.length; year++) {
+      console.log(years[year]);
+      years[year].onclick = function(event){
+      	buildDrilldown_Month($(this).data('year'));
+      };
+    }
+ } 
+  /*	  
+ 
+	//$('body /deep/ #month,body /deep/ #day,body /deep/ #time').remove();
 		$('body /deep/ #drilldownBox ul#years li').removeClass('selectedOption');
 		$(this).addClass('selectedOption');
 		showMementoCountsByMonths($(this).data('year'));
-		if(debug) { console.log('coverage test 9943'); console.log($(this).data('year')); }
-	});
-console.log('done');
+		if(debug) { 
+		  console.log('coverage test 9943'); console.log($(this).data('year'));
+		}
+	});*/
+
 	//adjustDrilldownPositionalOffset();
+
+
+
+function buildDrilldown_Month(year){
+    var mementos = tmData.mementos.list;
+	var memCountList = '<ul id="months">';
+	var months = {}
+
+
+	for(memento in year){
+
+		var monthName = monthNames[moment(year[memento].datetime).month()];
+		if(!months[monthName]){
+			months[monthName] = [];
+		}
+		months[monthName].push(year[memento]);
+	}
+
+	for(month in months){
+		memCountList += '<li data-month="' + month + '">' + month + '<span class="memCount">' + months[month].length + '</span></li>\r\n';
+	}
+
+	memCountList += '</ul>';
+    
+    var parser = new DOMParser();
+    var monthNodes = parser.parseFromString(memCountList, "text/xml");
+    
+    var drilldown = document.getElementById('drilldownBox');
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    shadow.getElementById('drilldownBox').appendChild(monthNodes);
+    
+    //TODO: setup onclick here
 }
 
+
+
+
+
 function showMementoCountsByMonths(year){
+/*
 	$('body /deep/ #months,body /deep/ #day,body /deep/ #time').remove();
 
 console.log('testX');
@@ -240,6 +300,15 @@ console.log('testX');
 	}
 
 	memCountList += '</ul>';
+	
+  var shadow = document.getElementById('minkWrapper').shadowRoot;
+
+    var yearsNode = shadow.getElementById('years');
+    console.log(yearsNode);
+    var years = shadow.getElementById('years').childNodes;
+    console.log(years.length);
+    for(var year=0; year<years.length; year++) {
+
 	$('body /deep/ #drilldownBox').append(memCountList);
 
 	$('body /deep/ #drilldownBox ul#months li').click(function(){
@@ -251,6 +320,7 @@ console.log('testX');
 	});
 
 	//adjustDrilldownPositionalOffset();
+	*/
 }
 
 function showMementoCountsByDays(mementos){
@@ -284,7 +354,7 @@ function showMementoCountsByDays(mementos){
 	//adjustDrilldownPositionalOffset();
 }
 
-function showMementoCountsByTime(mementos){
+function showMementoCountsByTime(mementos) {
 	var times = {};
 	var uris = {};
 	for(memento in mementos){
