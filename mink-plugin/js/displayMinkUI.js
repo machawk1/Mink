@@ -29,7 +29,7 @@ function appendHTMLToShadowDOM() {
      // TODO: call Miller column builder here
      console.log('TODO: call Miller column builder here, there are too many mementos for a dropdown');
      $('.dropdown').hide();
-     buildDrilldown();
+     buildDrilldown_Year(mementos);
    }else if(mementos.length === 0) {
      switchToArchiveNowInterface();     
    }else {
@@ -185,6 +185,9 @@ function archiveURI_allServices() {
 
 var years = {};
 var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+	var dayNames = ['NA','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
+					'11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
+					'21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th','31st'];
 
 function buildDrilldown_Year(mementos){
 // NOTE: Shadow DOM not yet built. Do so after this function
@@ -216,63 +219,206 @@ function setupDrilldownInteraction_Year() {
     var shadow = document.getElementById('minkWrapper').shadowRoot;
 
     var yearsNode = shadow.getElementById('years');
-    console.log(yearsNode);
+    //console.log(yearsNode);
     var years = shadow.getElementById('years').childNodes;
-    console.log(years.length);
+    //console.log(years.length);
     for(var year=0; year<years.length; year++) {
-      console.log(years[year]);
+      //console.log(years[year]);
       years[year].onclick = function(event){
-      	buildDrilldown_Month($(this).data('year'));
+          var existingMonthsUL = shadow.getElementById('months');
+          var existingDaysUL = shadow.getElementById('days');
+          var existingTimesUL = shadow.getElementById('times');
+          var drilldownShadow = shadow.getElementById('drilldownBox');
+    
+          if(existingMonthsUL) {
+              drilldownShadow.removeChild(existingMonthsUL);
+          }
+          if(existingDaysUL) {
+              drilldownShadow.removeChild(existingDaysUL);
+          }
+          if(existingTimesUL) {
+              drilldownShadow.removeChild(existingTimesUL);
+          } 
+      
+      	  buildDrilldown_Month($(this).data('year'));
       };
     }
  } 
-  /*	  
- 
-	//$('body /deep/ #month,body /deep/ #day,body /deep/ #time').remove();
-		$('body /deep/ #drilldownBox ul#years li').removeClass('selectedOption');
-		$(this).addClass('selectedOption');
-		showMementoCountsByMonths($(this).data('year'));
-		if(debug) { 
-		  console.log('coverage test 9943'); console.log($(this).data('year'));
-		}
-	});*/
 
-	//adjustDrilldownPositionalOffset();
 
 
 
 function buildDrilldown_Month(year){
-    var mementos = tmData.mementos.list;
-	var memCountList = '<ul id="months">';
+    var mementos = tmData.mementos.list;	
+    
+	var monthUL = document.createElement('ul');
+	monthUL.id = 'months';
+	
 	var months = {}
 
-
-	for(memento in year){
-
-		var monthName = monthNames[moment(year[memento].datetime).month()];
+	for(memento in mementos){
+        var datetime = moment(mementos[memento].datetime);
+        if(datetime.year() !== year) {
+            continue;
+        }
+		var monthName = monthNames[datetime.month()];
 		if(!months[monthName]){
 			months[monthName] = [];
 		}
 		months[monthName].push(year[memento]);
 	}
-
+    
 	for(month in months){
-		memCountList += '<li data-month="' + month + '">' + month + '<span class="memCount">' + months[month].length + '</span></li>\r\n';
-	}
-
-	memCountList += '</ul>';
-    
-    var parser = new DOMParser();
-    var monthNodes = parser.parseFromString(memCountList, "text/xml");
-    
+		var li = document.createElement('li');
+		li.setAttribute('data-month', month);
+		li.setAttribute('data-year', year);
+		li.appendChild(document.createTextNode(month));
+		
+		var liSpan = document.createElement('span');
+		liSpan.className = 'memCount';
+		liSpan.appendChild(document.createTextNode(months[month].length));
+		
+		//console.log(month);
+		li.appendChild(liSpan);
+		li.onclick = function(event){
+      	    buildDrilldown_Day($(this).data('year'), $(this).data('month'));
+        };
+		
+		monthUL.appendChild(li);
+	} 
+        
     var drilldown = document.getElementById('drilldownBox');
     var shadow = document.getElementById('minkWrapper').shadowRoot;
-    shadow.getElementById('drilldownBox').appendChild(monthNodes);
     
-    //TODO: setup onclick here
+    var existingMonthsUL = shadow.getElementById('months');
+    var existingDaysUL = shadow.getElementById('days');
+    var existingTimesUL = shadow.getElementById('times');
+    var drilldownShadow = shadow.getElementById('drilldownBox');
+    
+    if(existingMonthsUL) {
+        drilldownShadow.removeChild(existingMonthsUL);
+    }
+    if(existingDaysUL) {
+        drilldownShadow.removeChild(existingDaysUL);
+    }
+    if(existingTimesUL) {
+        drilldownShadow.removeChild(existingTimesUL);
+    }    
+    
+    drilldownShadow.appendChild(monthUL);
 }
 
 
+
+function buildDrilldown_Day(year, month){
+    var mementos = tmData.mementos.list;	
+    
+	var dayUL = document.createElement('ul');
+	dayUL.id = 'days';
+	
+	var days = {}
+
+	for(memento in mementos){
+        var datetime = moment(mementos[memento].datetime);
+        
+        if(datetime.year() !== year || monthNames[datetime.month()] !== month) {
+            continue;
+        }
+		var dayName = dayNames[datetime.date()];
+		if(!days[dayName]){
+			days[dayName] = [];
+		}
+		days[dayName].push(mementos[memento]);
+	}
+    
+	for(day in days){
+		var li = document.createElement('li');
+		li.setAttribute('data-date', day);
+		li.setAttribute('data-month', month);
+		li.setAttribute('data-year', year);
+		li.appendChild(document.createTextNode(day));
+		
+		var liSpan = document.createElement('span');
+		liSpan.className = 'memCount';
+		liSpan.appendChild(document.createTextNode(days[day].length));
+		
+		li.appendChild(liSpan);
+		li.onclick = function(event){
+      	    buildDrilldown_Time($(this).data('year'), $(this).data('month'), parseInt($(this).data('date')));
+        };
+		
+		dayUL.appendChild(li);
+	} 
+        
+    var drilldown = document.getElementById('drilldownBox');
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    
+    var existingDaysUL = shadow.getElementById('days');
+    var existingTimesUL = shadow.getElementById('times');
+    var drilldownShadow = shadow.getElementById('drilldownBox');
+    
+    if(existingDaysUL) {
+        drilldownShadow.removeChild(existingDaysUL);
+    }
+    if(existingTimesUL) {
+        drilldownShadow.removeChild(existingTimesUL);
+    }    
+    
+    drilldownShadow.appendChild(dayUL);
+}
+
+function buildDrilldown_Time(year, month, date){
+    var mementos = tmData.mementos.list;	
+    
+	var timeUL = document.createElement('ul');
+	timeUL.id = 'times';
+	
+	var times = [];
+
+	for(memento in mementos){
+        var datetime = moment(mementos[memento].datetime);
+        
+        if(datetime.year() !== year || monthNames[datetime.month()] !== month || datetime.date() !== date) {
+            //console.log('Reject: ' + year + '!=' + datetime.year() + ' ' + month + '!=' + monthNames[datetime.month()] + ' ' + date + '!=' + datetime.date() + ' >> ' + mementos[memento].datetime);
+            //console.log(datetime.year() !== year);
+            //console.log(monthNames[datetime.month()] !== month);
+            //console.log(dayNames[datetime.date()] !== date);
+            continue;
+        }
+        //console.log('Accept: ' + year + '!=' + datetime.year() + ' ' + month + '!=' + datetime.month() + ' ' + date + '!=' + datetime.date());
+
+        var time = addZ(datetime.hour()) + ':' + addZ(datetime.minute()) + ':' + addZ(datetime.second());
+        mementos[memento].time = time;
+		times.push(mementos[memento]);
+	}
+    
+	for(time in times){
+		var li = document.createElement('li');
+		li.setAttribute('data-time', time);
+		li.setAttribute('data-day', day);
+		li.setAttribute('data-month', month);
+		li.setAttribute('data-year', year);
+		li.appendChild(document.createTextNode(times[time].time));
+		
+		li.onclick = function(event){
+      	    window.location = times[time].uri;
+      	    //console.log(times[time]);
+        };
+		
+		timeUL.appendChild(li);
+	} 
+        
+    var drilldown = document.getElementById('drilldownBox');
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    
+    var existingTimesUL = shadow.getElementById('times');
+    var drilldownShadow = shadow.getElementById('drilldownBox');
+    
+    if(existingTimesUL) {
+        drilldownShadow.removeChild(existingTimesUL);
+    }
+    drilldownShadow.appendChild(timeUL);
+}
 
 
 
