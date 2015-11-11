@@ -26,15 +26,18 @@ function appendHTMLToShadowDOM() {
    var mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
    
    if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
-     // TODO: call Miller column builder here
-     console.log('TODO: call Miller column builder here, there are too many mementos for a dropdown');
      $('.dropdown').hide();
+     $('#steps .action').removeClass('active');
+     $('#title_drilldown').addClass('active');
      buildDrilldown_Year(mementos);
    }else if(mementos.length === 0) {
      switchToArchiveNowInterface();     
    }else {
      buildDropDown(mementos);
      buildDrilldown_Year(mementos);
+     $('#drilldownBox').hide();
+     $('#steps .action').removeClass('active');
+     $('#title_dropdown').addClass('active');
    }
    
    $('#mementosAvailable span').html(mementos.length);

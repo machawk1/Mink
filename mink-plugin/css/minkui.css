@@ -7,6 +7,7 @@
 #minkuiX #minkStatus li#options {position: absolute; right: 0;}
 #minkuiX #minkStatus li#options:hover {cursor: pointer;}
 #minkuiX #minkStatus li span {border-radius: 10px; padding: 2px 8px 2px 8px; margin: 2px 0px 0px 0px;}
+#minkuiX #minkStatus li.active {background-color: white; font-weight: bold; border-radius: 10px;}
 #minkuiX #minkStatus li span:hover {cursor: pointer; text-decoration: underline;}
 #minkuiX #minkStatus li#stepsTitle span:hover {cursor: default; text-decoration: none;}
 #minkuiX #minkStatus li#stepsTitle {width: 200px; text-align: right;}
