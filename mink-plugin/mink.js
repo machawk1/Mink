@@ -153,6 +153,9 @@ chrome.runtime.onMessage.addListener(
       tmData = request.value;
     }else if(request.method == 'setBadge') {
       setBadge(request.text, request.iconPath);
+    }else if(request.method === 'openOptionsPage') {
+      console.log('opening options page');
+      chrome.runtime.openOptionsPage();
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue

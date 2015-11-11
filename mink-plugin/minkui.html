@@ -45,6 +45,15 @@ $('#steps li').click(function(){
  }
 });
 
+$('#options').click(function(){
+  //window.location = 'chrome://extensions/?options='+ chrome.runtime.id;
+  //chrome.runtime.openOptionsPage();
+	chrome.runtime.sendMessage({method: "openOptionsPage"}, function(response) {
+		
+	});
+  
+});
+
 
 var viewButton = $("#viewMementoButton");
 

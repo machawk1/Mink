@@ -17,7 +17,7 @@ var mementosInTimemapBasedOnRelAttributeRegex = /;rel=\".*memento.*\"/g;
 var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g;
 
 //TODO: check if in blacklist
-if(debug){console.log('blacklist test');}
+if(debug){console.log('blacklist test');console.log(chrome.runtime.id);}
 //getBlacklist();
 
 
