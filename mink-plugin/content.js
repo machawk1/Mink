@@ -423,14 +423,11 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 		type: 'GET'
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status === 200){
-			if(debug){console.log(data);}
-			if(debug){console.log(xhr.getAllResponseHeaders());}
-			if(debug){console.log(xhr.getResponseHeader('X-Memento-Count'));}
 			var memCount = xhr.getResponseHeader('X-Memento-Count');
 			
 			var numberOfMementos = memCount ? memCount : 0;
 
-			chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + memCount}, function(response) {});
+			chrome.runtime.sendMessage({method: 'setBadge', text: '' + memCount, iconPath: chrome.extension.getURL('images/minkLogo38.png')}, function(response) {});
 			chrome.runtime.sendMessage({method: 'setDropdownContents', value: data}, function(response) {});
 		}
 	}).fail(function(xhr,textStatus) {
@@ -457,12 +454,6 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 			URI_M = URI_M.replace('http://', 'http://'); //cross-protocol interaction is a no-no
 			return getMementosWithTimemap(memgator_proxy + URI_M, null, true);
 		}
-
-		// hide the Memento logo
-		hideLogo = true;
-		logoInFocus = true;
-
-		if(debug){console.log(xhr);}
 	});
 }
 

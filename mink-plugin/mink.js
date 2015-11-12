@@ -236,9 +236,6 @@ function setBadgeText(value, tabid) {
 function setBadge(value, icon, tabid) {
 		chrome.browserAction.setBadgeText({text: value + '', tabId: tabid});
 		chrome.browserAction.setIcon({tabId: tabid, path: {'38': icon}});  
-
-		//TODO: stop spinning
-		//stopSpinningActionButton()
 }
 
 
@@ -456,7 +453,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 function displaySecureSiteMementos(mementos, tabid){
   console.log('in displaySecureSiteMementos()');
   console.log(mementos);
-  setBadgeText(mementos.length, tabid);
+  setBadge(mementos.length, chrome.extension.getURL('images/minkLogo38.png'), tabid);
 }
 
 
