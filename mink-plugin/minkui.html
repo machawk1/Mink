@@ -120,11 +120,17 @@ $(document).ready(function() {
   });
   
   $('.archiveLogo').click(function() {
+    if($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
+     
+      return;
+    }
+  
     var that = this;
     var newSrc = $(this).attr('src').replace('.png', '_success.png');
     $(this).attr('src',chrome.extension.getURL('./images/spinner.gif'));
     
-    var cb = function(){changeIconFor(that, newSrc);};
+    var id = $(this).attr('id');
+    var cb = function(){changeIconFor(that, newSrc); };
     if($(this).attr('id') === 'archivelogo_ia') {
         archiveURI_archiveOrg(cb);
     }else if($(this).attr('id') === 'archivelogo_ia') {

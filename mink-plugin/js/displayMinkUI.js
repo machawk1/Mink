@@ -128,17 +128,19 @@ function archiveURI_archiveOrg(cb) {
 			cb();
 			
 			
-			$('#archivelogo_ia').addClass('archiveNowSuccess');
-			$('#archiveNow_archivedotorg').html('View on Archive.org');
+			var shadow = document.getElementById('minkWrapper').shadowRoot;
+			shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess');
+			
+			//$('#archiveNow_archivedotorg').html('View on Archive.org');
 			var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
 			var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
-			//console.log(archiveURI);
-			$('#archiveNow_archivedotorg').attr('title', archiveURI);
-			$('.archiveNowSuccess').click(function(){
-				window.open($(this).attr('title'));
-			});
+			shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI);
+			shadow.getElementById('archivelogo_ia').onclick = function() {
+			  window.location = $(this).attr('title');
+			};
+				
 
-			refreshAggregatorsTimeMap(document.URL);
+			//refreshAggregatorsTimeMap(document.URL);
 		}
 	});
 }
