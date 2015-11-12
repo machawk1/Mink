@@ -3,6 +3,7 @@ var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';
 var stillProcessingBadgeDisplay = 'WAIT';
+var tabBadgeCount = {}; // Maintain tabId-->count association
 
 
 /*
@@ -27,6 +28,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
 		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
 			chrome.tabs.getSelected(null, function(tab) {
+			    console.log('Setting badge text based on getSelected tab id instead of origin tab');
 				chrome.browserAction.setBadgeText({text: stillProcessingBadgeDisplay, tabId: tab.id});
 			});
 		    return; // Badge has not yet been set
@@ -79,7 +81,7 @@ chrome.runtime.onMessage.addListener(
     	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchSecureSitesTimeMap') {
       var tgURI = request.value;
-      
+      if(debug) {console.log('method = fetchSecureSitesTimeMap');}
       
       console.log('about to fetch secure sites mementos');
       $.ajax({
@@ -87,7 +89,7 @@ chrome.runtime.onMessage.addListener(
     		type: "GET"
     	}).done(function(data,textStatus,xhr,a,b){
     	  console.log('success querying w/ secure URI');
-          getMementosWithTimemap(data.timemap_uri.json_format);
+          getMementosWithTimemap(data.timemap_uri.json_format, sender.tab.id);
           
     	}).fail(function(xhr, data, error){
     	  console.log('querying secure FAILED, mitigating');
@@ -98,7 +100,8 @@ chrome.runtime.onMessage.addListener(
     	  }
     	  
     	  // Should only get here if there is some sort of weird cross-scheme issue
-          getMementosWithTimemap(tgURI);
+          if(debug){alert('ERROR!');}
+          getMementosWithTimemap(tgURI, sender.tab.id);
       });
     }else if (request.method == 'notify') {
 		  var notify = chrome.notifications.create(
@@ -141,7 +144,7 @@ chrome.runtime.onMessage.addListener(
         
         
     }else if(request.method == 'setBadgeText') {
-        setBadgeText(request.value)
+        setBadgeText(request.value, sender.tab.id)
 
 		//TODO: stop spinning
 		//stopSpinningActionButton()
@@ -152,7 +155,7 @@ chrome.runtime.onMessage.addListener(
     }else if(request.method == 'setDropdownContents') {
       tmData = request.value;
     }else if(request.method == 'setBadge') {
-      setBadge(request.text, request.iconPath);
+      setBadge(request.text, request.iconPath, sender.tab.id);
     }else if(request.method === 'openOptionsPage') {
       console.log('opening options page');
       chrome.runtime.openOptionsPage();
@@ -197,26 +200,33 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-function setBadgeText(value) {
-        chrome.tabs.getSelected(null, function(tab) {
-            var badgeValue = value;
+function setBadgeText(value, tabid) {
+        var badgeValue = value;
 
-            if(parseInt(badgeValue) > 999) {
-                badgeValue = maxBadgeDisplay
-            }
+        if(parseInt(badgeValue) > 999) {
+                badgeValue = maxBadgeDisplay;
+        }
 
-			chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tab.id});
-			chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tab.id});
-		});
+        console.log('Setting badge text for tab id '+tabid);
+
+        chrome.tabs.get(tabid, function(tab) {
+            tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
+            console.log("We set: ");
+            console.log(tabBadgeCount);
+        }); 
+        
+
+		chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid});
+		chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tabid});
+
 		//TODO: stop spinning
 		//stopSpinningActionButton()
 }
 
-function setBadge(value, icon) {
-        chrome.tabs.getSelected(null, function(tab) {
-			chrome.browserAction.setBadgeText({text: value + '', tabId: tab.id});
-			chrome.browserAction.setIcon({tabId: tab.id, path: {'38': icon}});  
-		});
+function setBadge(value, icon, tabid) {
+		chrome.browserAction.setBadgeText({text: value + '', tabId: tabid});
+		chrome.browserAction.setIcon({tabId: tabid, path: {'38': icon}});  
+
 		//TODO: stop spinning
 		//stopSpinningActionButton()
 }
@@ -258,6 +268,13 @@ function hideMinkUI(){
         });
     });
 }
+
+chrome.tabs.onActivated.addListener(function(activeTabInfo) {
+  console.log('Tab activated:');
+  console.log(activeTabInfo);
+});
+
+
 
 if(debug) { // Only show contextual menu items in dev for now.
 chrome.contextMenus.create({
@@ -385,22 +402,10 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders']);
 
 
-function displaySecureSiteMementos(mementos){
+function displaySecureSiteMementos(mementos, tabid){
   console.log('in displaySecureSiteMementos()');
   console.log(mementos);
-  setBadgeText(mementos.length);
-		
-//		chrome.runtime.sendMessage({method: "setDropdownContents", value: mementos}, function(response) {
-//		  console.log('done?');
-//		  console.log(response);
-//		});
-//	});
-  
-    //chrome.tabs.sendMessage(tab.id, {
-    //  method: 'displaySecureSiteMementos',
-    //  value: mementos
-    //});
-  //});
+  setBadgeText(mementos.length, tabid);
 }
 
 
@@ -422,17 +427,11 @@ function showInterfaceForZeroMementos() {
 
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.
    Is there a reason that the below should even be in content.js? */
-function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
-    console.log('access test');
-	if(!timemaploc){ //use the aggregator
-        // Redundant def of content.js constant, which cannot be accessed from here
-        //var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
-        var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
-		timemaploc = memgator_json + window.location;
-		if(debug) {
-		  console.log('In getMementosWithTimemap');
-		}
-	}
+function getMementosWithTimemap(uri, tabid){
+    var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
+	var timemaploc = memgator_json + window.location;
+
+    console.log('in getMementosWithTimemap with uri ' + uri + ' and tabid ' +tabid);
 
 	if(uri){
 	    if(debug) {
@@ -456,8 +455,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	         // The MemGator service currently returns a 404 w/ no X-Memento-Count 
 	         //    HTTP Header
 	         //  Q: Does a 404 cause the above AJAX to invoke this "fail" handler
-			if(debug){console.log(numberOfMementos + ' mementos available');}
-
+			if(debug){console.log(numberOfMementos + ' mementos availableX');}
+            
 			if (numberOfMementos == 0) {
 				  if (debug) {console.log('We still need to fetch the TimeMap in mink.js');}
 				  revamp_fetchTimeMaps(data.timemap_index, displaySecureSiteMementos);
@@ -465,7 +464,7 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 				  return;
 			}
            tmData = data;
-           displaySecureSiteMementos(data.mementos.list);
+           displaySecureSiteMementos(data.mementos.list, tabid);
 
       return;
 		}
