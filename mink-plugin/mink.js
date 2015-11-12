@@ -87,30 +87,8 @@ chrome.runtime.onMessage.addListener(
       });
     }else if (request.method == 'nukeFromOrbit') {
     	localStorage.removeItem('minkURI');
-    }else if (request.method == 'fetchSecureSitesTimeMap') {
-      var tgURI = request.value;
-      if(debug) {console.log('method = fetchSecureSitesTimeMap');}
-      
-      console.log('about to fetch secure sites mementos');
-      $.ajax({
-    		url: tgURI,
-    		type: "GET"
-    	}).done(function(data,textStatus,xhr,a,b){
-    	  console.log('success querying w/ secure URI');
-          getMementosWithTimemap(data.timemap_uri.json_format, sender.tab.id);
-          
-    	}).fail(function(xhr, data, error){
-    	  console.log('querying secure FAILED, mitigating');
-    	  if(xhr.status === 404) {
-    	    console.log('Display zero mementos here!');
-    	    showInterfaceForZeroMementos();
-    	    return;
-    	  }
-    	  
-    	  // Should only get here if there is some sort of weird cross-scheme issue
-          if(debug){alert('ERROR!');}
-          getMementosWithTimemap(tgURI, sender.tab.id);
-      });
+    }else if (request.method == 'fetchTimeMap') {
+      fetchTimeMap(request.value, sender.tab.id);
     }else if (request.method == 'notify') {
 		  var notify = chrome.notifications.create(
 			  'id1',{
@@ -210,32 +188,47 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
+function fetchTimeMap(uri, tabid) {
+	$.ajax({
+		url: uri,
+		type: "GET"
+	}).done(function(data,textStatus,xhr,a,b){ 
+      var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
+      tmData = data;
+      displaySecureSiteMementos(data.mementos.list, tabid);
+	}).fail(function(xhr, data, error){
+	  if(xhr.status === 404) {
+		if(debug){console.log('querying secure FAILED, Display zero mementos interface');}
+		showInterfaceForZeroMementos();
+		return;
+	  }
+	  if(debug){console.log('Some error occurred with a secure site that was not a 404');console.log(xhr);}
+	});
+}
+
 function setBadgeText(value, tabid) {
-        var badgeValue = value;
+	var badgeValue = value;
 
-        if(parseInt(badgeValue) > 999) {
-                badgeValue = maxBadgeDisplay;
-        }
+	if(parseInt(badgeValue) > 999) {
+			badgeValue = maxBadgeDisplay;
+	}
 
-        console.log('Setting badge text for tab id '+tabid);
+    // Cache query data for eventually restoring when back button is hit (UNIMPLEMENTED)
+	chrome.tabs.get(tabid, function(tab) {
+		tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
+	}); 
+	
+	chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid});
+	chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tabid});
+}
 
-        chrome.tabs.get(tabid, function(tab) {
-            tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
-            console.log("We set: ");
-            console.log(tabBadgeCount);
-        }); 
-        
-
-		chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid});
-		chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tabid});
-
-		//TODO: stop spinning
-		//stopSpinningActionButton()
+function setBadgeIcon(iconPath, tabid) {
+    chrome.browserAction.setIcon({tabId: tabid, path: {'38': iconPath}}); 
 }
 
 function setBadge(value, icon, tabid) {
-		chrome.browserAction.setBadgeText({text: value + '', tabId: tabid});
-		chrome.browserAction.setIcon({tabId: tabid, path: {'38': icon}});  
+    setBadgeText(value + '', tabid);
+    setBadgeIcon(icon, tabid);
 }
 
 
@@ -243,7 +236,6 @@ chrome.contextMenus.create({
 	"title": "Hide Mink until reload",
 	"contexts": ["image"],
 	"onclick" : hideMinkUI
-	//,"targetUrlPatterns":["*://*/*"] //TODO: filter this solely to the Mink UI
 });
 
 function nextAnimationStep() {
@@ -451,8 +443,6 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 
 
 function displaySecureSiteMementos(mementos, tabid){
-  console.log('in displaySecureSiteMementos()');
-  console.log(mementos);
   setBadge(mementos.length, chrome.extension.getURL('images/minkLogo38.png'), tabid);
 }
 
@@ -575,29 +565,6 @@ function revamp_fetchTimeMaps(tms, cb) {
 		});
 
 		return;
-}
-
-/* Redundant of content.js. Does content.js really need this function? */
-function fetchTimeMap(uri) {
-	  if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
-		var prom = new Promise(
-			function(resolve, reject) {
-
-				$.ajax({
-					url: uri
-				}).done(function(tmData){
-					resolve(tmData);
-				}).fail(function(xhr,status,err){
-					if(debug){
-						console.log('A ajax request within a promise failed!');
-						console.log(xhr);
-						console.log(status);
-						console.log(err);
-					}
-				});
-			}
-		);
-		return prom;
 }
 
 /* Redundant of content.js. Does content.js really need this function? */

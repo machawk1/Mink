@@ -403,58 +403,10 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
     //TODO: set 'working' icon
     chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/minkLogo38_working.png')}, function(response) {});
 
-    
-    // HTTPS URI-Rs must go to a background script to call the aggregator due to Cross-scheme JS restrictions
-	if(timemaploc.indexOf('https:') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
-		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
-		chrome.runtime.sendMessage({
-					method: 'fetchSecureSitesTimeMap',
-					value: timemaploc
-		}, function(response) {});
-		//Cannot use above callback, will usually not execute due to a race condition from chrome messaging and the subsequent Ajax call.
-
-		return;
-	}
-
-
-	if(debug){console.log('Content.js: About to fire off Ajax request for ' + timemaploc);}
-	$.ajax({
-		url: timemaploc,
-		type: 'GET'
-	}).done(function(data,textStatus,xhr){
-		if(xhr.status === 200){
-			var memCount = xhr.getResponseHeader('X-Memento-Count');
-			
-			var numberOfMementos = memCount ? memCount : 0;
-
-			chrome.runtime.sendMessage({method: 'setBadge', text: '' + memCount, iconPath: chrome.extension.getURL('images/minkLogo38.png')}, function(response) {});
-			chrome.runtime.sendMessage({method: 'setDropdownContents', value: data}, function(response) {});
-		}
-	}).fail(function(xhr,textStatus) {
-		if(debug){
-			console.log('ERROR');
-			console.log(textStatus);
-			console.log(xhr);
-		}
-		if(xhr.status === 404){
-			if(debug){console.log('404');}
-			chrome.runtime.sendMessage({method: 'setBadge', text: 'NA', iconPath: chrome.extension.getURL('images/minkLogo38_noMementos.png')}, function(response) {});
-			//TODO: show Archive Now Interface
-			//return; //prevent infinite loop. This is probably not the correct way to handle it
-		}
-
-		//check if we're currently viewing an archive
-		if(debug){console.log('Are we viewing the archive? Basis 1: two http[s]*?://');}
-
-		var schemeOccurances = (window.location + '').match(/http[s]*:\/\//g);
-		if(schemeOccurances.length > 1){ //we likely have two URIs in window.location
-			console.log('  It appears we are viewing the archive based on multiple instances of http[s]*:// in window.location');
-			// - Attempt to extract the URI-R
-			var URI_M = (window.location + '').substr((window.location + '').indexOf('http', 6)); //exclude the initial scheme, let's figure out where the URI-M starts
-			URI_M = URI_M.replace('http://', 'http://'); //cross-protocol interaction is a no-no
-			return getMementosWithTimemap(memgator_proxy + URI_M, null, true);
-		}
-	});
+	chrome.runtime.sendMessage({
+	    method: 'fetchTimeMap',
+	    value: timemaploc
+	}, function(response) {});
 }
 
 function Memento(uri,datetime){
