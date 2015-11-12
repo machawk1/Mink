@@ -116,7 +116,7 @@ function appendCSSToShadowDOM() {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
    .done(function(data) {
     var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
-    $('#minkuiX').append(styleElement);
+    $('#minkuiX').prepend(styleElement);
     createShadowDOM();
   });
 }
@@ -204,9 +204,6 @@ function archiveURI_allServices() {
 	});
 }
 
-
-
-/* ********************* */
 
 var years = {};
 var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -446,55 +443,6 @@ function buildDrilldown_Time(year, month, date){
     drilldownShadow.appendChild(timeUL);
 }
 
-
-
-function showMementoCountsByMonths(year){
-/*
-	$('body /deep/ #months,body /deep/ #day,body /deep/ #time').remove();
-
-console.log('testX');
-
-	var memCountList = '<ul id="months">';
-	var months = {}
-
-
-	for(memento in years[year]){
-
-		var monthName = monthNames[moment(years[year][memento].datetime).month()];
-		if(!months[monthName]){
-			months[monthName] = [];
-		}
-		months[monthName].push(years[year][memento]);
-	}
-
-	for(month in months){
-		memCountList += '<li data-month="' + month + '">' + month + '<span class="memCount">' + months[month].length + '</span></li>\r\n';
-	}
-
-	memCountList += '</ul>';
-	
-  var shadow = document.getElementById('minkWrapper').shadowRoot;
-
-    var yearsNode = shadow.getElementById('years');
-    console.log(yearsNode);
-    var years = shadow.getElementById('years').childNodes;
-    console.log(years.length);
-    for(var year=0; year<years.length; year++) {
-
-	$('body /deep/ #drilldownBox').append(memCountList);
-
-	$('body /deep/ #drilldownBox ul#months li').click(function(){
-		$('body /deep/ #day,body /deep/ #time').remove();
-		$('body /deep/ #drilldownBox ul#months li').removeClass('selectedOption');
-		$(this).addClass('selectedOption');
-
-		showMementoCountsByDays(months[$(this).data('month')]);
-	});
-
-	//adjustDrilldownPositionalOffset();
-	*/
-}
-
 function showMementoCountsByDays(mementos){
 	var days = {};
 	var dayNames = ['NA','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
@@ -522,8 +470,6 @@ function showMementoCountsByDays(mementos){
 
 		showMementoCountsByTime(days[$(this).data('day')]);
 	});
-
-	//adjustDrilldownPositionalOffset();
 }
 
 function showMementoCountsByTime(mementos) {
@@ -549,17 +495,8 @@ function showMementoCountsByTime(mementos) {
 	$('body /deep/ #drilldownBox').append(memCountList);
 	$('body /deep/ #drilldownBox ul#time li').click(function(){
 		window.location = $(this).data('time');
-		//console.log(days[$(this).text().substr(0,$(this).text().indexOf(':'))]);
 	});
-
-	//adjustDrilldownPositionalOffset();
 }
-
-function adjustDrilldownPositionalOffset(){
-	var h = $('body /deep/ #drilldownBox').css('height').substr(0,$('body /deep/ #drilldownBox').css('height').indexOf('px'));
-	$('body /deep/ #drilldownBox').css('top',((h*-1)-30)+'px');
-}
-
 
 
 if($('#minkWrapper').length == 0) {

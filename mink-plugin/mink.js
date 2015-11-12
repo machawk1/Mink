@@ -36,7 +36,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 			  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
 				chrome.tabs.getSelected(null, function(tab) {
 					console.log('Setting badge text based on getSelected tab id instead of origin tab');
-					chrome.browserAction.setBadgeText({text: stillProcessingBadgeDisplay, tabId: tab.id});
+					setBadgeText(stillProcessingBadgeDisplay, tab.id);
 				});
 				return; // Badge has not yet been set
 			  }
@@ -218,11 +218,32 @@ function setBadgeText(value, tabid) {
 		tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
 	}); 
 	
+	var badgeColor = "#090";
+	if(value === stillProcessingBadgeDisplay) {
+	    badgeColor = "#900"
+	}
+	
 	chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid});
-	chrome.browserAction.setBadgeBackgroundColor({color: '#090', tabId: tabid});
+	chrome.browserAction.setBadgeBackgroundColor({color: badgeColor, tabId: tabid});
 }
 
 function setBadgeIcon(iconPath, tabid) {
+    /*console.log('setting '+iconPath+ ' tab:'+tabid);
+	
+	var img = document.createElement('img');
+	img.width = 38;
+	img.height = 38;
+	img.src = iconPath;
+	var canvas = document.createElement('canvas');
+	canvas.width = 38;
+	canvas.height = 38;
+	var context = canvas.getContext('2d');
+	context.drawImage(img, 0, 0, 38, 38);
+	
+	chrome.browserAction.setIcon({tabId: tabid,
+	  imageData: {'38': context.getImageData(0, 0, 38, 38)}
+	});*/
+
     chrome.browserAction.setIcon({tabId: tabid, path: {'38': iconPath}}); 
 }
 
@@ -393,6 +414,8 @@ chrome.webRequest.onCompleted.addListener(function(deets){
    // console.log(deets.url);
    // console.log(deets);
 
+   console.log('*************');
+
     chrome.tabs.query({
         'active': true,
         'currentWindow': true
@@ -457,8 +480,8 @@ function showInterfaceForZeroMementos() {
   
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   chrome.tabs.getSelected(null, function(tab) {
-    chrome.browserAction.setBadgeText({text: '' + tmData.mementos.list.length, tabId: tab.id});
-    chrome.browserAction.setIcon({tabId: tab.id, path: 'images/minkLogo38_noMementos.png'});
+    setBadgeText('', tab.id);
+    setBadgeIcon('images/minkLogo38_noMementos.png', tab.id);
   });
   
 }
