@@ -24,6 +24,20 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 
 
 chrome.browserAction.onClicked.addListener(function(tab) {
+    // Check if isA Memento
+    chrome.storage.sync.get('timemaps', function(items) {
+    console.log(items.timemaps);
+      chrome.tabs.query({active: true}, function(tabs) {
+		  if(items.timemaps && items.timemaps[tabs[0].url]) {
+		      console.log('CLicked button and we are viewing a memento');
+		      return;
+	      }else {
+	          console.log('No timemap for ' + tabs[0].url);
+	      }
+	  });
+	});
+
+
     chrome.tabs.getSelected(null, function(tab) {
     	chrome.storage.sync.get('disabled',function(items) {
     	    if(items.disabled) {
@@ -214,9 +228,9 @@ function setBadgeText(value, tabid) {
 	}
 
     // Cache query data for eventually restoring when back button is hit (UNIMPLEMENTED)
-	chrome.tabs.get(tabid, function(tab) {
-		tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
-	}); 
+	//chrome.tabs.get(tabid, function(tab) {
+	//	tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
+	//}); 
 	
 	var badgeColor = "#090";
 	if(value === stillProcessingBadgeDisplay) {

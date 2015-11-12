@@ -82,6 +82,7 @@ function displayUIBasedOnContext() {
     chrome.storage.sync.get('timemaps',function(items) {
 	  if(items.timemaps && items.timemaps[document.URL]) {
 	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mLogo38_isAMemento.png')}, function(response) {});
+	    if(debug){console.log('attach viewing memento interface here');}
 	  }else {
 	    getMementos();
 	  }
