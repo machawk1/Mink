@@ -9,10 +9,12 @@
 </select>
 <input type="button" value="View" id="viewMementoButton" disabled="disabled" class="dropdown" />
 <input type="button" value="Archive Page To..." id="archiveNow" />
-<span class="archiveNowInterface hidden">Archive Page To...</span>
-<img src="images/iaLogo.png" alt="Internet Archive" id="archivelogo_ia" class="archiveNowInterface hidden archiveLogo" />
-<img src="images/archiveisLogo.png" alt="Archive.is" id="archivelogo_ais" class="archiveNowInterface hidden archiveLogo" />
-<img src="images/allListedArchives.png" alt="All Listed Archives" id="archivelogo_ala" class="archiveNowInterface hidden archiveLogo" />
+<span id="archiveNowInterface" class="hidden">
+ <span class="archiveNowInterface">Archive Page To...</span>
+ <img src="images/iaLogo.png" alt="Internet Archive" id="archivelogo_ia" class="archiveNowInterface archiveLogo" />
+ <img src="images/archiveisLogo.png" alt="Archive.is" id="archivelogo_ais" class="archiveNowInterface archiveLogo" />
+ <img src="images/allListedArchives.png" alt="All Listed Archives" id="archivelogo_ala" class="archiveNowInterface archiveLogo" />
+</span>
 <!--<input type="button" value="?" id="helpButton" />-->
 
 
@@ -108,7 +110,14 @@ function changeIconFor(obj, src) {
 $(document).ready(function() {
   console.log($('#mementosAvailable span').text() + ' X ');
   
-  console.log($('#minkuiX #archiveNow').click(function(){$("#minkuiX #archiveNow").html();}));
+  $('#minkuiX #archiveNow').click(function(){
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    shadow.getElementById('archiveNowInterface').classList.remove('hidden');
+    shadow.getElementById('archiveNow').classList.add('hidden','nonArchiveNowInterface');
+    shadow.getElementById('mementosDropdown').classList.add('hidden','nonArchiveNowInterface');
+    shadow.getElementById('viewMementoButton').classList.add('hidden','nonArchiveNowInterface');
+    shadow.getElementById('steps').classList.add('hidden','nonArchiveNowInterface');
+  });
   
   $('.archiveLogo').click(function() {
     var that = this;
