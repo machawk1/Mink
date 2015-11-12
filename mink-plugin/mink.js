@@ -25,16 +25,24 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.getSelected(null, function(tab) {
-		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
-		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
-			chrome.tabs.getSelected(null, function(tab) {
-			    console.log('Setting badge text based on getSelected tab id instead of origin tab');
-				chrome.browserAction.setBadgeText({text: stillProcessingBadgeDisplay, tabId: tab.id});
-			});
-		    return; // Badge has not yet been set
-		  }
-		  displayMinkUI(tab.id);
+    	chrome.storage.sync.get('disabled',function(items) {
+    	    if(items.disabled) {
+    	      stopWatchingRequests();
+    	      //TODO: show alternate interface
+    	      return;
+    	    }
+
+			chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
+			  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
+				chrome.tabs.getSelected(null, function(tab) {
+					console.log('Setting badge text based on getSelected tab id instead of origin tab');
+					chrome.browserAction.setBadgeText({text: stillProcessingBadgeDisplay, tabId: tab.id});
+				});
+				return; // Badge has not yet been set
+			  }
+			  displayMinkUI(tab.id);
 		  
+			});
 		});
 	});
 });
@@ -159,6 +167,8 @@ chrome.runtime.onMessage.addListener(
     }else if(request.method === 'openOptionsPage') {
       console.log('opening options page');
       chrome.runtime.openOptionsPage();
+    }else if(request.method == 'stopWatchingRequests') {
+      stopWatchingRequests()
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
@@ -270,13 +280,54 @@ function hideMinkUI(){
 }
 
 chrome.tabs.onActivated.addListener(function(activeTabInfo) {
-  console.log('Tab activated:');
-  console.log(activeTabInfo);
+  chrome.storage.sync.get('disabled',function(items) {
+    if(items.disabled) {
+      stopWatchingRequests();
+    }
+  });
 });
 
 
 
+
+function startWatchingRequests() {
+  chrome.storage.sync.remove('disabled', function() {
+	  chrome.contextMenus.update('mink_stopStartWatching', {
+		  'title': 'Stop Watching Requests',
+		  'onclick': stopWatchingRequests
+	  });
+  
+	  setBadge('', chrome.extension.getURL('images/minkLogo38.png'), null);
+  });
+}
+
+function stopWatchingRequests() {
+  if(debug){console.log('stopWatchingRequests');}
+  chrome.storage.sync.set({'disabled': true}, function() {        
+	  chrome.contextMenus.update('mink_stopStartWatching', {
+		  'title': 'Restart Live-Archived Web Integration',
+		  'onclick': startWatchingRequests
+	  });
+  
+	  setBadge('', chrome.extension.getURL('images/minkLogo38_disabled.png'), null);
+	  // Without an id, the current tab's badge won't be updated
+	  //chrome.tabs.getCurrent(function(tab) {
+	  //    setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab.id);
+	  //});
+  });
+}
+
+
 if(debug) { // Only show contextual menu items in dev for now.
+chrome.contextMenus.create({
+    'id': 'mink_stopStartWatching',
+	'title': 'Stop Watching Requests',
+	'contexts': ['browser_action'],
+	'onclick' : stopWatchingRequests
+},function(err){
+  if(err){console.log('error creating second contextmenu');}
+});
+
 chrome.contextMenus.create({
 	'title': 'Add to Mink Blacklist',
 	'contexts': ['image'],

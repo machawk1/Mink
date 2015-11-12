@@ -21,32 +21,14 @@ if(debug){console.log('blacklist test');console.log(chrome.runtime.id);}
 //getBlacklist();
 
 
-//PENDING, Issue #6, not possible w/o Chrome Canary: $.scoped(); //allows the usage of bootstrap without affecting the target page's style
 
-$('body').append('<div id="minkContainer"></div>');
-//PENDING, Issue #6, not possible w/o Chrome Canary: $("#minkContainer").append("<style scoped>\r\n@import url('"+bootstrapCSS+"');\r\n</style>");
-$('#minkContainer').append('<style type="text/css" scoped="scoped">\r\n' +
-	'#minkContainer * {font-size: 12px; font-family: Helvetica, sans-serif; text-transform: none;}\r\n' +
-	'#minkContainer input[type=button] { background-color: white; border: 1px double black; padding: 2px 5px 2px 5px; border-radius: 5px; font-weight: bold;}\r\n' +
-	'#minkContainer input[type=button]:enabled:hover {cursor: pointer; background-color: #ccc; }' +
-	'#minkContainer input[type=button]:disabled:hover {cursor: not-allowed; }' +
-	'#minkContainer input[type=button]:disabled {opacity: 0.25; }' +
-'</style>');
-//$.scoped();
-$('#minkContainer').append('<div id="archiveOptions"></div>');
-$('#minkContainer').append('<img src="' + iconUrl + '" id="mLogo" />');
-
-/*
-$(document).ready(function() {
-	//$('#mLogo').click(function() {
-	//	showArchiveOptions();
-	//});
-	console.log('Starting?...');
-	displayUIBasedOnContext();
+chrome.storage.sync.get('disabled',function(items) {
+    if(items.disabled) {
+      chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function(response) {});
+    } else {
+      displayUIBasedOnContext();
+    }
 });
-*/
-
-displayUIBasedOnContext();
 
 var jsonizedMementos = '[';
 var jsonizedMementos;
@@ -100,27 +82,6 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 function displayUIBasedOnContext() {
     console.log('displayUIBasedOnContext()');
     getMementos();
-    return;
-    
-	chrome.runtime.sendMessage({method: "retrieve"}, function(response) {
-		if(response === null || response.value === window.location || response.value === null){ // ON A LIVE WEB PAGE, FETCH MEMENTOS
-			getMementos();
-		}else if(response && response.value !== null && 										//ON AN ARCHIVED PAGE, SHOW RETURN TO LIVE WEB BUTTON
-				( ((window.location + '').indexOf(response.value) > -1) ||					//check if URI-R is in URI-M
-				  ((window.location + '').replace('www.','').indexOf(response.value) > -1) ||	// 3 hacky attempts at removing the www to further accomplish this
-				  ((window.location + '').indexOf(response.value.replace('www.','')) > -1) ||
-				  ((window.location + '').replace('www.','').indexOf(response.value.replace('www.', '')) > -1)
-				) 																	// There were memento HTTP headers
-			){
-			//Display UI For When Browsing An Archive Page
-			displayReturnToLiveWebButton(response.value);
-		}else {
-			if(debug){console.log('There is no else, only if');}
-			//ugh, we don't want to be here, let's nuke the localStorage
-			//clearHistory();
-			//displayUIBasedOnContext();
-		}
-	  });
 }
 
 function isEmpty(o){ //returns if empty object is passed in
@@ -361,71 +322,6 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 	});
 }
 
-/**
- * TODO: update this old description since it is now a wrapper/router
- * Acquire all mementos from a timegate with either the current window URI
- *  or the URI of a value passed in
- * @param uri The target URI-R, if null then use window location
- * @param alreadyAcquiredTimemaps When function is called recursively, the
- *         previously acquired timemaps are passed in this argument
- * @param stopAtOneTimemap A boolean to specify whether additional pagination
- *         references should be followed and parsed before data is returned
- */
-function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
-	if(debug){console.log('In getMementos');}
-	getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
-	return;
-	
-	chrome.storage.local.get(null, function(keys){
-		if(isEmpty(keys)) { 	// No link headers in the request. :(
-			if(debug){console.log('No URI accessed did not have an HTTP link header');}
-			getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
-		}else {				//we have link headers!
-			if(keys.datetime){ //isA memento
-				if(debug){console.log('We are a memento!');}
-				logoInFocus = true;
-				if(debug){console.log(keys);}
-				//Display UI For When Browsing An Archive Page
-				displayReturnToLiveWebButton(keys.original);
-			}else if(keys.timemap) {
-				//prefer this, simply do a drop-in replacement from the previous implementation, which hit the aggregator
-				if(debug){
-					console.log('We have a timemap, lets do more! The timemap:');
-					console.log(keys.timemap);
-					console.log('We will need to call getMementosWithTimemap() here if we want the dropdown to be generated');
-				}
-
-				createTimemapFromURI(keys.timemap);
-                console.log('This part of the code is dependent ont he cache/localStorage');
-				if(debug){console.log('Starting call chain to generate dropdown HTML');}
-				getMementosWithTimemap();
-			}else if(keys.timegate) {
-				if(debug){
-					console.log('We have a timegate URI, lets fetch it and try to get mementos or a timemap');
-				}
-				//todo: set this up using promises to allow recursion, callback with returned arrays
-				var prom = new Promise(
-					function(resolve, reject) {
-						queryTimegate(keys.timegate);
-					}
-				).then(function(tms){
-					console.log('accepted:');
-					console.log(tms);
-					logoInFocus = true;
-				},function(val){
-					console.log('rejected');
-				});
-				return;
-			}else { // We had some link headers but none that were related to memento, so act as if we had no link header
-				getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap);
-			}
-
-			if (debug) {
-			  console.log('TODO, change the timegate/map to that which was specified in the link headers.');
-			}
-		}
-	});
-}
 
 function fetchTimeMap(uri) {
 	  if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
@@ -494,7 +390,7 @@ function displayUIBasedOnStoredTimeMapData() {
 }
 
 
-function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
+function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
     if(debug) {console.log('getMementosWithTimemap()');}
 	if(!timemaploc){ //use the aggregator
 		timemaploc = memgator_json + window.location;
@@ -503,7 +399,11 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 	if(uri){
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
+    
+    //TODO: set 'working' icon
+    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/minkLogo38_working.png')}, function(response) {});
 
+    
     // HTTPS URI-Rs must go to a background script to call the aggregator due to Cross-scheme JS restrictions
 	if(timemaploc.indexOf('https:') > -1){	//the target URI is secure and we can't have cross-scheme calls for JS
 		console.warn('Mink has issues with Cross-scheme querying (this is an https site).');
