@@ -467,7 +467,19 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		  }
 		  tms[url] = tm;
 		  
-		  chrome.storage.sync.set({'timemaps':tms},function() {});
+       
+		  chrome.storage.sync.set({'timemaps':tms},function(bytesUsed) {
+			if(chrome.runtime.lastError) {
+			  console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
+			  if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
+			    // Chicken wire and duct tape! Clear the cache, do it again, yeah!
+			    chrome.storage.sync.clear();
+			    chrome.storage.sync.set({'timemaps':tms},function(){});
+			  }
+			}
+			console.log('Bytes used: '+bytesUsed);
+		  });
+
 		});
 
 	}
