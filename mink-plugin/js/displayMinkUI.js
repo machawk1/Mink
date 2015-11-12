@@ -264,6 +264,8 @@ function setupDrilldownInteraction_Year() {
           } 
       
       	  buildDrilldown_Month($(this).data('year'));
+      	  $(this).siblings().removeClass('selectedOption');
+      	  $(this).addClass('selectedOption');
       };
     }
  } 
@@ -305,6 +307,8 @@ function buildDrilldown_Month(year){
 		li.appendChild(liSpan);
 		li.onclick = function(event){
       	    buildDrilldown_Day($(this).data('year'), $(this).data('month'));
+      	    $(this).siblings().removeClass('selectedOption');
+      	    $(this).addClass('selectedOption');
         };
 		
 		monthUL.appendChild(li);
@@ -368,6 +372,8 @@ function buildDrilldown_Day(year, month){
 		li.appendChild(liSpan);
 		li.onclick = function(event){
       	    buildDrilldown_Time($(this).data('year'), $(this).data('month'), parseInt($(this).data('date')));
+      	    $(this).siblings().removeClass('selectedOption');;
+      	    $(this).addClass('selectedOption');
         };
 		
 		dayUL.appendChild(li);
@@ -424,8 +430,9 @@ function buildDrilldown_Time(year, month, date){
 		li.appendChild(document.createTextNode(times[time].time));
 		
 		li.onclick = function(event){
+			$(this).siblings().removeClass('selectedOption');
+		    $(this).addClass('selectedOption');
       	    window.location = times[time].uri;
-      	    //console.log(times[time]);
         };
 		
 		timeUL.appendChild(li);
@@ -441,61 +448,6 @@ function buildDrilldown_Time(year, month, date){
         drilldownShadow.removeChild(existingTimesUL);
     }
     drilldownShadow.appendChild(timeUL);
-}
-
-function showMementoCountsByDays(mementos){
-	var days = {};
-	var dayNames = ['NA','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
-					'11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
-					'21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th','31st'];
-
-	for(memento in mementos){
-		var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
-		if(!days[dayNumber]){
-			days[dayNumber] = [];
-		}
-		days[dayNumber].push(mementos[memento]);
-	}
-	var memCountList = '<ul id="day">';
-	for(day in days){
-		memCountList += '<li data-day="' + day + '">' + day + '<span class="memCount">' + days[day].length + '</span></li>\r\n';
-	}
-
-	memCountList += '</ul>';
-	$('body /deep/ #drilldownBox').append(memCountList);
-	$('body /deep/ #drilldownBox ul#day li').click(function(){
-		$('body /deep/ #time').remove();
-		$('body /deep/ #drilldownBox ul#day li').removeClass('selectedOption');
-		$(this).addClass('selectedOption');
-
-		showMementoCountsByTime(days[$(this).data('day')]);
-	});
-}
-
-function showMementoCountsByTime(mementos) {
-	var times = {};
-	var uris = {};
-	for(memento in mementos){
-		var mom = moment(mementos[memento].datetime);
-		var time = mom.format('HH:mm:ss');
-
-		if(!times[time]){
-			times[time] = [];
-			uris[time] = [];
-		}
-		times[time].push(mementos[memento]);
-		uris[time] = mementos[memento].uri;
-	}
-	var memCountList = '<ul id="time">';
-	for(time in times){
-		memCountList += '<li data-time="' + uris[time]+ '">' + time + '</li>\r\n';
-	}
-
-	memCountList += '</ul>';
-	$('body /deep/ #drilldownBox').append(memCountList);
-	$('body /deep/ #drilldownBox ul#time li').click(function(){
-		window.location = $(this).data('time');
-	});
 }
 
 
