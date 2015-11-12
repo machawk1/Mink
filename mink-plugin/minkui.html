@@ -63,32 +63,38 @@ $('#mementosDropdown').change(function() {
 	}
 });
 
-$('#title_dropdown').click(function(){
-    //$('#mementosDropdown').show();
-    //$('#viewMementoButton').show();
+document.getElementById('title_dropdown').onclick = function() {
     var shadow = document.getElementById('minkWrapper').shadowRoot;
     var mementosDropdown = shadow.getElementById('mementosDropdown');
     var viewMementoButton = shadow.getElementById('viewMementoButton');
+    var drilldownBox = shadow.getElementById('drilldownBox');
+    
+    if(mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
+        alert('Dropdown available for large collections of mementos due to major browser performance degradation.');
+        return;
+    }
     
     mementosDropdown.className = 'dropdown';
     viewMementoButton.className = 'dropdown';
     shadow.getElementById('title_dropdown').className = 'active';
+    drilldownBox.className = 'hidden';
+    
     shadow.getElementById('title_drilldown').className = '';
-});
+};
 
-//var shadow = document.getElementById('minkWrapper').shadowRoot;
-
-$('#title_drilldown').click(function(){
-    $('#mementosDropdown').hide();
+document.getElementById('title_drilldown').onclick = function() {
     var shadow = document.getElementById('minkWrapper').shadowRoot;
     var mementosDropdown = shadow.getElementById('mementosDropdown');
     var viewMementoButton = shadow.getElementById('viewMementoButton');
+    var drilldownBox = shadow.getElementById('drilldownBox');
     
     mementosDropdown.className = 'dropdown hidden';
     viewMementoButton.className = 'dropdown hidden';
     shadow.getElementById('title_dropdown').className = '';
+    drilldownBox.className = '';
+    
     shadow.getElementById('title_drilldown').className = 'active';
-});
+};
 
 $('#viewMementoButton').click(function() {
   window.location = $(this).attr('alt');

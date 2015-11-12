@@ -30,3 +30,5 @@ h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-
 #drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
 #drilldownBox ul li.selectedOption {background-color: #ddddff;}
 #drilldownBox ul li span.memCount {float: right;  font-family: Monaco, Courier, sans-serif; padding: 0px 3px; margin-right: 5px; border-radius: 2px; font-size: 10px; line-height: 10px;}
+
+.disabled {color: #999;}

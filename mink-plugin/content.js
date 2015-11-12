@@ -261,7 +261,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			return;
 		}
 		var tm = new Timemap(request.data);
-		displayUIBasedOnTimemap(tm);
+		//displayUIBasedOnTimemap(tm);
 
 		return;
 	}
@@ -273,22 +273,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.log(request.uri);
 			console.log('-----');
 		}
-	}
-
-	if(request.method === 'displaySecureSiteMementos') {
-			if((!(request.value.mementos) && !(request.value.timemaps) && !(request.value.timemap_uri)) || request.value.mementos == []){
-				hideLogo = true;
-				logoInFocus = true;
-			  flip();
-			}else {
-				storeTimeMapData([request.value]);
-				revamp_createUIShowingMementosInTimeMap(request.value);
-
-				//hideLogo = true;
-				//logoInFocus = true;
-				//flip();
-			}
-			return;
 	}
 
 	displayUIBasedOnContext();
@@ -340,33 +324,6 @@ function queryTimegate(tgURI) {
 	}).done(function(data,textStatus,xhr) {
 		processResponseFromAggregator(xhr);
 	});
-}
-
-function displayUIBasedOnTimemap(tm) {
-	console.log('likely obsolete interface');
-
-	if(tm.mementos.length > 0) {
-		logoInFocus = true; //stop rotating the logo, we have a list of mementos
-		chrome.runtime.sendMessage({
-			method: 'notify',
-			title: 'TimeMap fetching complete.',
-			body: tm.mementos.length + '+ mementos returned.'
-		}, function(response) {});
-		displayMementoCountAtopLogo();
-
-		var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
-		$(tm.mementos).each(function(i,m){
-			selectBox += '\t<option value="' + m.uri + '">' + moment(m.datetime) + '</option>\r\n';
-		});
-		selectBox += '</select>';
-
-		console.log('Calling addInterfaceComponents from 1');
-		addInterfaceComponents(tm.mementos.length, 1, ' timemaps', selectBox);
-		$('#viewMementoButton').click(function() {viewDifferentMemento();});
-		setMementoButtonInteractivityBasedOnMementoDropdown();
-		//$('#countOverLogo').text(':)');//tm.mementos.length
-
-	}
 }
 
 function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
@@ -470,45 +427,6 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap) {
 	});
 }
 
-
-function createSelectBoxContents(tms) {
-	var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
-	return selectBox;
-
-	// Chrome does not like very large strings
-/*	console.log(tms[0]);
-	for(var tm = 0; tm < tms.length; m++) {
-
-		for(var m = 0; m < tms[tm].mementos.list.length; m++){
-			selectBox += '\t<option></option>\n';
-			//selectBox += '\t<option value="' + tms[tm].mementos.list[m].uri + '">' + moment(tms[tm].mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
-		}
-	}
-	selectBox += '</select>';
-
-	return selectBox;
-	*/
-}
-
-function revamp_createUIShowingMementosInTimeMap(tm) {
-	var selectBox = '<select id="mdts"><option>Select a Memento to view</option>';
-	for(var m=0; m<tm.mementos.list.length; m++){
-		selectBox += '\t<option value="' + tm.mementos.list[m].uri + '">' + moment(tm.mementos.list[m].datetime).format('MMMM Do YYYY, h:mm:ss a') + '</option>\r\n';
-	}
-	selectBox += '</select>';
-
-	var numberOfTimeMaps = 1; // TODO: Looks to be an object an not an array, need example where multiple are defined
-	addInterfaceComponents(tm.mementos.list.length, numberOfTimeMaps, 'TimeMap', selectBox);
-	displayMementoCountAtopLogo();
-	$('#countOverLogo').text($('#countOverLogo').html());
-	logoInFocus = true; // Stop spinning the logo
-
-	$('#fetchAllMementosButton').click(function() {
-			logoInFocus = false;
-			flip();
-		});
-}
-
 function fetchTimeMap(uri) {
 	  if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
 		var prom = new Promise(
@@ -573,29 +491,6 @@ function storeTimeMapData(arrayOfTimeMaps, cbIn){
 function displayUIBasedOnStoredTimeMapData() {
     alert('displayUIBasedOnStoredTImeMapData');
     return;
-	// Only executed with indexed TimeMaps
-	chrome.storage.local.get('timemaps',
-		function(localStore){
-			var tms = localStore.timemaps;
-			//if(debug){console.log('We got the data from localstorage in ' + displayUIBasedOnStoredTimeMapData());}
-			var numberOfMementos = countNumberOfMementos(tms);
-			var tmPlurality = 'TimeMap';
-			if(tms.length > 1) {
-				tmPlurality += 's';
-			}
-			var selectBoxContents = createSelectBoxContents(tms);
-
-			addInterfaceComponents(numberOfMementos, tms.length, tmPlurality, selectBoxContents);
-			displayMementoCountAtopLogo();
-
-			if(tms[0].mementos.list.length > 500) {
-				$('#largeNumberOfMementoOption1').attr('disabled','disabled').addClass('disabled');
-			}
-
-			logoInFocus = true;
-		}
-	);
-
 }
 
 

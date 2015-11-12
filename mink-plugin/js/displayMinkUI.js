@@ -26,16 +26,17 @@ function appendHTMLToShadowDOM() {
    var mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
    
    if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
-     $('.dropdown').hide();
+     $('.dropdown').addClass('hidden');
      $('#steps .action').removeClass('active');
      $('#title_drilldown').addClass('active');
+     buildDropDown([]);
      buildDrilldown_Year(mementos);
    }else if(mementos.length === 0) {
      switchToArchiveNowInterface();     
    }else {
      buildDropDown(mementos);
      buildDrilldown_Year(mementos);
-     $('#drilldownBox').hide();
+     $('#drilldownBox').addClass('hidden');
      $('#steps .action').removeClass('active');
      $('#title_dropdown').addClass('active');
    }
@@ -88,6 +89,10 @@ function buildDropDown(mementos) {
      mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="'+ mementos[mm].datetime + '">' + mementos[mm].datetime + '</option>';
    }
 
+   $('#mementosDropdown').attr('data-memento-count', mementos.length);
+   if(mementos.length === 0) {
+         $('#title_dropdown').addClass('disabled'); 
+    }
    $('#mementosDropdown').append(mementoSelections);
 }
 
@@ -194,7 +199,6 @@ var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','N
 
 function buildDrilldown_Year(mementos){
 // NOTE: Shadow DOM not yet built. Do so after this function
-
 	years = null;
 	years = {};
 	var yearDataFromLastIteration = '';
@@ -213,6 +217,7 @@ function buildDrilldown_Year(mementos){
 	memCountList += '</ul>';
 
     var drilldown = document.getElementById('drilldownBox');
+    console.log(memCountList);
 	$('body #drilldownBox').append(memCountList);
 }
 
