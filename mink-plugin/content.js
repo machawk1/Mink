@@ -17,7 +17,6 @@ var mementosInTimemapBasedOnRelAttributeRegex = /;rel=\".*memento.*\"/g;
 var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g;
 
 //TODO: check if in blacklist
-if(debug){console.log('blacklist test');console.log(chrome.runtime.id);}
 //getBlacklist();
 
 
@@ -79,9 +78,15 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 	alert('Halting execution');
 }
 
-function displayUIBasedOnContext() {
-    console.log('displayUIBasedOnContext()');
-    getMementos();
+function displayUIBasedOnContext() {    
+    chrome.storage.sync.get('timemaps',function(items) {
+	  if(items.timemaps && items.timemaps[document.URL]) {
+	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mLogo38_isAMemento.png')}, function(response) {});
+	  }else {
+	    getMementos();
+	  }
+	});
+    
 }
 
 function isEmpty(o){ //returns if empty object is passed in
@@ -91,13 +96,6 @@ function isEmpty(o){ //returns if empty object is passed in
         }
     }
     return true;
-}
-
-
-function displayReturnToLiveWebButton(uri){
-		//Display UI For When Browsing An Archive Page
-		$('#archiveOptions').html('<button id="liveWeb">Return to Live Web</button>');
-		$('#liveWeb').click(function() {window.location = (uri ? uri : response.value);});
 }
 
 

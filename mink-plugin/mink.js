@@ -410,10 +410,6 @@ function getMementosForHTTPSWebsite(){
 }
 
 chrome.webRequest.onCompleted.addListener(function(deets){
-   // console.log('onHeadersReceived()');
-   // console.log(deets.url);
-   // console.log(deets);
-
    console.log('*************');
 
     chrome.tabs.query({
@@ -432,7 +428,8 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var timemap, timegate, original, url;
 
 	var headers = deets.responseHeaders;
-	var mementoDateTimeHeader, linkHeaderAsString;
+	var mementoDateTimeHeader;
+	var linkHeaderAsString;
 	for(var headerI=0; headerI<headers.length; headerI++){
 		if(headers[headerI].name == 'Memento-Datetime'){
 			mementoDateTimeHeader = headers[headerI].value;
@@ -443,26 +440,27 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 
 	if(linkHeaderAsString){
 		var tm = new Timemap(linkHeaderAsString);
-		chrome.storage.local.clear();
 		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
 		}
-		chrome.storage.local.set(tm);
-		if(mementoDateTimeHeader){
-			//if(debug){console.log('You're viewing something in the archive! TODO: Show simpler interface.');}
-			//var m = new Memento();
-			//m.datetime = mementoDateTimeHeader;
-			//chrome.storage.local.set(m);
-			return;	//if we ever want to show the standard interface regardless of the memento-datetime header, disable this
-		}
-	}else {	//e.g., http://matkelly.com
-		if(debug){console.log('There is no HTTP link header, Mink will utilize a Memento aggregator instead.');	}
-		chrome.storage.local.clear(); //get rid of previous timemaps, timegates, etc.
+
+		chrome.storage.sync.get('timemaps', function(items) {
+		  var tms;
+		  if(!items.timemaps) {
+		    tms = {};
+		  }else {
+		    tms = items.timemaps;
+		  }
+		  tms[url] = tm;
+		  
+		  chrome.storage.sync.set({'timemaps':tms},function() {});
+		});
+
 	}
-
-
+	
+	
 },
-{urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders']);
+{urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
 
 
 function displaySecureSiteMementos(mementos, tabid){
