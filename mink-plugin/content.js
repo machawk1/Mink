@@ -541,6 +541,8 @@ function getMementosWithTimemap(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,tim
 		}
 		if(xhr.status === 404){
 			if(debug){console.log('404');}
+			chrome.runtime.sendMessage({method: 'setBadge', text: 'NA', iconPath: chrome.extension.getURL('images/minkLogo38_noMementos.png')}, function(response) {});
+			//TODO: show Archive Now Interface
 			//return; //prevent infinite loop. This is probably not the correct way to handle it
 		}
 

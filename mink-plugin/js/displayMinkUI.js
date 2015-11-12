@@ -23,7 +23,12 @@ function appendHTMLToShadowDOM() {
    
    $('body').append(data);
    
-   var mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
+   var mementos;
+   if(tmData && tmData.mementos) {
+      mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
+   }else {
+      mementos = [];
+   }
    
    if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
      $('.dropdown').addClass('hidden');
@@ -98,10 +103,13 @@ function buildDropDown(mementos) {
 
 function switchToArchiveNowInterface() {
   $('#mementosDropdown').addClass('noMementos');
+  $('#drilldownBox').addClass('noMementos');
   $('#viewMementoButton').addClass('noMementos');
   $('#minkStatus #steps').addClass('noMementos');
+  
+  
   $('#archiveNow').addClass('noMementos');
-  $('.archiveNowInterface').removeClass('hidden');  
+  $('#archiveNowInterface').removeClass('hidden');  
 }
  
 function appendCSSToShadowDOM() {
@@ -145,33 +153,40 @@ function archiveURI_archiveOrg(cb) {
 	});
 }
 
-function archiveURI_archiveDotIs() {
+function archiveURI_archiveDotIs(cb) {
+    if(debug){console.log('submitting to archive.is');}
 	$.ajax({
 		method: 'POST',
 		url: 'http://archive.is/submit/',
 		data: { coo: '', url: document.URL}
 	})
-	.done(function(a,b,c){
+	.done(function(data,status,xhr){
 		//console.log(a);
-		if(b == 'success'){
+		if(debug){console.log('success on ais submission');}
+		if(status == 'success'){
 			chrome.runtime.sendMessage({
 				method: 'notify',
 				title: 'Mink',
 				body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
 			}, function(response) {});
+			cb();
+			
 			$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
-			$('#archiveNow_archivedotis').html('View on Archive.is');
 
-			var linkHeader = c.getResponseHeader('link');
+			var linkHeader = xhr.getResponseHeader('link');
 			var tmFromLinkHeader = new Timemap(linkHeader);
+
 			var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
+			
+			var shadow = document.getElementById('minkWrapper').shadowRoot;
+			shadow.getElementById('archivelogo_ais').classList.add('archiveNowSuccess');
+			
+			shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI);
+			shadow.getElementById('archivelogo_ais').onclick = function() {
+			  window.location = $(this).attr('title');
+			};
 
-			$('#archiveNow_archivedotis').attr('title', archiveURI);
-			$('.archiveNowSuccess').click(function(){
-				window.open($(this).attr('title'));
-			});
-
-			refreshAggregatorsTimeMap(document.URL);
+			    //refreshAggregatorsTimeMap(document.URL);
 		}else {
 			console.log(b);
 
@@ -224,6 +239,7 @@ function buildDrilldown_Year(mementos){
 }
 
 function setupDrilldownInteraction_Year() {
+    if(!tmData) {console.log('There are likely no mementos'); return;}
     var mementos = tmData.mementos.list;
     console.log('setting up...');
     var shadow = document.getElementById('minkWrapper').shadowRoot;
