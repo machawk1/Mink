@@ -27,7 +27,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     // Check if isA Memento
     chrome.storage.sync.get('timemaps', function(items) {
         console.log(items.timemaps);
-        if(items.timemaps && items.timemaps[tabs.url]) {
+        if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
 	        return;
          }else {
