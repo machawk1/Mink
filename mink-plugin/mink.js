@@ -26,39 +26,36 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 chrome.browserAction.onClicked.addListener(function(tab) {
     // Check if isA Memento
     chrome.storage.sync.get('timemaps', function(items) {
-    console.log(items.timemaps);
-      chrome.tabs.query({active: true}, function(tabs) {
-		  if(items.timemaps && items.timemaps[tabs[0].url]) {
-		      console.log('CLicked button and we are viewing a memento');
-		      return;
-	      }else {
-	          console.log('No timemap for ' + tabs[0].url);
-	      }
-	  });
+        console.log(items.timemaps);
+        if(items.timemaps && items.timemaps[tabs.url]) {
+	        console.log('CLicked button and we are viewing a memento');
+	        return;
+         }else {
+	        console.log('No timemap for ' + tab.url);
+         }
+
 	});
 
 
-    chrome.tabs.getSelected(null, function(tab) {
-    	chrome.storage.sync.get('disabled',function(items) {
-    	    if(items.disabled) {
-    	      stopWatchingRequests();
-    	      //TODO: show alternate interface
-    	      return;
-    	    }
 
-			chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
-			  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
-				chrome.tabs.getSelected(null, function(tab) {
-					console.log('Setting badge text based on getSelected tab id instead of origin tab');
-					setBadgeText(stillProcessingBadgeDisplay, tab.id);
-				});
-				return; // Badge has not yet been set
-			  }
-			  displayMinkUI(tab.id);
-		  
-			});
+	chrome.storage.sync.get('disabled',function(items) {
+		if(items.disabled) {
+		  stopWatchingRequests();
+		  //TODO: show alternate interface
+		  return;
+		}
+
+		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
+		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
+			  setBadgeText(stillProcessingBadgeDisplay, tab.id);
+
+			  return; // Badge has not yet been set
+		  }
+		  displayMinkUI(tab.id);
+	  
 		});
 	});
+
 });
 
 function displayMinkUI(tabId) {
@@ -213,7 +210,7 @@ function fetchTimeMap(uri, tabid) {
 	}).fail(function(xhr, data, error){
 	  if(xhr.status === 404) {
 		if(debug){console.log('querying secure FAILED, Display zero mementos interface');}
-		showInterfaceForZeroMementos();
+		showInterfaceForZeroMementos(tabid);
 		return;
 	  }
 	  if(debug){console.log('Some error occurred with a secure site that was not a 404');console.log(xhr);}
@@ -494,7 +491,7 @@ function displaySecureSiteMementos(mementos, tabid){
 }
 
 
-function showInterfaceForZeroMementos() {
+function showInterfaceForZeroMementos(tabid) {
   console.log('Displaying zero mementos');
   tmData = {};
   tmData.mementos = {};
@@ -503,10 +500,9 @@ function showInterfaceForZeroMementos() {
   
   
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
-  chrome.tabs.getSelected(null, function(tab) {
-    setBadgeText('', tab.id);
-    setBadgeIcon('images/minkLogo38_noMementos.png', tab.id);
-  });
+  setBadgeText('', tabid);
+  setBadgeIcon('images/minkLogo38_noMementos.png', tabid);
+
   
 }
 
