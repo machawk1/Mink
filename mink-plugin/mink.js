@@ -214,6 +214,10 @@ function fetchTimeMap(uri, tabid) {
 		return;
 	  }
 	  if(debug){console.log('Some error occurred with a secure site that was not a 404');console.log(xhr);}
+	}).always(function() {
+	  chrome.tabs.sendMessage(tabid, {
+	      'method': 'stopAnimatingBrowserActionIcon'
+	  });
 	});
 }
 
@@ -613,7 +617,7 @@ function revamp_fetchTimeMaps(tms, cb) {
 /* Redundant of content.js. Does content.js really need this function? */
 function storeTimeMapData(arrayOfTimeMaps, cbIn){
 	//var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
-	if(debug){console.log('executing storeTimeMapData');}
+	if(debug){console.log('executing storeTimeMapData with no functionality');}
 /*
 	chrome.storage.local.set({
 			'uri_r': arrayOfTimeMaps[0].original_uri,

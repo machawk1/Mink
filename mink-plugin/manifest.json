@@ -1,7 +1,7 @@
 {
    "manifest_version": 2,
    "name": "Mink",
-   "version": "1.4.3",
+   "version": "0.0.0",
    "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
    "homepage_url": "http://matkelly.com/mink",
    "author": "Mat Kelly <mink@matkelly.com>",
@@ -67,6 +67,8 @@
 "images/archives/iaLogo.png","images/archives/archiveisLogo.png","images/archives/allListedArchives.png",
 "images/archives/iaLogo_success.png","images/archives/archiveisLogo_success.png",
 "images/spinner.gif",
+
+"images/mementoLogos/mLogo38_7.5.png","images/mementoLogos/mLogo38_15.png","images/mementoLogos/mLogo38_22.5.png","images/mementoLogos/mLogo38_30.png","images/mementoLogos/mLogo38_37.5.png","images/mementoLogos/mLogo38_45.png","images/mementoLogos/mLogo38_52.5.png","images/mementoLogos/mLogo38_60.png",
 
     	"images/archives/ia.png",
     	"style.css",

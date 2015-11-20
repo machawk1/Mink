@@ -16,6 +16,9 @@ var timemapsURIsWithinTimemapsRegex = /<https?:.*>;rel=\".*timemap.*\"/g;
 var mementosInTimemapBasedOnRelAttributeRegex = /;rel=\".*memento.*\"/g;
 var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g;
 
+var animateBrowserActionIcon = false;
+var animationTimer;
+
 //TODO: check if in blacklist
 //getBlacklist();
 
@@ -188,6 +191,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		//$('#minkContainer').fadeOut();
 		return;
 	}
+
+    if(request.method === 'stopAnimatingBrowserActionIcon') {
+        clearTimeout(animationTimer);
+        animateBrowserActionIcon = false;
+        return;
+    }
 
 	if(request.method === 'echoBlacklist') {
 		console.log('Here is the current blacklist:');
@@ -400,12 +409,39 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 	}
     
     //TODO: set 'working' icon
-    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/minkLogo38_working.png')}, function(response) {});
+    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')}, function(response) {});
+    animateBrowserActionIcon = true;
+    setTimeout(animatePageActionIcon, 500);
 
 	chrome.runtime.sendMessage({
 	    method: 'fetchTimeMap',
 	    value: timemaploc
 	}, function(response) {});
+}
+
+
+
+var clockIcons = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_15.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_22.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_30.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_37.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_45.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_52.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')];
+var iteration = clockIcons.length - 1;
+	
+function animatePageActionIcon() {
+  if(!animateBrowserActionIcon) {
+    clearTimeout(animationTimer); 
+  	return;
+  }
+  chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: clockIcons[iteration]}, function(response) {});;
+  iteration--;
+  
+  if(iteration < 0) {iteration = clockIcons.length - 1;}
+  animationTimer = setTimeout(animatePageActionIcon, 250);
+  //TODO: know when to stop this
 }
 
 function Memento(uri,datetime){
