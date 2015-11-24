@@ -28,6 +28,7 @@ chrome.storage.sync.get('disabled',function(items) {
     if(items.disabled) {
       chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function(response) {});
     } else {
+      if(debug) {console.log('not disabled, firing displayUIBasedOnContext');}
       displayUIBasedOnContext();
     }
 });
@@ -81,9 +82,14 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 	alert('Halting execution');
 }
 
-function displayUIBasedOnContext() {    
+function displayUIBasedOnContext() {
+    console.log('displayUIBasedOnContext()');
     chrome.storage.sync.get('timemaps',function(items) {
-	  if(items.timemaps && items.timemaps[document.URL]) {
+	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].datetime) {
+	    console.log('has a timemap in cache.');
+	    console.log('TODO: check that has Memento-Datetime header');
+	    console.log('isAMemento, changing icons');
+	    console.log(items.timemaps);
 	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mLogo38_isAMemento.png')}, function(response) {});
 	    if(debug){console.log('attach viewing memento interface here');}
 	  }else {
@@ -178,6 +184,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 	
 	if(request.method == 'startMinkExecution') {
+	    if(debug) {console.log('firing off displayUIBasedOnContext from startMinkExecution');}
 	    displayUIBasedOnContext();
 	    return;
 	}
@@ -229,6 +236,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 			return;
 		}
+		console.log('creating new TM');
 		var tm = new Timemap(request.data);
 		//displayUIBasedOnTimemap(tm);
 
@@ -243,7 +251,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.log('-----');
 		}
 	}
-
+    
+    if(debug) {console.log('ppp');}
 	displayUIBasedOnContext();
 });
 
@@ -252,6 +261,7 @@ function processResponseFromAggregator(xhr) {
 	if(debug){console.log('Done querying timegate');}
 	if(xhr.status === 200){
 		var linkHeaderStr = xhr.getResponseHeader('Link');
+		console.log('creating new TM X');
 		var tm = new Timemap(linkHeaderStr);
 
 		if(debug) {
@@ -304,6 +314,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 		type: 'GET' /* The payload is in the response body, not the head */
 	}).done(function(data,textStatus,xhr){
 		if(xhr.status === 200){
+		    console.log('creating new tm ll');
 			var tm = new Timemap(data);
 			// Move data from tm.mementos as array to tm.mementos as an object and
 			//  tm.mementos.list as array to conform to JSON API from LANL aggregator

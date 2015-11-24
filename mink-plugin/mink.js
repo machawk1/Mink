@@ -26,6 +26,7 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 chrome.browserAction.onClicked.addListener(function(tab) {
     // Check if isA Memento
     chrome.storage.sync.get('timemaps', function(items) {
+        console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento');
         console.log(items.timemaps);
         if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
@@ -445,15 +446,30 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var headers = deets.responseHeaders;
 	var mementoDateTimeHeader;
 	var linkHeaderAsString;
-	for(var headerI=0; headerI<headers.length; headerI++){
+	
+	console.log(deets);
+	console.log(deets.url);
+	for(var headerI = 0; headerI < headers.length; headerI++){
 		if(headers[headerI].name == 'Memento-Datetime'){
 			mementoDateTimeHeader = headers[headerI].value;
 		}else if(headers[headerI].name == 'Link'){
+		    console.log('Found a link header, enumerating values here');
 			linkHeaderAsString = headers[headerI].value;
+			console.log(headers[headerI].value);
+			//for(var lh = 0; lh < headers[headerI].value.length; lh++) {
+			//  console.log(' > ' + headers[headerI].value[lh]);
+			//}
 		}
+		console.log(headers[headerI].name+' OOO '+headers[headerI].value);
 	}
-
+    
+    console.log(headers['Link']);
+    
+    console.log(deets);
 	if(linkHeaderAsString){
+	    console.log('creating new tm ooio');
+	    console.log('linkheaderasstring');
+	    console.log(linkHeaderAsString);
 		var tm = new Timemap(linkHeaderAsString);
 		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
@@ -468,7 +484,10 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 		  }
 		  tms[url] = tm;
 		  
-       
+          
+          console.log('Setting chrome.storage.sync: timemaps: ');
+          console.log(tms);
+          
 		  chrome.storage.sync.set({'timemaps':tms},function(bytesUsed) {
 			if(chrome.runtime.lastError) {
 			  console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
@@ -483,6 +502,8 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 
 		});
 
+	} else if(debug) {
+	  console.log('The current page did not send a link header');
 	}
 	
 	
@@ -505,7 +526,7 @@ function showInterfaceForZeroMementos(tabid) {
   
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   setBadgeText('', tabid);
-  setBadgeIcon('images/minkLogo38_noMementos.png', tabid);
+  setBadgeIcon('images/minkLogo38_noMementos2.png', tabid);
 
   
 }
@@ -569,6 +590,7 @@ function getMementosWithTimemap(uri, tabid){
 			console.log(xhr);
 		}
 		if(xhr.status == 404){
+		console.log('creating new tm ppppp');
       var tm = new Timemap();
       tm.original = uri;
 

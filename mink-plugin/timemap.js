@@ -2,7 +2,7 @@ function Timemap(fromString){
 	if(debug){console.log("In timemap.js");}
 	var timemap, timegate, original, url, self;
 	this.str = fromString;
-  if (!this.str) {
+    if (!this.str) {
 			if (debug) {
 			  console.log('data passed in was null');
 			}
@@ -22,6 +22,7 @@ function Timemap(fromString){
 		}
 	//		this = this.str;
 	}
+	console.log(fromString);
 	var linkHeaderEntries = this.str.split(",");
 
 	var mementoUrlExpression = /<[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?>/gi;
@@ -85,6 +86,9 @@ function Timemap(fromString){
 	if(!timemap && !timegate && !original){
 		if(debug){
 			console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
+			console.log('link header: ');
+			console.log(this.str);
+			console.log(linkHeaderEntries);
 			console.log(linkHeaderEntries);
 		}
 	}
