@@ -5,6 +5,11 @@ var maxBadgeDisplay = '999+';
 var stillProcessingBadgeDisplay = 'WAIT';
 var tabBadgeCount = {}; // Maintain tabId-->count association
 
+var iconPath_isAMemento = chrome.extension.getURL('images/mLogo38_isAMemento.png');
+
+var browserActionTitle_viewingMemento = 'Mink - Viewing Memento';
+var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web';
+
 
 /*
 chrome.webNavigation.onCommitted.addListener(function(e) {
@@ -30,6 +35,11 @@ chrome.browserAction.onClicked.addListener(function(tab) {
         console.log(items.timemaps);
         if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
+	        displayMinkUI(tab.id);
+	        console.log('TODO: Change UI here to reflect that we are viewing a memento');
+	        chrome.tabs.sendMessage(tab.id, {
+				  'method': 'showViewingMementoInterface'
+			  });
 	        return;
          }else {
 	        console.log('No timemap for ' + tab.url);
@@ -47,8 +57,16 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 		}
 
 		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
-		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		              
-			  setBadgeText(stillProcessingBadgeDisplay, tab.id);
+		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
+		      chrome.browserAction.getTitle({tabId: tab.id}, function(result) {
+		        // Only set badge text if not viewing a memento
+		        if(result !== browserActionTitle_viewingMemento) { 
+		          setBadgeText(stillProcessingBadgeDisplay, tab.id);
+		        } else {
+		          console.log('Show "Viewing Memento" Mink UI in page content.');
+		        }
+		      });
+		                  
 
 			  return; // Badge has not yet been set
 		  }
@@ -266,6 +284,12 @@ function setBadgeIcon(iconPath, tabid) {
 function setBadge(value, icon, tabid) {
     setBadgeText(value + '', tabid);
     setBadgeIcon(icon, tabid);
+    
+    if(icon === iconPath_isAMemento) {
+      chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento});
+    }else {
+      chrome.browserAction.setTitle({title: browserActionTitle_normal});
+    }
 }
 
 
@@ -447,20 +471,20 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var mementoDateTimeHeader;
 	var linkHeaderAsString;
 	
-	console.log(deets);
-	console.log(deets.url);
+	//console.log(deets);
+	//console.log(deets.url);
 	for(var headerI = 0; headerI < headers.length; headerI++){
 		if(headers[headerI].name == 'Memento-Datetime'){
 			mementoDateTimeHeader = headers[headerI].value;
 		}else if(headers[headerI].name == 'Link'){
-		    console.log('Found a link header, enumerating values here');
+		    //console.log('Found a link header, enumerating values here');
 			linkHeaderAsString = headers[headerI].value;
-			console.log(headers[headerI].value);
+			//console.log(headers[headerI].value);
 			//for(var lh = 0; lh < headers[headerI].value.length; lh++) {
 			//  console.log(' > ' + headers[headerI].value[lh]);
 			//}
 		}
-		console.log(headers[headerI].name+' OOO '+headers[headerI].value);
+		//console.log(headers[headerI].name+' OOO '+headers[headerI].value);
 	}
     
     console.log(headers['Link']);

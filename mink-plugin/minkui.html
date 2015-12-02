@@ -14,6 +14,7 @@
  <img src="images/iaLogo.png" alt="Internet Archive" id="archivelogo_ia" class="archiveNowInterface archiveLogo" />
  <img src="images/archiveisLogo.png" alt="Archive.is" id="archivelogo_ais" class="archiveNowInterface archiveLogo" />
  <img src="images/allListedArchives.png" alt="All Listed Archives" id="archivelogo_ala" class="archiveNowInterface archiveLogo" />
+ <button class="archiveNowInterface" id="goBackButton">&lt; Go Back</button>
 </span>
 <!--<input type="button" value="?" id="helpButton" />-->
 
@@ -107,7 +108,19 @@ function changeIconFor(obj, src) {
 }
 
 
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if(request.method === 'showViewingMementoInterface') {
+      console.log('caught showViewingMementoInterface, tweak UI here');
+    }else {
+      console.log('caught message in minkui.html but did not react');
+    }
+  }
+);
+
 $(document).ready(function() {
+  console.log('TODO (minkui.html): check if viewing a memento, change UI.');
+
   console.log($('#mementosAvailable span').text() + ' X ');
   
   $('#minkuiX #archiveNow').click(function(){
@@ -117,6 +130,15 @@ $(document).ready(function() {
     shadow.getElementById('mementosDropdown').classList.add('hidden','nonArchiveNowInterface');
     shadow.getElementById('viewMementoButton').classList.add('hidden','nonArchiveNowInterface');
     shadow.getElementById('steps').classList.add('hidden','nonArchiveNowInterface');
+  });
+
+  $('#minkuiX #goBackButton').click(function(){
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    shadow.getElementById('archiveNowInterface').classList.add('hidden');
+    shadow.getElementById('archiveNow').classList.remove('hidden','nonArchiveNowInterface');
+    shadow.getElementById('mementosDropdown').classList.remove('hidden','nonArchiveNowInterface');
+    shadow.getElementById('viewMementoButton').classList.remove('hidden','nonArchiveNowInterface');
+    shadow.getElementById('steps').classList.remove('hidden','nonArchiveNowInterface');
   });
   
   $('.archiveLogo').click(function() {
@@ -131,6 +153,7 @@ $(document).ready(function() {
     
     var id = $(this).attr('id');
     var cb = function(){changeIconFor(that, newSrc); };
+    
     if($(this).attr('id') === 'archivelogo_ia') {
         archiveURI_archiveOrg(cb);
     }else if($(this).attr('id') === 'archivelogo_ais') {

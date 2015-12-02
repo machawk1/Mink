@@ -30,6 +30,13 @@ function appendHTMLToShadowDOM() {
       mementos = [];
    }
    
+   
+   
+//   chrome.browserAction.getTitle(null, function(result) {
+     console.log('TODO displayMinkUI.js: change UI to show viewing memento if applicable');
+//     console.log(result);
+//   });
+   
    if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
      $('.dropdown').addClass('hidden');
      $('#steps .action').removeClass('active');
