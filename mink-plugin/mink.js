@@ -42,7 +42,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 			  });
 	        return;
         }else {
-	        console.log('No timemap for ' + tab.url);
+	        console.log('No timemap stored in cache for ' + tab.url);
         }
 
 	});
@@ -162,9 +162,6 @@ chrome.runtime.onMessage.addListener(
     }else if(request.method == 'setBadgeText') {
         setBadgeText(request.value, sender.tab.id)
 
-		//TODO: stop spinning
-		//stopSpinningActionButton()
-		
         sendResponse({
           value: 'stopAnimation'
         });
@@ -516,6 +513,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
           console.log(tms);
           
 		  chrome.storage.sync.set({'timemaps':tms},function(bytesUsed) {
+		    console.warn('chrome.storage.sync.setting');
 			if(chrome.runtime.lastError) {
 			  console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
 			  if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
@@ -559,7 +557,7 @@ function showInterfaceForZeroMementos(tabid) {
 }
 
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.
-   Is there a reason that the below should even be in content.js? */
+   Is there a reason that the below should even be in content.js? 
 function getMementosWithTimemap(uri, tabid){
     var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
 	var timemaploc = memgator_json + window.location;
@@ -634,7 +632,7 @@ function getMementosWithTimemap(uri, tabid){
 			if(debug){console.log('404'); console.log("report no mementos, show appropriate interface");}
 		}
 	});
-}
+}*/
 
 /* Redundant of content.js. Does content.js really need this function? */
 function revamp_fetchTimeMaps(tms, cb) {

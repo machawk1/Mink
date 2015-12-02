@@ -23,8 +23,9 @@ function appendHTMLToShadowDOM() {
  .done(function(data) {
    console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');
    
+   console.warn('CC');
    $('body').append(data);
-   
+   console.warn('DD');
    var mementos;
    if(tmData && tmData.mementos) {
       mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
@@ -36,47 +37,57 @@ function appendHTMLToShadowDOM() {
    
 //   chrome.browserAction.getTitle(null, function(result) {
      console.log('TODO displayMinkUI.js: change UI to show viewing memento if applicable');
+     console.warn(mementos);
 //     console.log(result);
 //   });
    
-
+   console.warn('BB');
 
    chrome.storage.sync.get('timemaps',function(items) {
-	  if(items.timemaps && items.timemaps[document.URL]) {
-	    var mCount = items.timemaps[document.URL].mementos.length;
-	    var cb = function() {
+      console.warn('XXX');
+      console.log(items);
+      console.log(items.timemaps);
+      console.log(items.timemaps[document.URL]);
+      var cb = function() {
 	      createShadowDOM(setupDrilldownInteractions);
-	    };
-	    
-	    if(mCount > MAX_MEMENTOS_IN_DROPDOWN) {
+	  };
+      var mCount = mementos.length;
+      
+	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
+	    mCount = items.timemaps[document.URL].mementos.length;
+	    console.log('c');
+	    console.log('isAMemento, hide ALL THE THINGS!');
+	    $('.dropdown').addClass('hidden');
+	    $('#drilldownBox').addClass('hidden');
+	    $('#steps').addClass('hidden');
+	    $('#title_dropdown').addClass('hidden');
+	    $('#archiveNow').addClass('hidden');
+	    $('#viewingMementoInterface').removeClass('hidden');
+	    $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)));
+	    cb = createShadowDOM;
+      }else if(mCount > MAX_MEMENTOS_IN_DROPDOWN) {
 	      $('.dropdown').addClass('hidden');
           $('#steps .action').removeClass('active');
           $('#title_drilldown').addClass('active');
           buildDropDown([]);
           buildDrilldown_Year(items.timemaps[document.URL].mementos);
-	    }else if(mCount === 0) {
+          console.log('a');
+	   }else if(mCount === 0) {
+	      console.log('b');
           switchToArchiveNowInterface(); 
-	    }else if(items.timemaps[document.URL].datetime) {
-          console.log('isAMemento, hide ALL THE THINGS!');
-          $('.dropdown').addClass('hidden');
-          $('#drilldownBox').addClass('hidden');
-          $('#steps').addClass('hidden');
-          $('#title_dropdown').addClass('hidden');
-          $('#archiveNow').addClass('hidden');
-          $('#viewingMementoInterface').removeClass('hidden');
-          $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)));
-          cb = createShadowDOM;
-        }else {
-          buildDropDown(items.timemaps[document.URL].mementos);
-          buildDrilldown_Year(items.timemaps[document.URL].mementos);
+	   }else {
+          console.log('d');
+          buildDropDown(mementos);
+          buildDrilldown_Year(mementos);
           $('#drilldownBox').addClass('hidden');
           $('#steps .action').removeClass('active');
           $('#title_dropdown').addClass('active');
         }
         
+        console.warn('** About to append CSS1');
         $('#mementosAvailable span').html(mCount);
+        console.warn('** About to append CSS2');
         appendCSSToShadowDOM(cb);
-      }
     });
     
    
@@ -146,11 +157,12 @@ function switchToArchiveNowInterface() {
 }
  
 function appendCSSToShadowDOM(cb) {
+  console.log('APPENDING CSS!');
   $.ajax(chrome.extension.getURL('css/minkui.css'))
    .done(function(data) {
-    var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
-    $('#minkuiX').prepend(styleElement);
-    cb();
+     var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
+     $('#minkuiX').prepend(styleElement);
+     cb();
   });
 }
 

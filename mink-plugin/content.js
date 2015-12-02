@@ -164,7 +164,7 @@ function addToBlacklist(currentBlacklist, uriIn){
 		console.log('Current blacklist contents:');
 		console.log(save.uris);
 	}
-
+    
 	chrome.storage.sync.set(save,
 		function() {
 			console.log('done adding ' + uri + ' to blacklist. Prev blacklist:');
