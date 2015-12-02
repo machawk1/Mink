@@ -118,27 +118,54 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
+function displayAndHideShadowDOMElements(showElementsIds, hideElementsIds) {
+  var shadow = document.getElementById('minkWrapper').shadowRoot;
+  for(var ee = 0; ee < showElementsIds.length; ee++) {
+    shadow.getElementById(showElementsIds[ee]).classList.remove('hidden','nonArchiveNowInterface');
+  }
+  for(var ee = 0; ee < hideElementsIds.length; ee++) {
+    shadow.getElementById(hideElementsIds[ee]).classList.add('hidden','nonArchiveNowInterface');
+  }
+
+}
+
 $(document).ready(function() {
   console.log('TODO (minkui.html): check if viewing a memento, change UI.');
 
   console.log($('#mementosAvailable span').text() + ' X ');
   
   $('#minkuiX #archiveNow').click(function(){
+    var show = ['archiveNowInterface'];
+    var hide = ['archiveNow','steps'];
+    
     var shadow = document.getElementById('minkWrapper').shadowRoot;
-    shadow.getElementById('archiveNowInterface').classList.remove('hidden');
-    shadow.getElementById('archiveNow').classList.add('hidden','nonArchiveNowInterface');
-    shadow.getElementById('mementosDropdown').classList.add('hidden','nonArchiveNowInterface');
-    shadow.getElementById('viewMementoButton').classList.add('hidden','nonArchiveNowInterface');
-    shadow.getElementById('steps').classList.add('hidden','nonArchiveNowInterface');
+    var dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active');
+    var drilldownActive = shadow.getElementById('title_drilldown').classList.contains('active');
+    
+    if(dropdownActive) {
+      hide.push('mementosDropdown','viewMementoButton');
+    }else if(drilldownActive) {
+      hide.push('drilldownBox');
+    }
+    
+    displayAndHideShadowDOMElements(show, hide);
   });
 
   $('#minkuiX #goBackButton').click(function(){
+    var hide = ['archiveNowInterface'];
+    var show = ['archiveNow', 'steps'];
+
     var shadow = document.getElementById('minkWrapper').shadowRoot;
-    shadow.getElementById('archiveNowInterface').classList.add('hidden');
-    shadow.getElementById('archiveNow').classList.remove('hidden','nonArchiveNowInterface');
-    shadow.getElementById('mementosDropdown').classList.remove('hidden','nonArchiveNowInterface');
-    shadow.getElementById('viewMementoButton').classList.remove('hidden','nonArchiveNowInterface');
-    shadow.getElementById('steps').classList.remove('hidden','nonArchiveNowInterface');
+    var dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active');
+    var drilldownActive = shadow.getElementById('title_drilldown').classList.contains('active');
+    
+    if(dropdownActive) {
+      show.push('mementosDropdown','viewMementoButton');
+    }else if(drilldownActive) {
+      show.push('drilldownBox');
+    }
+    
+    displayAndHideShadowDOMElements(show, hide);
   });
   
   $('.archiveLogo').click(function() {
