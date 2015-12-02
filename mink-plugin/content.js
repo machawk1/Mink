@@ -252,6 +252,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		}
 	}
     
+    if(request.method === 'showViewingMementoInterface') {
+      if(debug) {
+        console.log('We will show the "return to live web" interface but it is not implemented yet');
+      }
+      return;
+    }
+    
     if(debug) {console.log('ppp');}
 	displayUIBasedOnContext();
 });

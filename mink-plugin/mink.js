@@ -31,7 +31,7 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 chrome.browserAction.onClicked.addListener(function(tab) {
     // Check if isA Memento
     chrome.storage.sync.get('timemaps', function(items) {
-        console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento');
+        console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento. Related to Issue #150.');
         console.log(items.timemaps);
         if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
@@ -41,9 +41,9 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 				  'method': 'showViewingMementoInterface'
 			  });
 	        return;
-         }else {
+        }else {
 	        console.log('No timemap for ' + tab.url);
-         }
+        }
 
 	});
 
@@ -60,7 +60,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
 		      chrome.browserAction.getTitle({tabId: tab.id}, function(result) {
 		        // Only set badge text if not viewing a memento
-		        if(result !== browserActionTitle_viewingMemento) { 
+		        if(result !== browserActionTitle_viewingMemento) {
 		          setBadgeText(stillProcessingBadgeDisplay, tab.id);
 		        } else {
 		          console.log('Show "Viewing Memento" Mink UI in page content.');
@@ -225,6 +225,9 @@ function fetchTimeMap(uri, tabid) {
 	}).done(function(data,textStatus,xhr,a,b){ 
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
+      if(debug) {
+        console.log('in ajax -- tab id = ' + tabid);
+      }
       displaySecureSiteMementos(data.mementos.list, tabid);
 	}).fail(function(xhr, data, error){
 	  if(xhr.status === 404) {

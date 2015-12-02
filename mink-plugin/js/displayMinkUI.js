@@ -1,6 +1,6 @@
 var MAX_MEMENTOS_IN_DROPDOWN = 500;
 
-function createShadowDOM() {
+function createShadowDOM(cb) {
    var selector = '#minkuiX';
    
    var shadow = document.querySelector('#minkWrapper').createShadowRoot();
@@ -8,7 +8,9 @@ function createShadowDOM() {
    //var clone = document.importNode(template, true);
    shadow.appendChild(template);
    
-   setupDrilldownInteractions();
+   if(cb) {
+     cb();
+   }
 }
 
 function setupDrilldownInteractions() {
@@ -37,24 +39,48 @@ function appendHTMLToShadowDOM() {
 //     console.log(result);
 //   });
    
-   if(mementos.length > MAX_MEMENTOS_IN_DROPDOWN) {
-     $('.dropdown').addClass('hidden');
-     $('#steps .action').removeClass('active');
-     $('#title_drilldown').addClass('active');
-     buildDropDown([]);
-     buildDrilldown_Year(mementos);
-   }else if(mementos.length === 0) {
-     switchToArchiveNowInterface();     
-   }else {
-     buildDropDown(mementos);
-     buildDrilldown_Year(mementos);
-     $('#drilldownBox').addClass('hidden');
-     $('#steps .action').removeClass('active');
-     $('#title_dropdown').addClass('active');
-   }
+
+
+   chrome.storage.sync.get('timemaps',function(items) {
+	  if(items.timemaps && items.timemaps[document.URL]) {
+	    var mCount = items.timemaps[document.URL].mementos.length;
+	    var cb = function() {
+	      createShadowDOM(setupDrilldownInteractions);
+	    };
+	    
+	    if(mCount > MAX_MEMENTOS_IN_DROPDOWN) {
+	      $('.dropdown').addClass('hidden');
+          $('#steps .action').removeClass('active');
+          $('#title_drilldown').addClass('active');
+          buildDropDown([]);
+          buildDrilldown_Year(items.timemaps[document.URL].mementos);
+	    }else if(mCount === 0) {
+          switchToArchiveNowInterface(); 
+	    }else if(items.timemaps[document.URL].datetime) {
+          console.log('isAMemento, hide ALL THE THINGS!');
+          $('.dropdown').addClass('hidden');
+          $('#drilldownBox').addClass('hidden');
+          $('#steps').addClass('hidden');
+          $('#title_dropdown').addClass('hidden');
+          $('#archiveNow').addClass('hidden');
+          $('#viewingMementoInterface').removeClass('hidden');
+          $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)));
+          cb = createShadowDOM;
+        }else {
+          buildDropDown(items.timemaps[document.URL].mementos);
+          buildDrilldown_Year(items.timemaps[document.URL].mementos);
+          $('#drilldownBox').addClass('hidden');
+          $('#steps .action').removeClass('active');
+          $('#title_dropdown').addClass('active');
+        }
+        
+        $('#mementosAvailable span').html(mCount);
+        appendCSSToShadowDOM(cb);
+      }
+    });
+    
    
-   $('#mementosAvailable span').html(mementos.length);
-   appendCSSToShadowDOM();
+   
   });
 }
 
@@ -119,12 +145,12 @@ function switchToArchiveNowInterface() {
   $('#archiveNowInterface').removeClass('hidden');  
 }
  
-function appendCSSToShadowDOM() {
+function appendCSSToShadowDOM(cb) {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
    .done(function(data) {
     var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
     $('#minkuiX').prepend(styleElement);
-    createShadowDOM();
+    cb();
   });
 }
 
@@ -460,6 +486,7 @@ function buildDrilldown_Time(year, month, date){
 
 
 if($('#minkWrapper').length == 0) {
+  if(debug) {console.log('appending HTML to Shadow DOM');}
   appendHTMLToShadowDOM();
 } else {
   $('#minkWrapper').toggle();
