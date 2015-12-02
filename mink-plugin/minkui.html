@@ -17,7 +17,7 @@
  <button class="archiveNowInterface" id="goBackButton">&lt; Go Back</button>
 </span>
 <span id="viewingMementoInterface" class="hidden">
-  <button>Back to Live Web</button><!--
+  <button id="backToLiveWeb">Back to Live Web</button><!--
   <button>Temporally previous memento</button>
   <button>Temporally next memento</button>-->
 </span>
@@ -194,6 +194,12 @@ $(document).ready(function() {
         archiveURI_archiveOrg(); 
         archiveURI_archiveDotIs();   
     }
+  });
+  
+  $('#backToLiveWeb').click(function() {
+    chrome.storage.sync.get('timemaps', function(items) {
+	  window.location = items.timemaps[document.URL].original;
+	});
   });
 });
 
