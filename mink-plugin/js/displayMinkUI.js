@@ -98,7 +98,7 @@ function buildBreadcrumbs(mementos) {
 function buildDropDown(mementos) {
    var mementoSelections = '';
    for(var mm = 0; mm < mementos.length; mm++) {
-     mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="'+ mementos[mm].datetime + '">' + mementos[mm].datetime + '</option>';
+     mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="'+ mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>';
    }
 
    $('#mementosDropdown').attr('data-memento-count', mementos.length);
