@@ -8,6 +8,8 @@ function createShadowDOM(cb) {
    //var clone = document.importNode(template, true);
    shadow.appendChild(template);
    
+   console.log('in createShadowDOM()');
+   console.log(cb);
    if(cb) {
      cb();
    }
@@ -33,13 +35,10 @@ function appendHTMLToShadowDOM() {
       mementos = [];
    }
    
-   
-   
-//   chrome.browserAction.getTitle(null, function(result) {
-     console.log('TODO displayMinkUI.js: change UI to show viewing memento if applicable');
-     console.warn(mementos);
-//     console.log(result);
-//   });
+
+   console.log('TODO displayMinkUI.js: change UI to show viewing memento if applicable');
+   console.warn(mementos);
+
    
    console.warn('BB');
 
@@ -154,6 +153,7 @@ function switchToArchiveNowInterface() {
  
 function appendCSSToShadowDOM(cb) {
   console.log('APPENDING CSS!');
+  console.log(cb);
   $.ajax(chrome.extension.getURL('css/minkui.css'))
    .done(function(data) {
      var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
@@ -310,6 +310,7 @@ function setupDrilldownInteraction_Year() {
       	  $(this).addClass('selectedOption');
       };
     }
+    console.log('Done setting up drilldown');
  } 
 
 
@@ -492,10 +493,11 @@ function buildDrilldown_Time(year, month, date){
     drilldownShadow.appendChild(timeUL);
 }
 
-
-if($('#minkWrapper').length == 0) {
+var minkUICreated = false;
+if(!minkUICreated) {
   if(debug) {console.log('appending HTML to Shadow DOM');}
   appendHTMLToShadowDOM();
+  
 } else {
   $('#minkWrapper').toggle();
 }

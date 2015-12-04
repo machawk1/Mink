@@ -36,19 +36,20 @@ chrome.browserAction.onClicked.addListener(function(tab) {
         if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
 	        displayMinkUI(tab.id);
-	        console.log('TODO: Change UI here to reflect that we are viewing a memento');
-	        chrome.tabs.sendMessage(tab.id, {
-				  'method': 'showViewingMementoInterface'
-			  });
+	        //console.log('TODO: Change UI here to reflect that we are viewing a memento');
+	        //chrome.tabs.sendMessage(tab.id, {
+			//	  'method': 'showViewingMementoInterface'
+			//  });
 	        return;
         }else {
 	        console.log('No timemap stored in cache for ' + tab.url);
+	        showMinkBadgeInfoBasedOnProcessingState(tab.id);
         }
 
 	});
+});
 
-
-
+function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 	chrome.storage.sync.get('disabled',function(items) {
 		if(items.disabled) {
 		  stopWatchingRequests();
@@ -56,12 +57,12 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 		  return;
 		}
 
-		chrome.browserAction.getBadgeText({tabId: tab.id}, function(result) {
+		chrome.browserAction.getBadgeText({tabId: tabid}, function(result) {
 		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
-		      chrome.browserAction.getTitle({tabId: tab.id}, function(result) {
+		      chrome.browserAction.getTitle({tabId: tabid}, function(result) {
 		        // Only set badge text if not viewing a memento
 		        if(result !== browserActionTitle_viewingMemento) {
-		          setBadgeText(stillProcessingBadgeDisplay, tab.id);
+		          setBadgeText(stillProcessingBadgeDisplay, tabid);
 		        } else {
 		          console.log('Show "Viewing Memento" Mink UI in page content.');
 		        }
@@ -70,14 +71,14 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
 			  return; // Badge has not yet been set
 		  }
-		  displayMinkUI(tab.id);
+		  displayMinkUI(tabid);
 	  
 		});
 	});
-
-});
+}
 
 function displayMinkUI(tabId) {
+  console.log('Injecting displayMinkUI.js');
   chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData)}, 
     function() {
 	  chrome.tabs.executeScript(tabId, {
@@ -223,6 +224,7 @@ function fetchTimeMap(uri, tabid) {
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
       if(debug) {
+        console.log('TODO: set chrome.storage cached TM here');
         console.log('in ajax -- tab id = ' + tabid);
       }
       displaySecureSiteMementos(data.mementos.list, tabid);
@@ -239,6 +241,8 @@ function fetchTimeMap(uri, tabid) {
 	  });
 	});
 }
+
+function setLocalStorage(){}
 
 function setBadgeText(value, tabid) {
 	var badgeValue = value;
@@ -471,28 +475,17 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	var mementoDateTimeHeader;
 	var linkHeaderAsString;
 	
-	//console.log(deets);
-	//console.log(deets.url);
+	// Enumerate through the HTTP response headers to grab those related to Memento (if applicable)
 	for(var headerI = 0; headerI < headers.length; headerI++){
 		if(headers[headerI].name == 'Memento-Datetime'){
 			mementoDateTimeHeader = headers[headerI].value;
 		}else if(headers[headerI].name == 'Link'){
-		    //console.log('Found a link header, enumerating values here');
 			linkHeaderAsString = headers[headerI].value;
-			//console.log(headers[headerI].value);
-			//for(var lh = 0; lh < headers[headerI].value.length; lh++) {
-			//  console.log(' > ' + headers[headerI].value[lh]);
-			//}
 		}
-		//console.log(headers[headerI].name+' OOO '+headers[headerI].value);
 	}
     
-    console.log(headers['Link']);
-    
-    console.log(deets);
-	if(linkHeaderAsString){
-	    console.log('creating new tm ooio');
-	    console.log('linkheaderasstring');
+	if(linkHeaderAsString) {
+	    console.log('A link header exists:');
 	    console.log(linkHeaderAsString);
 		var tm = new Timemap(linkHeaderAsString);
 		if(mementoDateTimeHeader){

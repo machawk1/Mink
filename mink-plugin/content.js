@@ -2,11 +2,13 @@ var debug = true;
 
 //var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/';
-//var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
 var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/';
 var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
+
+//var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/';
 //var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/';
 //var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/';
+
 var numberOfTimemaps = 0;
 
 var embeddedTimemapRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g;
@@ -28,7 +30,7 @@ chrome.storage.sync.get('disabled',function(items) {
     if(items.disabled) {
       chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function(response) {});
     } else {
-      if(debug) {console.log('not disabled, firing displayUIBasedOnContext');}
+      if(debug) {console.log('Mink is not disabled, firing displayUIBasedOnContext');}
       displayUIBasedOnContext();
     }
 });
@@ -294,7 +296,6 @@ function queryTimegate(tgURI) {
 
 	if (isHTTPSSite) {
 			// Send message to mink.js to query https URI-R to aggregator
-
 			chrome.runtime.sendMessage({
 				method: 'fetchSecureSitesTimeMap',
 				value: memgator_json + tgURI.substr(tgURI.indexOf('https:'))
@@ -319,7 +320,7 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 	$.ajax({
 		url: uri,
 		type: 'GET' /* The payload is in the response body, not the head */
-	}).done(function(data,textStatus,xhr){
+	}).done(function(data,textStatus,xhr) {
 		if(xhr.status === 200){
 		    console.log('creating new tm ll');
 			var tm = new Timemap(data);
@@ -369,23 +370,6 @@ function fetchTimeMap(uri) {
 			}
 		);
 		return prom;
-}
-
-function revamp_fetchTimeMaps(tms) {
-  if (debug) {console.log('revamp_fetchTimeMaps()');}
-		var tmFetchPromises = [];
-		for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
-			tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
-		}
-		if(debug){console.log('Fetching ' + tms.length + ' TimeMaps');}
-		Promise.all(tmFetchPromises).then(storeTimeMapData).catch(function(e) {
-			if(debug){
-				console.log('A promise failed: ');
-				console.log(e);
-			}
-		});
-
-		return;
 }
 
 function countNumberOfMementos(arrayOfTimeMaps) {

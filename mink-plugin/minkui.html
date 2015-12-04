@@ -37,76 +37,104 @@
 
 
 <script>
-document.getElementById('minkLogo').src = chrome.extension.getURL('./images/mink_marvel_80.png');
 
-document.getElementById('archivelogo_ia').src = chrome.extension.getURL('./images/archives/iaLogo.png');
-document.getElementById('archivelogo_ais').src = chrome.extension.getURL('./images/archives/archiveisLogo.png');
-document.getElementById('archivelogo_ala').src = chrome.extension.getURL('./images/archives/allListedArchives.png');
-
-$('#steps li').click(function(){
- if($(this).attr('data-status') == 'waiting') {
-   $(this).attr('data-status','processing');
- }else if($(this).attr('data-status') == 'processing') {
-   $(this).attr('data-status','complete');
- }else if($(this).attr('data-status') == 'complete') {
-   $(this).attr('data-status','waiting');
- }
+$(document).ready(function() {
+  replaceContentScriptImagesWithChromeExtensionImages();
+  bindSteps(); // What steps!?!
+  bindOptions();
+  bindViewButton();
+  bindDropdown();
+  bindDrilldown();
+  bindArchiveNowButton();
+  bindGoBackToMainInterfaceButton();
+  bindArchiveLogos();
+  bindGoBackToLiveWebButton();
+  
+  $('#viewMementoButton').click(function() {
+    window.location = $(this).attr('alt');
+});
 });
 
-$('#options').click(function(){
-	chrome.runtime.sendMessage({method: "openOptionsPage"}, function(response) {		
+function replaceContentScriptImagesWithChromeExtensionImages() {
+	document.getElementById('minkLogo').src = chrome.extension.getURL('images/mink_marvel_80.png');
+
+	document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png');
+	document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png');
+	document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png');
+
+   console.log('done');
+   console.log(document.getElementById('archivelogo_ia'));
+}
+
+function bindSteps() {
+	$('#steps li').click(function(){
+	 if($(this).attr('data-status') == 'waiting') {
+	   $(this).attr('data-status','processing');
+	 }else if($(this).attr('data-status') == 'processing') {
+	   $(this).attr('data-status','complete');
+	 }else if($(this).attr('data-status') == 'complete') {
+	   $(this).attr('data-status','waiting');
+	 }
 	});
-});
+}
 
+function bindOptions() {
+	$('#options').click(function(){
+		chrome.runtime.sendMessage({method: "openOptionsPage"}, function(response) {		
+		});
+	});
+}
 
-var viewButton = $("#viewMementoButton");
+function bindViewButton() {
+	var viewButton = $("#viewMementoButton");
 
-$('#mementosDropdown').change(function() {
-	if($(this)[0].selectedIndex == 0){
-		$(viewButton).attr('disabled','disabled');
-		$(viewButton).removeAttr('alt');
-	}else {
-		$(viewButton).removeAttr('disabled');
-		$(viewButton).attr('alt',$(this).find('option:selected').data('uri'));
-	}
-});
+	$('#mementosDropdown').change(function() {
+		if($(this)[0].selectedIndex == 0){
+			$(viewButton).attr('disabled','disabled');
+			$(viewButton).removeAttr('alt');
+		}else {
+			$(viewButton).removeAttr('disabled');
+			$(viewButton).attr('alt',$(this).find('option:selected').data('uri'));
+		}
+	});
+}
 
-document.getElementById('title_dropdown').onclick = function() {
-    var shadow = document.getElementById('minkWrapper').shadowRoot;
-    var mementosDropdown = shadow.getElementById('mementosDropdown');
-    var viewMementoButton = shadow.getElementById('viewMementoButton');
-    var drilldownBox = shadow.getElementById('drilldownBox');
-    
-    if(mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
-        alert('Dropdown available for large collections of mementos due to major browser performance degradation.');
-        return;
-    }
-    
-    mementosDropdown.className = 'dropdown';
-    viewMementoButton.className = 'dropdown';
-    shadow.getElementById('title_dropdown').className = 'active';
-    drilldownBox.className = 'hidden';
-    
-    shadow.getElementById('title_drilldown').className = '';
-};
+function bindDropdown() {
+	document.getElementById('title_dropdown').onclick = function() {
+		var shadow = document.getElementById('minkWrapper').shadowRoot;
+		var mementosDropdown = shadow.getElementById('mementosDropdown');
+		var viewMementoButton = shadow.getElementById('viewMementoButton');
+		var drilldownBox = shadow.getElementById('drilldownBox');
+	
+		if(mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
+			alert('Dropdown available for large collections of mementos due to major browser performance degradation.');
+			return;
+		}
+	
+		mementosDropdown.className = 'dropdown';
+		viewMementoButton.className = 'dropdown';
+		shadow.getElementById('title_dropdown').className = 'active';
+		drilldownBox.className = 'hidden';
+	
+		shadow.getElementById('title_drilldown').className = '';
+	};
+}
 
-document.getElementById('title_drilldown').onclick = function() {
-    var shadow = document.getElementById('minkWrapper').shadowRoot;
-    var mementosDropdown = shadow.getElementById('mementosDropdown');
-    var viewMementoButton = shadow.getElementById('viewMementoButton');
-    var drilldownBox = shadow.getElementById('drilldownBox');
-    
-    mementosDropdown.className = 'dropdown hidden';
-    viewMementoButton.className = 'dropdown hidden';
-    shadow.getElementById('title_dropdown').className = '';
-    drilldownBox.className = '';
-    
-    shadow.getElementById('title_drilldown').className = 'active';
-};
-
-$('#viewMementoButton').click(function() {
-  window.location = $(this).attr('alt');
-});
+function bindDrilldown() {
+	document.getElementById('title_drilldown').onclick = function() {
+		var shadow = document.getElementById('minkWrapper').shadowRoot;
+		var mementosDropdown = shadow.getElementById('mementosDropdown');
+		var viewMementoButton = shadow.getElementById('viewMementoButton');
+		var drilldownBox = shadow.getElementById('drilldownBox');
+	
+		mementosDropdown.className = 'dropdown hidden';
+		viewMementoButton.className = 'dropdown hidden';
+		shadow.getElementById('title_dropdown').className = '';
+		drilldownBox.className = '';
+	
+		shadow.getElementById('title_drilldown').className = 'active';
+	};
+}
 
 function changeIconFor(obj, src) {
   $(obj).attr('src', src);
@@ -134,11 +162,7 @@ function displayAndHideShadowDOMElements(showElementsIds, hideElementsIds) {
 
 }
 
-$(document).ready(function() {
-  console.log('TODO (minkui.html): check if viewing a memento, change UI.');
-
-  console.log($('#mementosAvailable span').text() + ' X ');
-  
+function bindArchiveNowButton() {
   $('#minkuiX #archiveNow').click(function(){
     var show = ['archiveNowInterface'];
     var hide = ['archiveNow','steps'];
@@ -156,6 +180,9 @@ $(document).ready(function() {
     displayAndHideShadowDOMElements(show, hide);
   });
 
+}
+
+function bindGoBackToMainInterfaceButton() {
   $('#minkuiX #goBackButton').click(function(){
     var hide = ['archiveNowInterface'];
     var show = ['archiveNow', 'steps'];
@@ -172,7 +199,9 @@ $(document).ready(function() {
     
     displayAndHideShadowDOMElements(show, hide);
   });
-  
+}
+
+function bindArchiveLogos() {
   $('.archiveLogo').click(function() {
     if($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
      
@@ -195,13 +224,17 @@ $(document).ready(function() {
         archiveURI_archiveDotIs();   
     }
   });
-  
-  $('#backToLiveWeb').click(function() {
-    chrome.storage.sync.get('timemaps', function(items) {
-	  window.location = items.timemaps[document.URL].original;
-	});
-  });
-});
+}
+
+function bindGoBackToLiveWebButton() {
+	$('#backToLiveWeb').click(function() {
+		chrome.storage.sync.get('timemaps', function(items) {
+		  window.location = items.timemaps[document.URL].original;
+		});
+	  });
+}
+
+
 
 </script>
 </div>
