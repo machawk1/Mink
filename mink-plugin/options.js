@@ -62,9 +62,32 @@ function createAddURIBinder(){
     });
 }
 
+function populatedCachedTimeMapsUI() {
+  chrome.storage.sync.get('timemaps',function(items) {
+    var tms = items.timemaps;
+
+    var keys = Object.keys(tms);
+    var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs';
+    $('#cachedTimemaps').append('<option>--- Select to view ' + keys.length + ' ' + uriPluralityString + ' ---</option>');
+    for(var tm = 0; tm < keys.length; tm++) {
+      var originalURI = tms[keys[tm]].original;
+      $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
+    }
+  });
+}
+
+function removeTMFromCache(originalURI) {
+
+}
+
 document.addEventListener('DOMContentLoaded', restore_options);
 document.addEventListener('DOMContentLoaded', updateSaveButtonStatus);
 document.addEventListener('DOMContentLoaded', createAddURIBinder);
+document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI);
 
+$('#removeSelectedTMFromCache').click(function() {
+  var oURI = $('#cachedTimemaps option:selected').text();
+  console.log(oURI);
+});
 //document.getElementById('save').addEventListener('click',
 //    save_options);

@@ -44,10 +44,6 @@ function appendHTMLToShadowDOM() {
    console.warn('BB');
 
    chrome.storage.sync.get('timemaps',function(items) {
-      console.warn('XXX');
-      console.log(items);
-      console.log(items.timemaps);
-      console.log(items.timemaps[document.URL]);
       var cb = function() {
 	      createShadowDOM(setupDrilldownInteractions);
 	  };

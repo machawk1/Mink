@@ -1,7 +1,7 @@
 {
    "manifest_version": 2,
    "name": "Mink",
-   "version": "0.0.0",
+   "version": "1.9.9.9",
    "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
    "homepage_url": "http://matkelly.com/mink",
    "author": "Mat Kelly <mink@matkelly.com>",
@@ -16,7 +16,7 @@
      	"38": "images/minkLogo38.png"}
    },
    
-   "icons": { "128": "images/minkLogo_128.png"},
+   "icons": { "128": "images/mink_marvel_128.png"},
    "permissions": [
        "webRequest",
        "webNavigation",
@@ -76,6 +76,7 @@
         "js/date.js",
 
 "js/displayMinkUI.js", "minkui.html", "css/minkui.css", "images/minkLogo_300.png",
+"images/mink_marvel_80.png",
     	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
     	"bootstrap/css/bootstrap.min.css","bootstrap/css/bootstrap-theme.min.css",
