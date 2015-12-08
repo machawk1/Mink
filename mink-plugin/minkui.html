@@ -228,7 +228,7 @@ function bindArchiveLogos() {
 
 function bindGoBackToLiveWebButton() {
 	$('#backToLiveWeb').click(function() {
-		chrome.storage.sync.get('timemaps', function(items) {
+		chrome.storage.local.get('timemaps', function(items) {
 		  window.location = items.timemaps[document.URL].original;
 		});
 	  });

@@ -26,7 +26,7 @@ var animationTimer;
 
 
 
-chrome.storage.sync.get('disabled',function(items) {
+chrome.storage.local.get('disabled',function(items) {
     if(items.disabled) {
       chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function(response) {});
     } else {
@@ -86,7 +86,10 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 
 function displayUIBasedOnContext() {
     console.log('displayUIBasedOnContext()');
-    chrome.storage.sync.get('timemaps',function(items) {
+    chrome.storage.local.get('timemaps', function(items) {
+      console.log('localStorage test:');
+      console.log(document.URL);
+      console.log(items);
 	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].datetime) {
 	    console.log('has a timemap in cache.');
 	    console.log('TODO: check that has Memento-Datetime header');
@@ -113,7 +116,7 @@ function isEmpty(o){ //returns if empty object is passed in
 
 function getBlacklist(cb){
 	var callbackArguments = arguments;
-	chrome.storage.sync.get('uris', function(items){
+	chrome.storage.local.get('uris', function(items){
 		if(debug){
 			console.log('Current blacklist: ');
 			console.log(items);
@@ -167,7 +170,7 @@ function addToBlacklist(currentBlacklist, uriIn){
 		console.log(save.uris);
 	}
     
-	chrome.storage.sync.set(save,
+	chrome.storage.local.set(save,
 		function() {
 			console.log('done adding ' + uri + ' to blacklist. Prev blacklist:');
 			console.log(currentBlacklist);
@@ -423,7 +426,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 
 
 
-var clockIcons = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
+var clockIcons_38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
 	chrome.extension.getURL('images/mementoLogos/mLogo38_15.png'),
 	chrome.extension.getURL('images/mementoLogos/mLogo38_22.5.png'),
 	chrome.extension.getURL('images/mementoLogos/mLogo38_30.png'),
@@ -431,17 +434,25 @@ var clockIcons = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png')
 	chrome.extension.getURL('images/mementoLogos/mLogo38_45.png'),
 	chrome.extension.getURL('images/mementoLogos/mLogo38_52.5.png'),
 	chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')];
-var iteration = clockIcons.length - 1;
+var clockIcons_19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_15.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_22.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_30.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_37.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_45.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_52.5.png'),
+	chrome.extension.getURL('images/mementoLogos/mLogo19_60.png')];
+var iteration = clockIcons_38.length - 1;
 	
 function animatePageActionIcon() {
   if(!animateBrowserActionIcon) {
     clearTimeout(animationTimer); 
   	return;
   }
-  chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: clockIcons[iteration]}, function(response) {});;
+  chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: clockIcons_38[iteration]}, function(response) {});;
   iteration--;
   
-  if(iteration < 0) {iteration = clockIcons.length - 1;}
+  if(iteration < 0) {iteration = clockIcons_38.length - 1;}
   animationTimer = setTimeout(animatePageActionIcon, 250);
   //TODO: know when to stop this
 }

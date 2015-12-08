@@ -42,7 +42,7 @@ function appendHTMLToShadowDOM() {
    
    console.warn('BB');
 
-   chrome.storage.sync.get('timemaps',function(items) {
+   chrome.storage.local.get('timemaps',function(items) {
       var cb = function() {
 	      createShadowDOM(setupDrilldownInteractions);
 	  };

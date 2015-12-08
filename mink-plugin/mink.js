@@ -30,16 +30,12 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 
 chrome.browserAction.onClicked.addListener(function(tab) {
     // Check if isA Memento
-    chrome.storage.sync.get('timemaps', function(items) {
+    chrome.storage.local.get('timemaps', function(items) {
         console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento. Related to Issue #150.');
         console.log(items.timemaps);
         if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
 	        displayMinkUI(tab.id);
-	        //console.log('TODO: Change UI here to reflect that we are viewing a memento');
-	        //chrome.tabs.sendMessage(tab.id, {
-			//	  'method': 'showViewingMementoInterface'
-			//  });
 	        return;
         }else {
 	        console.log('No timemap stored in cache for ' + tab.url);
@@ -50,13 +46,15 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 });
 
 function showMinkBadgeInfoBasedOnProcessingState(tabid) {
-	chrome.storage.sync.get('disabled',function(items) {
+	chrome.storage.local.get('disabled',function(items) {
 		if(items.disabled) {
 		  stopWatchingRequests();
 		  //TODO: show alternate interface
 		  return;
 		}
 
+        //TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
+        // - maybe rely on the title, since the icon's src path cannot be had.
 		chrome.browserAction.getBadgeText({tabId: tabid}, function(result) {
 		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
 		      chrome.browserAction.getTitle({tabId: tabid}, function(result) {
@@ -119,6 +117,8 @@ chrome.runtime.onMessage.addListener(
     }else if (request.method == 'nukeFromOrbit') {
     	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchTimeMap') {
+      console.log('received message with request.value:');
+      console.log(request.value);
       fetchTimeMap(request.value, sender.tab.id);
     }else if (request.method == 'notify') {
 		  var notify = chrome.notifications.create(
@@ -217,6 +217,9 @@ chrome.runtime.onMessage.addListener(
 );
 
 function fetchTimeMap(uri, tabid) {
+    console.log('in fetchTimeMap with params:');
+    console.log(uri);
+    console.log(tabid);
 	$.ajax({
 		url: uri,
 		type: "GET"
@@ -228,6 +231,11 @@ function fetchTimeMap(uri, tabid) {
         console.log('in ajax -- tab id = ' + tabid);
       }
       displaySecureSiteMementos(data.mementos.list, tabid);
+      // TODO: set cache here
+      //chrome.storage.local.set({'timemaps':tms},function(bytesUsed) {
+      setTimemapInStorage(tmData, uri);
+      
+      
 	}).fail(function(xhr, data, error){
 	  if(xhr.status === 404) {
 		if(debug){console.log('querying secure FAILED, Display zero mementos interface');}
@@ -334,7 +342,7 @@ function hideMinkUI(){
 }
 
 chrome.tabs.onActivated.addListener(function(activeTabInfo) {
-  chrome.storage.sync.get('disabled',function(items) {
+  chrome.storage.local.get('disabled',function(items) {
     if(items.disabled) {
       stopWatchingRequests();
     }
@@ -345,7 +353,7 @@ chrome.tabs.onActivated.addListener(function(activeTabInfo) {
 
 
 function startWatchingRequests() {
-  chrome.storage.sync.remove('disabled', function() {
+  chrome.storage.local.remove('disabled', function() {
 	  chrome.contextMenus.update('mink_stopStartWatching', {
 		  'title': 'Stop Watching Requests',
 		  'onclick': stopWatchingRequests
@@ -357,7 +365,7 @@ function startWatchingRequests() {
 
 function stopWatchingRequests() {
   if(debug){console.log('stopWatchingRequests');}
-  chrome.storage.sync.set({'disabled': true}, function() {        
+  chrome.storage.local.set({'disabled': true}, function() {        
 	  chrome.contextMenus.update('mink_stopStartWatching', {
 		  'title': 'Restart Live-Archived Web Integration',
 		  'onclick': startWatchingRequests
@@ -422,8 +430,8 @@ function addToBlackList(){
 }
 
 function nukeBlacklistCache(){
-  chrome.storage.sync.clear();
-  console.log('chrome.storage.sync cleared');
+  chrome.storage.local.clear();
+  console.log('chrome.storage.local cleared');
 }
 
 function nukeLocalStorage(){
@@ -467,7 +475,7 @@ chrome.webRequest.onCompleted.addListener(function(deets){
 },
 {urls: ['*://twitter.com/*/status/*'],types: ['xmlhttprequest']},['responseHeaders']);
 
-chrome.webRequest.onHeadersReceived.addListener(function(deets){
+chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	var url = deets.url;
 	var timemap, timegate, original, url;
 
@@ -492,34 +500,11 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 			tm.datetime = mementoDateTimeHeader;
 		}
 
-		chrome.storage.sync.get('timemaps', function(items) {
-		  var tms;
-		  if(!items.timemaps) {
-		    tms = {};
-		  }else {
-		    tms = items.timemaps;
-		  }
-		  tms[url] = tm;
-		  
-          
-          console.log('Setting chrome.storage.sync: timemaps: ');
-          console.log(tms);
-          
-		  chrome.storage.sync.set({'timemaps':tms},function(bytesUsed) {
-		    console.warn('chrome.storage.sync.setting');
-			if(chrome.runtime.lastError) {
-			  console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
-			  if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
-			    // Chicken wire and duct tape! Clear the cache, do it again, yeah!
-			    chrome.storage.sync.clear();
-			    chrome.storage.sync.set({'timemaps':tms},function(){});
-			  }
-			}
-			console.log('Bytes used: '+bytesUsed);
-		  });
 
-		});
-
+        console.log('calling setTimemapInStorage with:');
+        console.log(url);
+        console.log(tm);
+		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  console.log('The current page did not send a link header');
 	}
@@ -527,6 +512,38 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets){
 	
 },
 {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
+
+
+function setTimemapInStorage(tm, url) {
+	chrome.storage.local.get('timemaps', function(items) {
+		var tms;
+		if(!items.timemaps) {
+			tms = {};
+		}else {
+			tms = items.timemaps;
+		}
+		tms[url] = tm;
+
+
+		console.log('Setting chrome.storage.local: timemaps: ');
+		console.log(tms);
+		chrome.storage.local.set({'timemaps':tms},function(bytesUsed) {
+			console.warn('chrome.storage.local.setting');
+			if(chrome.runtime.lastError) {
+				console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
+				if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
+					// Chicken wire and duct tape! Clear the cache, do it again, yeah!
+					console.warn('LOCALSTORAGE full! clearing!');
+					chrome.storage.local.clear();
+					console.log('Re-setting chrome.storage.local with:');
+					console.log(tms);
+					chrome.storage.local.set({'timemaps':tms},function(){});
+				}
+			}
+		});
+	});
+}
+
 
 
 function displaySecureSiteMementos(mementos, tabid){
@@ -544,9 +561,7 @@ function showInterfaceForZeroMementos(tabid) {
   
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   setBadgeText('', tabid);
-  setBadgeIcon('images/minkLogo38_noMementos2.png', tabid);
-
-  
+  setBadgeIcon('images/minkLogo38_noMementos2.png', tabid);  
 }
 
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.

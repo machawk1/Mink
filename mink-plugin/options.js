@@ -1,5 +1,7 @@
+var tmDropdownString = '<option>--- Select to view URIs with cached TimeMaps ---</option>';
+
 function restore_options(){
-    chrome.storage.sync.get("uris",function(items){
+    chrome.storage.local.get("uris",function(items){
       console.log(items);
       $(items.uris).each(function(i, v){
         $("#options").append(getListItemHTML(v, 'glyphicon-remove'));
@@ -28,7 +30,7 @@ function saveBlacklist(){
   });
   return;
   /*
-  chrome.storage.sync.set(save,
+  chrome.storage.local.set(save,
     function(){
       if(debug){
         console.log("done adding "+uri+" to blacklist. Prev blacklist:");
@@ -63,12 +65,12 @@ function createAddURIBinder(){
 }
 
 function populatedCachedTimeMapsUI() {
-  chrome.storage.sync.get('timemaps',function(items) {
+  chrome.storage.local.get('timemaps',function(items) {
     var tms = items.timemaps;
 
     var keys = Object.keys(tms);
     var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs';
-    $('#cachedTimemaps').append('<option>--- Select to view ' + keys.length + ' ' + uriPluralityString + ' ---</option>');
+    $('#cachedTimemaps').append(tmDropdownString);
     for(var tm = 0; tm < keys.length; tm++) {
       var originalURI = tms[keys[tm]].original;
       $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
@@ -77,7 +79,17 @@ function populatedCachedTimeMapsUI() {
 }
 
 function removeTMFromCache(originalURI) {
-
+  chrome.storage.local.get('timemaps', function(items) {
+    var tms = items.timemaps;
+    delete tms[originalURI];
+    chrome.storage.local.set({'timemaps':tms},
+      function() {
+        console.log('Cache updated, updating UI');
+        $('#cachedTimemaps').html(tmDropdownString);
+        populateCachedTimeMapsUI();
+      };
+    );
+    
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);
@@ -88,6 +100,7 @@ document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI);
 $('#removeSelectedTMFromCache').click(function() {
   var oURI = $('#cachedTimemaps option:selected').text();
   console.log(oURI);
+  removeTMFromCache(oURI);
 });
 //document.getElementById('save').addEventListener('click',
 //    save_options);
