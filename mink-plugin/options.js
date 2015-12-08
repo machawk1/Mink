@@ -89,7 +89,7 @@ function removeTMFromCache(originalURI) {
       function() {
         console.log('Cache updated, updating UI');
         $('#cachedTimemaps').html(tmDropdownString);
-        populateCachedTimeMapsUI();
+        populatedCachedTimeMapsUI();
       }
     );
   });
