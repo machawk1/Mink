@@ -10,7 +10,6 @@ var iconPath_isAMemento = chrome.extension.getURL('images/mLogo38_isAMemento.png
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento';
 var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web';
 
-
 /*
 chrome.webNavigation.onCommitted.addListener(function(e) {
     if(e.frameId !== 0) { // Not main frame
@@ -29,6 +28,9 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 
 
 chrome.browserAction.onClicked.addListener(function(tab) {
+    console.log('minkUIcreated?');
+    //console.log(minkUICreated);
+    console.log($('#minkWrapper').html());
     // Check if isA Memento
     chrome.storage.local.get('timemaps', function(items) {
         console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento. Related to Issue #150.');
@@ -77,13 +79,16 @@ function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 
 function displayMinkUI(tabId) {
   console.log('Injecting displayMinkUI.js');
-  chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData)}, 
+  chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData) + "; var tabId = " + tabId + ";"}, 
     function() {
 	  chrome.tabs.executeScript(tabId, {
 	  // TODO: Account for data: URIs like the "connection unavailable" page.
 	  //   Currently, because this scheme format is not in the manifest, an exception is   
 	  //     thrown. Handle this more gracefully.
 		file: "js/displayMinkUI.js"
+	  }, function(res) {
+	    console.log('mink ui injected. res = ');
+	    console.log(res);
 	  });
   });
 
@@ -210,6 +215,8 @@ chrome.runtime.onMessage.addListener(
 			}
 
 		});
+    }else if(request.method === 'minkUICreated') {
+      console.log('**** mink ui created');
     }else {
       if(debug){console.log('Message sent using chrome.runtime not caught: ' + request.method);}
     }

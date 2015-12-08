@@ -493,11 +493,9 @@ function buildDrilldown_Time(year, month, date){
     drilldownShadow.appendChild(timeUL);
 }
 
-var minkUICreated = false;
-if(!minkUICreated) {
+if($('#minkWrapper').length == 0) {
   if(debug) {console.log('appending HTML to Shadow DOM');}
   appendHTMLToShadowDOM();
-  
 } else {
   $('#minkWrapper').toggle();
 }
