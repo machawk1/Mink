@@ -1,4 +1,5 @@
 var tmDropdownString = '<option>--- Select to view URIs with cached TimeMaps ---</option>';
+var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>';
 
 function restore_options(){
     chrome.storage.local.get("uris",function(items){
@@ -73,11 +74,20 @@ function populatedCachedTimeMapsUI() {
 
     var keys = Object.keys(tms);
     var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs';
-    $('#cachedTimemaps').append(tmDropdownString);
-    for(var tm = 0; tm < keys.length; tm++) {      
-      var originalURI = tms[keys[tm]].original_uri;
-      $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
-    }
+    
+    if(keys.length) {
+		$('#cachedTimemaps').append(tmDropdownString);
+		for(var tm = 0; tm < keys.length; tm++) {      
+		  var originalURI = tms[keys[tm]].original_uri;
+		  $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
+		}
+		$('#cachedTimemaps').prop('disabled',false)
+		$('#removeSelectedTMFromCache').prop('disabled',false);
+	}else {
+	    $('#cachedTimemaps').append(tmDropdownNoTimemapsString);
+	    $('#cachedTimemaps').prop('disabled',true)
+	    $('#removeSelectedTMFromCache').prop('disabled',true);
+	}
   });
 }
 
@@ -104,6 +114,16 @@ $('#removeSelectedTMFromCache').click(function() {
   var oURI = $('#cachedTimemaps option:selected').text();
   console.log(oURI);
   removeTMFromCache(oURI);
+});
+
+$('#removeAllTMsFromCache').click(function() {
+    chrome.storage.local.set({'timemaps':{}},
+      function() {
+        console.log('Remove all cached TMs');
+        $('#cachedTimemaps').empty();
+        populatedCachedTimeMapsUI();
+      }
+    );
 });
 //document.getElementById('save').addEventListener('click',
 //    save_options);

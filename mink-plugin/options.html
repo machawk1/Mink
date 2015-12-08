@@ -9,8 +9,12 @@
   <style>
     body {width: 500px; height: 750px; margin: 1.0em;}
 
-    h2 {font-size: 1.0em;}
-
+    h2, legend {font-size: 1.0em;}
+    legend {display: inline; width: auto; padding: 0 5px 0 5px; margin-left: -6px; margin-bottom: 0.25em;}
+    fieldset {background-color: #eee; border: 1px solid #ddd; margin-top: 1.0em; padding: 5px;}
+    fieldset legend {border-bottom: 1px solid #ddd; background-color: white;}
+    fieldset legend span {font-style: italic; font-size: 0.8em;}
+    
     ul {margin-left: 0; padding-left: 0; list-style-type: none;}
     li {vertical-align: middle; }
     button {margin-right: 0.5em;}
@@ -23,23 +27,49 @@
     .glyphicon-plus-sign {font-size: 18px;}
 
     .nevermind {color: white; background-color: red; font-weight: bold; margin-left: 1.0em; width: 1.0em; height: 1.0em; border-radius: 15px;}
+    
+    #resetButton {bottom: 15px; right: 15px; position: fixed;}
     </style>
   <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
 
 <body>
-  <h2>Blacklist <button id="add" class="btn btn-default btn-xs glyphicon glyphicon-plus-sign" type="button"></button></h2>
+  <fieldset>
+   <legend>Cached TimeMaps</legend>
+   <select id="cachedTimemaps"></select>
+   <button id="removeSelectedTMFromCache">Remove</button>
+   <br /><br />
+   <button id="removeAllTMsFromCache">Remove All</button>
+  </fieldset>
+
+  <fieldset>
+  <legend>Blacklist <span>(never run Mink on these sites)</span></legend>
+  <button id="add" class="btn btn-default btn-xs glyphicon glyphicon-plus-sign" type="button"></button>
   <ul id="options"></ul>
 
   <p id="status"></p>
-
+  
   <button id="save">Save Blacklist</button>
   
-  <h2>Cached TimeMaps</h2>
-  <select id="cachedTimemaps"></select>
-  <button id="removeSelectedTMFromCache">Remove</button>
-  <br /><br />
-  <button id="removeAllTMsFromCache">Remove All</button>
+  </fieldset>
+  
+  <fieldset>
+  <legend>Memento Aggregator</legend>
+  <select>
+    <option>memgator.cs.odu.edu</option>
+    <option>mementoweb.org</option>
+    <option>localhost via WAIL</option>
+  </select>
+  </fieldset>
+
+  <fieldset disabled>
+  <legend>Additional Archives</legend>
+  <select>
+    <option>localhost via WAIL</option>
+  </select>
+  </fieldset>
+  
+  <button id="resetButton">Reset</button>
   
   <script src="options.js"></script>
 </body>
