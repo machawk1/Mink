@@ -517,16 +517,21 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 function setTimemapInStorage(tm, url) {
 	chrome.storage.local.get('timemaps', function(items) {
 		var tms;
+		var originalURI = tm.original_uri;
 		if(!items.timemaps) {
 			tms = {};
 		}else {
 			tms = items.timemaps;
 		}
-		tms[url] = tm;
+		tms[originalURI] = tm;
 
 
 		console.log('Setting chrome.storage.local: timemaps: ');
+		console.log(url);
 		console.log(tms);
+		console.log('original uri?');
+		console.log(tm);
+		
 		chrome.storage.local.set({'timemaps':tms},function(bytesUsed) {
 			console.warn('chrome.storage.local.setting');
 			if(chrome.runtime.lastError) {

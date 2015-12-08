@@ -66,13 +66,16 @@ function createAddURIBinder(){
 
 function populatedCachedTimeMapsUI() {
   chrome.storage.local.get('timemaps',function(items) {
+    console.log('items in the TM localstorage');
+    console.log(items);
+  
     var tms = items.timemaps;
 
     var keys = Object.keys(tms);
     var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs';
     $('#cachedTimemaps').append(tmDropdownString);
-    for(var tm = 0; tm < keys.length; tm++) {
-      var originalURI = tms[keys[tm]].original;
+    for(var tm = 0; tm < keys.length; tm++) {      
+      var originalURI = tms[keys[tm]].original_uri;
       $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
     }
   });
@@ -87,9 +90,9 @@ function removeTMFromCache(originalURI) {
         console.log('Cache updated, updating UI');
         $('#cachedTimemaps').html(tmDropdownString);
         populateCachedTimeMapsUI();
-      };
+      }
     );
-    
+  });
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);
