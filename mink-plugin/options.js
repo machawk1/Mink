@@ -88,7 +88,7 @@ function removeTMFromCache(originalURI) {
     chrome.storage.local.set({'timemaps':tms},
       function() {
         console.log('Cache updated, updating UI');
-        $('#cachedTimemaps').html(tmDropdownString);
+        $('#cachedTimemaps').empty();
         populatedCachedTimeMapsUI();
       }
     );
