@@ -387,7 +387,7 @@ function stopWatchingRequests() {
 }
 
 
-if(debug) { // Only show contextual menu items in dev for now.
+
 chrome.contextMenus.create({
     'id': 'mink_stopStartWatching',
 	'title': 'Stop Watching Requests',
@@ -397,32 +397,12 @@ chrome.contextMenus.create({
   if(err){console.log('error creating second contextmenu');}
 });
 
+
 chrome.contextMenus.create({
-	'title': 'Add to Mink Blacklist',
-	'contexts': ['image'],
+	'title': 'Add URL to Mink Blacklist',
+	'contexts': ['browser_action', 'image'],
 	'onclick' : addToBlackList
-	//,'targetUrlPatterns':['*://*/*'] //TODO: filter this solely to the Mink UI
 });
-
-chrome.contextMenus.create({
-	'title': 'Nuke Blacklist Cache',
-	'contexts': ['image'],
-	'onclick' : nukeBlacklistCache
-	//,'targetUrlPatterns':['*://*/*'] //TODO: filter this solely to the Mink UI
-},function(err){
-  if(err){console.log('error creating second contextmenu');}
-});
-
-chrome.contextMenus.create({
-	'title': 'Clear LocalStorage',
-	'contexts': ['image'],
-	'onclick' : nukeLocalStorage
-	//,'targetUrlPatterns':['*://*/*'] //TODO: filter this solely to the Mink UI
-},function(err){
-  if(err){console.log('error creating second contextmenu');}
-});
-
-}
 
 function addToBlackList(){
  	chrome.tabs.query({

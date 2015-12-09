@@ -7,7 +7,7 @@
 <!-- Optional theme -->
 <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
   <style>
-    body {width: 500px; height: 750px; margin: 1.0em;}
+    body {width: 500px; height: 750px; margin: 1.0em; font-size: 1.2em;}
 
     h2, legend {font-size: 1.0em;}
     legend {display: inline; width: auto; padding: 0 5px 0 5px; margin-left: -6px; margin-bottom: 0.25em;}
@@ -29,6 +29,10 @@
     .nevermind {color: white; background-color: red; font-weight: bold; margin-left: 1.0em; width: 1.0em; height: 1.0em; border-radius: 15px;}
     
     #resetButton {bottom: 15px; right: 15px; position: fixed;}
+    
+    select#cachedTimemaps {width: 200px;}
+    
+    p#mementoCount {height: 1.0em;}
     </style>
   <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
@@ -38,13 +42,14 @@
    <legend>Cached TimeMaps</legend>
    <select id="cachedTimemaps"></select>
    <button id="removeSelectedTMFromCache">Remove</button>
-   <br /><br />
+   <button id="removeSelectedTMFromCacheAndBlacklist">... & Blacklist</button>
+   <p id="mementoCount"></p>
    <button id="removeAllTMsFromCache">Remove All</button>
   </fieldset>
 
   <fieldset>
-  <legend>Blacklist <span>(never run Mink on these sites)</span></legend>
-  <button id="add" class="btn btn-default btn-xs glyphicon glyphicon-plus-sign" type="button"></button>
+  <legend>Blacklist <span>(do not run Mink on these URIs)</span></legend>
+  <button id="add" class="btn btn-default btn-xs" type="button">add</button>
   <ul id="options"></ul>
 
   <p id="status"></p>
@@ -57,8 +62,8 @@
   <legend>Memento Aggregator</legend>
   <select>
     <option>memgator.cs.odu.edu</option>
-    <option>mementoweb.org</option>
-    <option>localhost via WAIL</option>
+    <option disabled>mementoweb.org</option>
+    <option disabled>localhost (MemGator via WAIL)</option>
   </select>
   </fieldset>
 

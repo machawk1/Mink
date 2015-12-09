@@ -1,4 +1,4 @@
-var tmDropdownString = '<option>--- Select to view URIs with cached TimeMaps ---</option>';
+var tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>';
 var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>';
 
 function restore_options(){
@@ -21,8 +21,11 @@ function restore_options(){
     });
 }
 
-function getListItemHTML(uri, classIn){
-  return '<li><button class="btn btn-default btn-xs glyphicon ' + classIn + ' remove" type="button"></button><span>' + uri + '</span></li>';
+function getListItemHTML(uri, classIn, buttonText){
+  if(!buttonText) {
+    buttonText = '';
+  }
+  return '<li><button class="btn btn-default btn-xs glyphicon ' + classIn + ' remove" type="button">' + buttonText + '</button><span>' + uri + '</span></li>';
 }
 
 function saveBlacklist(){
@@ -53,16 +56,52 @@ function updateSaveButtonStatus(){
 
 function createAddURIBinder(){
     $("#add").click(function(){
-      $("#options").prepend('<li><input type="text" placeholder="http://" id="newURI" /><button id="addToBlacklist">Add to Blacklist</button></li>');
-      $("#addToBlacklist").click(function(){
-        var uri = $('#newURI').val();
-
-        $(this).parent().replaceWith(getListItemHTML(uri, 'glyphicon-plus newItem'));
-        $('.newItem').removeClass('newItem').parent().addClass('newEntry');
-        //$('.newEntry').append('<button  class="btn btn-default btn-xs glyphicon glyphicon-chevron-left" style="font-size: 12px; margin-left: 1.0em;">Nevermind</button>');
-        updateSaveButtonStatus();
-      });
+      addMinkBlacklistToBeSavedLI();
+      bindAddBlacklistEntryUI();
     });
+}
+
+function bindAddBlacklistEntryUI() {
+  $('.uriTextField').keyup(function() {
+    var uriFieldValue = $(this).val();
+    if(uriFieldValue.length == 0) {
+      $(this).parent().find('button.addToBlacklist').attr('disabled',true);
+    }else {
+      $(this).parent().find('button.addToBlacklist').removeAttr('disabled');
+    }
+  });
+  $('.addToBlacklist').click(addToBlacklistToBeSaved);
+  $('.cancelAddToBlacklist').click(removeFromBlacklistToBeSaved);
+}
+
+function addMinkBlacklistToBeSavedLI(valIn) {
+  if(!valIn) {
+    valIn = '';
+  }
+  $("#options").prepend('<li><input type="text" placeholder="http://"  class="uriTextField" id="newURI" "' + valIn + '"/><button class="addToBlacklist" disabled>Add to Blacklist</button><button class="cancelAddToBlacklist">Cancel</button></li>');
+}
+
+function addToBlacklistToBeSaved() {
+  var uri = $(this).parent().find('.uriTextField').val();
+  if(uri.substr(0,4) !== 'http') {
+    uri = 'http://' + uri;
+  }
+
+
+  $(this).parent().replaceWith(getListItemHTML(uri, 'glyphicon-remove newItem'));
+  $('.newItem').click(removeEntry);
+  $('.newItem').removeClass('newItem').parent().addClass('newEntry');
+  // $('.newEntry').append('<button  class="btn btn-default btn-xs glyphicon glyphicon-chevron-left" style="font-size: 12px; margin-left: 1.0em;">Nevermind</button>');
+  updateSaveButtonStatus();
+}
+
+function removeFromBlacklistToBeSaved() {
+  $(this).parent().remove();
+}
+
+function removeEntry() {
+  $(this).parent().remove();
+  updateSaveButtonStatus();
 }
 
 function populatedCachedTimeMapsUI() {
@@ -81,14 +120,44 @@ function populatedCachedTimeMapsUI() {
 		  var originalURI = tms[keys[tm]].original_uri;
 		  $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
 		}
-		$('#cachedTimemaps').prop('disabled',false)
-		$('#removeSelectedTMFromCache').prop('disabled',false);
+		enableRemoveButtons(false);
+		$('#cachedTimemaps').change(enableRemoveButtonsBasedOnDropdown);
 	}else {
 	    $('#cachedTimemaps').append(tmDropdownNoTimemapsString);
-	    $('#cachedTimemaps').prop('disabled',true)
-	    $('#removeSelectedTMFromCache').prop('disabled',true);
+	    enableRemoveButtons(true, '#cachedTimemaps');
 	}
+	enableRemoveButtonsBasedOnDropdown();
   });
+}
+
+function updateMementoCount() {
+  chrome.storage.local.get('timemaps',function(items) {
+	$('#mementoCount').html(items.timemaps[$('#cachedTimemaps').val()].mementos.list.length + ' mementos available');
+  });
+}
+
+function resetMementoCount() {
+  $('#mementoCount').html('');
+}
+
+function enableRemoveButtons(disable, additionalIdsIn) {
+  var additionalIds = '';
+  if(additionalIdsIn) {
+    additionalIds = ',' + additionalIdsIn;
+  }
+  var buttonIds = '#removeSelectedTMFromCache, #removeAllTMsFromCache, #removeSelectedTMFromCacheAndBlacklist' + additionalIds;
+  $(buttonIds).prop('disabled', disable);
+}
+
+function enableRemoveButtonsBasedOnDropdown() {
+  var selectedIndex = $(this).find('option:selected').index();
+  if(selectedIndex > 0) { // -1 would be valid with the verbose conditional
+    enableRemoveButtons(false);
+    updateMementoCount();
+  }else { // selected index is 0, disable
+    enableRemoveButtons(true);
+    resetMementoCount();
+  }
 }
 
 function removeTMFromCache(originalURI) {
