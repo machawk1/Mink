@@ -137,11 +137,11 @@ function populatedCachedTimeMapsUI() {
 		  var originalURI = tms[keys[tm]].original_uri;
 		  $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
 		}
-		enableRemoveButtons(false);
+		enableRemoveButtons(false,'#removeAllTMsFromCache');
 		$('#cachedTimemaps').change(enableRemoveButtonsBasedOnDropdown);
 	}else {
 	    $('#cachedTimemaps').append(tmDropdownNoTimemapsString);
-	    enableRemoveButtons(true, '#cachedTimemaps');
+	    enableRemoveButtons(true, '#cachedTimemaps, #removeAllTMsFromCache');
 	}
 	enableRemoveButtonsBasedOnDropdown();
   });
@@ -162,7 +162,7 @@ function enableRemoveButtons(disable, additionalIdsIn) {
   if(additionalIdsIn) {
     additionalIds = ',' + additionalIdsIn;
   }
-  var buttonIds = '#removeSelectedTMFromCache, #removeAllTMsFromCache, #removeSelectedTMFromCacheAndBlacklist' + additionalIds;
+  var buttonIds = '#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndBlacklist' + additionalIds;
   $(buttonIds).prop('disabled', disable);
 }
 
