@@ -2,11 +2,13 @@ var tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &dar
 var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>';
 
 function restore_options(){
-    chrome.storage.local.get("uris",function(items){
-      console.log(items);
-      $(items.uris).each(function(i, v){
+    chrome.storage.local.get('blacklist', function(items) {
+      $(items.blacklist).each(function(i, v){
         $("#options").append(getListItemHTML(v, 'glyphicon-remove'));
       });
+      updateSaveButtonStatus();
+      updateRemoveAllBlacklistButtonStatus();
+      
       $(".remove").click(function(){
         if($(this).hasClass('glyphicon-remove')){
           var uriToStrike = $(this).parent().text();
@@ -17,6 +19,8 @@ function restore_options(){
           $(this).parent().removeClass("strike");
         }
         updateSaveButtonStatus();
+        updateRemoveAllBlacklistButtonStatus();
+        
       });
     });
 }
@@ -28,31 +32,44 @@ function getListItemHTML(uri, classIn, buttonText){
   return '<li><button class="btn btn-default btn-xs glyphicon ' + classIn + ' remove" type="button">' + buttonText + '</button><span>' + uri + '</span></li>';
 }
 
+
+function removeBlacklist() {
+  chrome.storage.local.set({'blacklist': []});
+}
+
 function saveBlacklist(){
-  $("#options").children().each(function(){
-    console.log($(this).text());
+  var blacklistJSON = {};
+  var uris = [];
+  $('.newEntry span').each(function(){
+    uris.push($(this).text());
   });
-  return;
-  /*
-  chrome.storage.local.set(save,
-    function(){
-      if(debug){
-        console.log("done adding "+uri+" to blacklist. Prev blacklist:");
-        console.log(currentBlacklist);
-        getBlacklist();
-      }
-    }
-  );*/
+  blacklistJSON.blacklist = uris;
+  chrome.storage.local.set(blacklistJSON);
+  $('.newEntry').removeClass('newEntry'); // Disable indicator for unsaved data
+  updateSaveButtonStatus();
 }
 
 function updateSaveButtonStatus(){
-    if($('.glyphicon-ok').length > 0 || $('.newEntry').length > 0){
-        $("#save").removeAttr('disabled').removeClass("disabled");
-    }else {
-        $('#save').attr('disabled','disabled').addClass("disabled");
-    }
+  var saveBlacklistButton = $('#saveBlacklist');
+  if($('.glyphicon-ok').length > 0 || $('.newEntry').length > 0) {
+    console.log('a');
+    saveBlacklistButton.removeAttr('disabled').removeClass('disabled');
+  }else {
+    console.log('b');
+    saveBlacklistButton.attr('disabled','disabled').addClass('disabled');
+  }
 }
 
+function updateRemoveAllBlacklistButtonStatus() {
+  var removeBlacklistButton = $('#removeBlacklist');
+  console.log($('#options li').length);
+  console.log($('#options li'));
+  if($('#options li').length > 0) {
+    removeBlacklistButton.removeAttr('disabled').removeClass('disabled');
+  }else {
+    removeBlacklistButton.attr('disabled','disabled').addClass('disabled');
+  }
+}
 
 function createAddURIBinder(){
     $("#add").click(function(){
@@ -175,7 +192,6 @@ function removeTMFromCache(originalURI) {
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);
-document.addEventListener('DOMContentLoaded', updateSaveButtonStatus);
 document.addEventListener('DOMContentLoaded', createAddURIBinder);
 document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI);
 
@@ -194,5 +210,8 @@ $('#removeAllTMsFromCache').click(function() {
       }
     );
 });
+
+$('#saveBlacklist').click(saveBlacklist);
+$('#removeBlacklist').click(removeBlacklist);
 //document.getElementById('save').addEventListener('click',
 //    save_options);
