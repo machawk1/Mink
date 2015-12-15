@@ -135,6 +135,9 @@ function populatedCachedTimeMapsUI() {
 		$('#cachedTimemaps').append(tmDropdownString);
 		for(var tm = 0; tm < keys.length; tm++) {      
 		  var originalURI = tms[keys[tm]].original_uri;
+		  if(!tms[keys[tm]].original_uri) {
+		    originalURI = keys[tm];
+		  }
 		  $('#cachedTimemaps').append('<option>' + originalURI + '</option>');
 		}
 		enableRemoveButtons(false,'#removeAllTMsFromCache');
