@@ -98,6 +98,7 @@ function displayUIBasedOnContext() {
 	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mLogo38_isAMemento.png')}, function(response) {});
 	    if(debug){console.log('attach viewing memento interface here');}
 	  }else {
+	    console.log('calling getMementos() from displayUIBasedOnContext');
 	    getMementos();
 	  }
 	});
@@ -418,6 +419,7 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
     animateBrowserActionIcon = true;
     setTimeout(animatePageActionIcon, 500);
 
+    console.log('in getMementos, sending "fetchTimeMap" message');
 	chrome.runtime.sendMessage({
 	    method: 'fetchTimeMap',
 	    value: timemaploc

@@ -30,11 +30,13 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 chrome.browserAction.onClicked.addListener(function(tab) {
     console.log('minkUIcreated?');
     //console.log(minkUICreated);
-    console.log($('#minkWrapper').html());
+    //console.log($('#minkWrapper').html());
     // Check if isA Memento
+    console.log('waiting 1?');
     chrome.storage.local.get('timemaps', function(items) {
+        console.log('waiting 2?');
         console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento. Related to Issue #150.');
-        console.log(items.timemaps);
+        //console.log(items.timemaps);
         if(items.timemaps && items.timemaps[tab.url]) {
 	        console.log('CLicked button and we are viewing a memento');
 	        displayMinkUI(tab.id);
@@ -504,13 +506,20 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 function setTimemapInStorage(tm, url) {
 	chrome.storage.local.get('timemaps', function(items) {
 		var tms;
-		var originalURI = tm.original_uri;
+		var originalURI;
+		if(tm.origin_uri) {
+		  originalURI = tm.original_uri;
+		}else if(tm.original) {
+		  originalURI = tm.original;
+		}
+		
+		
 		if(!items.timemaps) {
 			tms = {};
 		}else {
 			tms = items.timemaps;
 		}
-		tms[originalURI] = tm;
+		tms[url] = tm;
 
 
 		console.log('Setting chrome.storage.local: timemaps: ');
@@ -519,8 +528,16 @@ function setTimemapInStorage(tm, url) {
 		console.log('original uri?');
 		console.log(tm);
 		
-		chrome.storage.local.set({'timemaps':tms},function(bytesUsed) {
+		chrome.storage.local.set({'timemaps':tms}, function() {
 			console.warn('chrome.storage.local.setting');
+			
+			chrome.storage.local.get('timemaps', function(res) {
+			  console.log('here is the current state of the cache after setting');
+			  console.log(res);
+			});
+			chrome.storage.local.getBytesInUse('timemaps', function(bytesUsed) {
+			  console.log('current bytes used:' + bytesUsed);
+			});
 			if(chrome.runtime.lastError) {
 				console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
 				if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
