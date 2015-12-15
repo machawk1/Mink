@@ -128,7 +128,7 @@ function populatedCachedTimeMapsUI() {
   
     var tms = items.timemaps;
 
-    var keys = Object.keys(tms);
+    var keys = tms ? Object.keys(tms) : 0;
     var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs';
     
     if(keys.length) {
