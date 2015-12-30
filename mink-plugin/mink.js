@@ -49,6 +49,15 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 	});
 });
 
+function uriIsInBlacklist() {
+  chrome.tabs.query({active: true}, function(tab) {
+    console.log('is URI in blacklist?');
+    console.log(tab);
+  });
+
+
+}
+
 function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 	chrome.storage.local.get('disabled',function(items) {
 		if(items.disabled) {
@@ -56,6 +65,13 @@ function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 		  //TODO: show alternate interface
 		  return;
 		}
+		
+		//TODO: check if URI is in blacklist
+		if(uriIsInBlacklist()) {
+		  console.log('Current URI is in blacklist: ' + uri);
+		  return;
+		}
+		
 
         //TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
         // - maybe rely on the title, since the icon's src path cannot be had.
@@ -124,7 +140,7 @@ chrome.runtime.onMessage.addListener(
     }else if (request.method == 'nukeFromOrbit') {
     	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchTimeMap') {
-      console.log('received message with request.value:');
+      console.log('received message for method = fetchTimemap, value:');
       console.log(request.value);
       fetchTimeMap(request.value, sender.tab.id);
     }else if (request.method == 'notify') {
@@ -227,8 +243,8 @@ chrome.runtime.onMessage.addListener(
 
 function fetchTimeMap(uri, tabid) {
     console.log('in fetchTimeMap with params:');
-    console.log(uri);
-    console.log(tabid);
+    console.log('* uri: ' + uri);
+    console.log('* tab id: ' + tabid);
 	$.ajax({
 		url: uri,
 		type: "GET"
@@ -373,7 +389,7 @@ function startWatchingRequests() {
 }
 
 function stopWatchingRequests() {
-  if(debug){console.log('stopWatchingRequests');}
+  if(debug){console.log('stopWatchingRequests() executing');}
   chrome.storage.local.set({'disabled': true}, function() {        
 	  chrome.contextMenus.update('mink_stopStartWatching', {
 		  'title': 'Restart Live-Archived Web Integration',
@@ -520,7 +536,14 @@ function setTimemapInStorage(tm, url) {
 			tms = items.timemaps;
 		}
 		tms[url] = tm;
-
+		
+		console.warn('******* Number of cached TMs:');
+        var cachedTMKeys = Object.keys(items.timemaps);
+        if(cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
+          var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
+          var keyOfIndex = cachedTMKeys[indexToRemove];
+          delete tms[keyOfIndex];
+        }
 
 		console.log('Setting chrome.storage.local: timemaps: ');
 		console.log(url);
