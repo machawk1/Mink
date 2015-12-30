@@ -1,4 +1,4 @@
-![Mink Logo](https://github.com/machawk1/Mink/blob/master/mink-plugin/images/minkLogo_300.png)
+![Mink Logo](https://github.com/machawk1/Mink/blob/master/mink-plugin/images/mink_marvel_300.png)
 
 
 Mink is a Google Chrome extension to indicate that a page a user is viewing on the live web has an archived copy and to give the user access to the copy. If no copies exist, the extension provides one-button access to preserve the page in a select set of web archives and to easily view the page once it has been preserved.
