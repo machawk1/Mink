@@ -173,8 +173,8 @@ chrome.runtime.onMessage.addListener(
           }
       });
     }else if(request.method == 'startSpinningActionButton') {
-       console.log('starting animation.....');
-       iconState = 0;
+        console.log('starting animation.....');
+        iconState = 0;
         setTimeout(nextAnimationStep, 250);
         /*chrome.tabs.getSelected(null, function (tab) {
 		  chrome.tabs.sendMessage(tab.id, {
@@ -192,7 +192,7 @@ chrome.runtime.onMessage.addListener(
     }else if(request.method == 'setDropdownContents') {
       tmData = request.value;
     }else if(request.method == 'setBadge') {
-      setBadge(request.text, request.iconPath, sender.tab.id);
+        setBadge(request.text, request.iconPath, sender.tab.id);
     }else if(request.method === 'openOptionsPage') {
       console.log('opening options page');
       chrome.runtime.openOptionsPage();
@@ -319,7 +319,14 @@ function setBadgeIcon(iconPath, tabid) {
 }
 
 function setBadge(value, icon, tabid) {
-    setBadgeText(value + '', tabid);
+    if(value === '') {
+      chrome.browserAction.getBadgeText({tabId: tabid}, function(currentBadgeText) {
+        setBadgeText(currentBadgeText + '', tabid);
+      });
+    }else {
+      setBadgeText(value + '', tabid);
+    }
+    
     setBadgeIcon(icon, tabid);
     
     if(icon === iconPath_isAMemento) {
