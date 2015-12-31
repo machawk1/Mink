@@ -393,8 +393,11 @@ function startWatchingRequests() {
 		  'title': 'Stop Watching Requests',
 		  'onclick': stopWatchingRequests
 	  });
-  
-	  setBadge('', chrome.extension.getURL('images/minkLogo38.png'), null);
+	  
+      chrome.tabs.query({active: true}, function(tab) {
+        setBadge('', chrome.extension.getURL('images/minkLogo38.png'), tab[0].id);
+        setBadgeText('', tab[0].id);
+      });
   });
 }
 
@@ -407,9 +410,6 @@ function stopWatchingRequests() {
 	  });
       
       chrome.tabs.query({active: true}, function(tab) {
-        console.log(tab);
-        console.log('tabid:');
-        console.log(tab[0].id);
         setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab[0].id);
         setBadgeText('', tab[0].id);
       });
