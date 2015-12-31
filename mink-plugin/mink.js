@@ -314,7 +314,9 @@ function setBadgeIcon(iconPath, tabid) {
 	chrome.browserAction.setIcon({tabId: tabid,
 	  imageData: {'38': context.getImageData(0, 0, 38, 38)}
 	});*/
-
+    console.log('in setBadgeIcon, params:');
+    console.log(tabid);
+    console.log(iconPath);
     chrome.browserAction.setIcon({tabId: tabid, path: {'38': iconPath}}); 
 }
 
@@ -327,6 +329,7 @@ function setBadge(value, icon, tabid) {
       setBadgeText(value + '', tabid);
     }
     
+    console.log('setting badge icon');
     setBadgeIcon(icon, tabid);
     
     if(icon === iconPath_isAMemento) {
@@ -402,8 +405,15 @@ function stopWatchingRequests() {
 		  'title': 'Restart Live-Archived Web Integration',
 		  'onclick': startWatchingRequests
 	  });
-  
-	  setBadge('', chrome.extension.getURL('images/minkLogo38_disabled.png'), null);
+      
+      chrome.tabs.query({active: true}, function(tab) {
+        console.log(tab);
+        console.log('tabid:');
+        console.log(tab[0].id);
+        setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab[0].id);
+        setBadgeText('', tab[0].id);
+      });
+	  
 	  // Without an id, the current tab's badge won't be updated
 	  //chrome.tabs.getCurrent(function(tab) {
 	  //    setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab.id);
