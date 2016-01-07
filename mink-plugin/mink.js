@@ -426,7 +426,7 @@ function startWatchingRequests() {
 	  });
 	  
       chrome.tabs.query({active: true}, function(tab) {
-        setBadge('', badgeImages_plain, tab[0].id);
+        setBadge('', badgeImages_mink, tab[0].id);
         setBadgeText('', tab[0].id);
       });
   });
