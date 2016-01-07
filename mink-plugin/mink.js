@@ -210,14 +210,7 @@ chrome.runtime.onMessage.addListener(
     }else if(request.method == 'startSpinningActionButton') {
         console.log('starting animation.....');
         iconState = 0;
-        setTimeout(nextAnimationStep, 250);
-        /*chrome.tabs.getSelected(null, function (tab) {
-		  chrome.tabs.sendMessage(tab.id, {
-            "method": 'changeIcon'
-           });
-		});*/
-        
-        
+        setTimeout(nextAnimationStep, 250);            
     }else if(request.method == 'setBadgeText') {
         setBadgeText(request.value, sender.tab.id)
 

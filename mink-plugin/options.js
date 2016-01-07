@@ -33,8 +33,9 @@ function getListItemHTML(uri, classIn, buttonText){
 }
 
 
-function removeBlacklist() {
+function clearBlacklist() {
   chrome.storage.local.set({'blacklist': []});
+  document.location.reload();
 }
 
 function saveBlacklist(){
@@ -47,6 +48,7 @@ function saveBlacklist(){
   chrome.storage.local.set(blacklistJSON);
   $('.newEntry').removeClass('newEntry'); // Disable indicator for unsaved data
   updateSaveButtonStatus();
+  document.location.reload();
 }
 
 function updateSaveButtonStatus(){
@@ -61,13 +63,13 @@ function updateSaveButtonStatus(){
 }
 
 function updateRemoveAllBlacklistButtonStatus() {
-  var removeBlacklistButton = $('#removeBlacklist');
+  var clearBlacklistButton = $('#clearBlacklist');
   console.log($('#options li').length);
   console.log($('#options li'));
   if($('#options li').length > 0) {
-    removeBlacklistButton.removeAttr('disabled').removeClass('disabled');
+    clearBlacklistButton.removeAttr('disabled').removeClass('disabled');
   }else {
-    removeBlacklistButton.attr('disabled','disabled').addClass('disabled');
+    clearBlacklistButton.attr('disabled','disabled').addClass('disabled');
   }
 }
 
@@ -215,6 +217,6 @@ $('#removeAllTMsFromCache').click(function() {
 });
 
 $('#saveBlacklist').click(saveBlacklist);
-$('#removeBlacklist').click(removeBlacklist);
+$('#clearBlacklist').click(clearBlacklist);
 //document.getElementById('save').addEventListener('click',
 //    save_options);
