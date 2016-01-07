@@ -49,10 +49,12 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 	});
 });
 
-function uriIsInBlacklist() {
+function setEnabledBasedOnURIInBlacklist() {
   chrome.tabs.query({active: true}, function(tab) {
     console.log('is URI in blacklist?');
     console.log(tab);
+    
+    if(cb) {cb();}
   });
 
 
@@ -66,32 +68,35 @@ function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 		  return;
 		}
 		
-		//TODO: check if URI is in blacklist
-		if(uriIsInBlacklist()) {
-		  console.log('Current URI is in blacklist: ' + uri);
-		  return;
-		}
 		
+		
+		var cb = function() {setBadgeTextBasedOnBrowserActionState(tabid);};
+		
+		//TODO: check if URI is in blacklist
+		console.warn('about to call setEnabledBasedOnURIBlacklist');
+		setEnabledBasedOnURIInBlacklist(cb);       
+	});
+}
 
-        //TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
-        // - maybe rely on the title, since the icon's src path cannot be had.
-		chrome.browserAction.getBadgeText({tabId: tabid}, function(result) {
-		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
-		      chrome.browserAction.getTitle({tabId: tabid}, function(result) {
-		        // Only set badge text if not viewing a memento
-		        if(result !== browserActionTitle_viewingMemento) {
-		          setBadgeText(stillProcessingBadgeDisplay, tabid);
-		        } else {
-		          console.log('Show "Viewing Memento" Mink UI in page content.');
-		        }
-		      });
-		                  
+function setBadgeTextBasedOnBrowserActionState(tabid) {
+	//TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
+	// - maybe rely on the title, since the icon's src path cannot be had.
+	chrome.browserAction.getBadgeText({tabId: tabid}, function(result) {
+	  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
+		  chrome.browserAction.getTitle({tabId: tabid}, function(result) {
+			// Only set badge text if not viewing a memento
+			if(result !== browserActionTitle_viewingMemento) {
+			  setBadgeText(stillProcessingBadgeDisplay, tabid);
+			} else {
+			  console.log('Show "Viewing Memento" Mink UI in page content.');
+			}
+		  });
+					  
 
-			  return; // Badge has not yet been set
-		  }
-		  displayMinkUI(tabid);
-	  
-		});
+		  return; // Badge has not yet been set
+	  }
+	  displayMinkUI(tabid);
+  
 	});
 }
 
@@ -554,14 +559,17 @@ function setTimemapInStorage(tm, url) {
 		}
 		tms[url] = tm;
 		
-		console.warn('******* Number of cached TMs:');
-        var cachedTMKeys = Object.keys(items.timemaps);
-        if(cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
-          var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
-          var keyOfIndex = cachedTMKeys[indexToRemove];
-          delete tms[keyOfIndex];
+		// Trim the cache if overfull
+		if(items.timemaps) {
+			console.warn('******* Number of cached TMs:');
+			var cachedTMKeys = Object.keys(items.timemaps);
+			if(cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
+			  var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
+			  var keyOfIndex = cachedTMKeys[indexToRemove];
+			  delete tms[keyOfIndex];
+			}
         }
-
+        
 		console.log('Setting chrome.storage.local: timemaps: ');
 		console.log(url);
 		console.log(tms);

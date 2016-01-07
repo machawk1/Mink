@@ -445,7 +445,7 @@ function showMementoCountsByYear(){
 				console.log(yearData)
 				if(yearData == yearDataFromLastIteration) return;
 				yearDataFromLastIteration = yearData;
-				setTimeout(updateProgress,3000);
+				setTimeout(updateProgress, 3000);
 			}
 
 			$(localStore.timemaps).each(function(tmI,tm){
