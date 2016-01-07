@@ -143,7 +143,7 @@ function isEmpty(o){ //returns if empty object is passed in
 
 function getBlacklist(cb){
 	var callbackArguments = arguments;
-	chrome.storage.local.get('uris', function(items){
+	chrome.storage.local.get('blacklist', function(items){
 		if(debug){
 			console.log('Current blacklist: ');
 			console.log(items);
@@ -163,38 +163,41 @@ function getBlacklist(cb){
 function addToBlacklist(currentBlacklist, uriIn){
 	var uri = uriIn;
 	var save = {
-		'uris': null
+		'blacklist': null
 	};
 
+    console.log('current blacklistX');
+    console.log(currentBlacklist);
+
 	if($.isEmptyObject(currentBlacklist)){
-			save.uris = [];
+			save.blacklist = [];
 	} else {
-		save.uris = currentBlacklist.uris;
+		save.blacklist = currentBlacklist.blacklist;
 	}
 
-	if(!save.uris){
-		save.uris = [];
+	if(!save.blacklist){
+		save.blacklist = [];
 	}
 
 	// Check if URI is already in blacklist before adding
-	if(save.uris.indexOf(uriIn) > -1){
+	if(save.blacklist.indexOf(uriIn) > -1){
 		if(debug){
 			console.log('URI already in blacklist');
-			console.log(save.uris);
+			console.log(save.blacklist);
 		}
 		return;
 	}
 
 	if(debug){
 		console.log('Previous blacklist contents:');
-		console.log(save.uris);
+		console.log(save.blacklist);
 	}
 
-	save.uris.push(uriIn);
+	save.blacklist.push(uriIn);
 
 	if(debug){
 		console.log('Current blacklist contents:');
-		console.log(save.uris);
+		console.log(save.blacklist);
 	}
     
 	chrome.storage.local.set(save,
@@ -208,10 +211,10 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('in listenenr with ' + request.method);
+    if(debug){console.log('in listener with ' + request.method);}
     
-	if(request.method == "hideUI"){
-		$("#minkContainer").fadeOut();
+	if(request.method == 'hideUI'){
+		$('#minkContainer').fadeOut();
 		return;
 	}
 	
@@ -222,12 +225,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 	
 	if(request.method === 'addToBlacklist'){
-		// TODO: convert this to add to blacklist
-
-	//	console.log('adding ' + request.uri + ' to blacklist');
 		getBlacklist(addToBlacklist, request.uri); // And add uri
-
-		//$('#minkContainer').fadeOut();
 		return;
 	}
 

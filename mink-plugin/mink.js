@@ -175,8 +175,10 @@ chrome.runtime.onMessage.addListener(
     }else if (request.method == 'nukeFromOrbit') {
     	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchTimeMap') {
-      console.log('received message for method = fetchTimemap, value:');
-      console.log(request.value);
+      if(debug) {
+        console.log('received message for method = fetchTimemap, value:');
+        console.log(request.value);
+      }
       fetchTimeMap(request.value, sender.tab.id);
     }else if (request.method == 'notify') {
 		  var notify = chrome.notifications.create(
@@ -272,9 +274,11 @@ chrome.runtime.onMessage.addListener(
 );
 
 function fetchTimeMap(uri, tabid) {
-    console.log('in fetchTimeMap with params:');
-    console.log('* uri: ' + uri);
-    console.log('* tab id: ' + tabid);
+    if(debug) {
+      console.log('in fetchTimeMap with params:');
+      console.log('* uri: ' + uri);
+      console.log('* tab id: ' + tabid);
+    }
 	$.ajax({
 		url: uri,
 		type: "GET"
@@ -344,9 +348,7 @@ function setBadgeIcon(icons, tabid) {
 	chrome.browserAction.setIcon({tabId: tabid,
 	  imageData: {'38': context.getImageData(0, 0, 38, 38)}
 	});*/
-    console.log('in setBadgeIcon, params:');
-    console.log(tabid);
-    console.log(icons);
+
     chrome.browserAction.setIcon({tabId: tabid, path: icons}); 
 }
 
@@ -359,7 +361,6 @@ function setBadge(value, icon, tabid) {
       setBadgeText(value + '', tabid);
     }
     
-    console.log('setting badge icon');
     setBadgeIcon(icon, tabid);
     
     if(icon === badgeImages_isAMemento) {
@@ -368,13 +369,6 @@ function setBadge(value, icon, tabid) {
       chrome.browserAction.setTitle({title: browserActionTitle_normal});
     }
 }
-
-
-chrome.contextMenus.create({
-	"title": "Hide Mink until reload",
-	"contexts": ["image"],
-	"onclick" : hideMinkUI
-});
 
 function nextAnimationStep() {
 	  if(iconState <= 0) {
@@ -395,17 +389,6 @@ function nextAnimationStep() {
 	  //setTimeout(nextAnimationStep, 250);
 }
 
-function hideMinkUI(){
- 	chrome.tabs.query({
-        "active": true,
-        "currentWindow": true
-    }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            "method": "hideUI"
-        });
-    });
-}
-
 chrome.tabs.onActivated.addListener(function(activeTabInfo) {
   chrome.storage.local.get('disabled',function(items) {
     if(items.disabled) {
@@ -413,8 +396,6 @@ chrome.tabs.onActivated.addListener(function(activeTabInfo) {
     }
   });
 });
-
-
 
 
 function startWatchingRequests() {
@@ -476,7 +457,7 @@ chrome.contextMenus.create({
 
 chrome.contextMenus.create({
 	'title': 'Add URL to Mink Blacklist',
-	'contexts': ['browser_action', 'image'],
+	'contexts': ['browser_action', 'all'],
 	'onclick' : addToBlackList
 });
 
@@ -569,7 +550,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
         console.log(tm);
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
-	  console.log('The current page did not send a link header');
+	  if(debug){console.log('The current page did not send a link header');}
 	}
 	
 	
