@@ -5,10 +5,41 @@ var maxBadgeDisplay = '999+';
 var stillProcessingBadgeDisplay = 'WAIT';
 var tabBadgeCount = {}; // Maintain tabId-->count association
 
-var iconPath_isAMemento = chrome.extension.getURL('images/mLogo38_isAMemento.png');
+
 
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento';
 var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web';
+
+var badgeImages_disabled = {
+  '38' : chrome.extension.getURL('images/minkLogo38_disabled.png'),
+  '19' : chrome.extension.getURL('images/minkLogo19_disabled.png')
+};
+
+var badgeImages_blacklisted = {
+  '38' : chrome.extension.getURL('images/minkLogo38_blacklisted.png'),
+  '19' : chrome.extension.getURL('images/minkLogo19_blacklisted.png')
+};
+
+var badgeImages_noMementos = {
+  '38' : chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
+  '19' : chrome.extension.getURL('images/minkLogo19_noMementos2.png')
+};
+
+var badgeImages_mink = {
+  '38' : chrome.extension.getURL('images/minkLogo38.png'),
+  '19' : chrome.extension.getURL('images/minkLogo19.png')
+};
+
+var badgeImages_disabled = {
+  '38' : chrome.extension.getURL('images/minkLogo38_disabled.png'),
+  '19' : chrome.extension.getURL('images/minkLogo19_disabled.png')
+};
+
+var badgeImages_isAMemento = {
+  '38' : chrome.extension.getURL('images/mLogo38_isAMemento.png'),
+  '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')
+};
+
 
 /*
 chrome.webNavigation.onCommitted.addListener(function(e) {
@@ -28,28 +59,23 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 
 
 chrome.browserAction.onClicked.addListener(function(tab) {
-    console.log('minkUIcreated?');
-    //console.log(minkUICreated);
-    //console.log($('#minkWrapper').html());
     // Check if isA Memento
-    console.log('waiting 1?');
     chrome.storage.local.get('timemaps', function(items) {
         console.log('waiting 2?');
         console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento. Related to Issue #150.');
-        //console.log(items.timemaps);
+                
         if(items.timemaps && items.timemaps[tab.url]) {
-	        console.log('CLicked button and we are viewing a memento');
+	        console.log('Clicked button and we are viewing a memento');
 	        displayMinkUI(tab.id);
 	        return;
         }else {
 	        console.log('No timemap stored in cache for ' + tab.url);
 	        showMinkBadgeInfoBasedOnProcessingState(tab.id);
         }
-
 	});
 });
 
-function setEnabledBasedOnURIInBlacklist() {
+function setEnabledBasedOnURIInBlacklist(cb) {
   chrome.tabs.query({active: true}, function(tab) {
     console.log('is URI in blacklist?');
     console.log(tab);
@@ -67,9 +93,7 @@ function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 		  //TODO: show alternate interface
 		  return;
 		}
-		
-		
-		
+				
 		var cb = function() {setBadgeTextBasedOnBrowserActionState(tabid);};
 		
 		//TODO: check if URI is in blacklist
@@ -203,6 +227,8 @@ chrome.runtime.onMessage.addListener(
       chrome.runtime.openOptionsPage();
     }else if(request.method == 'stopWatchingRequests') {
       stopWatchingRequests()
+    }else if(request.method == 'stopWatchingRequests_blacklisted') {
+      stopWatchingRequests_blacklisted()
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
@@ -303,7 +329,7 @@ function setBadgeText(value, tabid) {
 	chrome.browserAction.setBadgeBackgroundColor({color: badgeColor, tabId: tabid});
 }
 
-function setBadgeIcon(iconPath, tabid) {
+function setBadgeIcon(icons, tabid) {
     /*console.log('setting '+iconPath+ ' tab:'+tabid);
 	
 	var img = document.createElement('img');
@@ -321,8 +347,8 @@ function setBadgeIcon(iconPath, tabid) {
 	});*/
     console.log('in setBadgeIcon, params:');
     console.log(tabid);
-    console.log(iconPath);
-    chrome.browserAction.setIcon({tabId: tabid, path: {'38': iconPath}}); 
+    console.log(icons);
+    chrome.browserAction.setIcon({tabId: tabid, path: icons}); 
 }
 
 function setBadge(value, icon, tabid) {
@@ -337,7 +363,7 @@ function setBadge(value, icon, tabid) {
     console.log('setting badge icon');
     setBadgeIcon(icon, tabid);
     
-    if(icon === iconPath_isAMemento) {
+    if(icon === badgeImages_isAMemento) {
       chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento});
     }else {
       chrome.browserAction.setTitle({title: browserActionTitle_normal});
@@ -400,7 +426,7 @@ function startWatchingRequests() {
 	  });
 	  
       chrome.tabs.query({active: true}, function(tab) {
-        setBadge('', chrome.extension.getURL('images/minkLogo38.png'), tab[0].id);
+        setBadge('', badgeImages_plain, tab[0].id);
         setBadgeText('', tab[0].id);
       });
   });
@@ -415,7 +441,7 @@ function stopWatchingRequests() {
 	  });
       
       chrome.tabs.query({active: true}, function(tab) {
-        setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab[0].id);
+        setBadge(' ', badgeImages_disabled, tab[0].id);
         setBadgeText('', tab[0].id);
       });
 	  
@@ -424,6 +450,17 @@ function stopWatchingRequests() {
 	  //    setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab.id);
 	  //});
   });
+}
+
+function stopWatchingRequests_blacklisted() {
+  if(debug){console.log('stopWatchingRequests_blacklisted() executing');}
+  
+  
+  chrome.tabs.query({active: true}, function(tab) {
+	setBadge(' ', badgeImages_blacklisted, tab[0].id);
+	setBadgeText('', tab[0].id);
+  });
+
 }
 
 
@@ -604,7 +641,7 @@ function setTimemapInStorage(tm, url) {
 
 
 function displaySecureSiteMementos(mementos, tabid){
-  setBadge(mementos.length, chrome.extension.getURL('images/minkLogo38.png'), tabid);
+  setBadge(mementos.length, badgeImages_mink, tabid);
 }
 
 
@@ -618,7 +655,7 @@ function showInterfaceForZeroMementos(tabid) {
   
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   setBadgeText('', tabid);
-  setBadgeIcon('images/minkLogo38_noMementos2.png', tabid);  
+  setBadgeIcon(badgeImages_noMementos, tabid);  
 }
 
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.

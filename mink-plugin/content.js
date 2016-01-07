@@ -26,14 +26,40 @@ var animationTimer;
 
 
 
-chrome.storage.local.get('disabled',function(items) {
-    if(items.disabled) {
-      chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function(response) {});
-    } else {
-      if(debug) {console.log('Mink is not disabled, firing displayUIBasedOnContext');}
-      displayUIBasedOnContext();
+// Faux promises for enabling/disabling UI
+var setBlacklisted = function() {setActiveBasedOnBlacklistedProperty(displayUIBasedOnContext);};
+var setInitialStateWithChecks = function() {setActiveBasedOnDisabledProperty(setBlacklisted);};
+
+setInitialStateWithChecks();
+
+function setActiveBasedOnDisabledProperty(cb) {
+	chrome.storage.local.get('disabled', function(items) {
+		if(items.disabled) {
+		  chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function(response) {});
+		} else {
+		  cb();
+		}
+	});
+}
+
+function setActiveBasedOnBlacklistedProperty(cb) {
+  chrome.storage.local.get('blacklist', function(items) {
+    var inBlacklist = false;
+    if(!items.blacklist) {cb(); return;}
+    
+    for(var ii = items.blacklist.length - 1; ii >= 0; ii--) {
+      var documentHostname = (new URL(document.URL)).hostname;
+      var blacklistEntryHostname = (new URL(items.blacklist[ii])).hostname;
+      if(documentHostname === blacklistEntryHostname) {
+        chrome.runtime.sendMessage({method: 'stopWatchingRequests_blacklisted'}, function(response) {});
+        return;
+      }
     }
-});
+    
+    cb();
+  });
+}
+
 
 var jsonizedMementos = '[';
 var jsonizedMementos;
@@ -95,7 +121,7 @@ function displayUIBasedOnContext() {
 	    console.log('TODO: check that has Memento-Datetime header');
 	    console.log('isAMemento, changing icons');
 	    console.log(items.timemaps);
-	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mLogo38_isAMemento.png')}, function(response) {});
+	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: {'38' : chrome.extension.getURL('images/mLogo38_isAMemento.png'), '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')}}, function(response) {});
 	    if(debug){console.log('attach viewing memento interface here');}
 	  }else {
 	    console.log('calling getMementos() from displayUIBasedOnContext');
@@ -451,7 +477,7 @@ function animatePageActionIcon() {
     clearTimeout(animationTimer); 
   	return;
   }
-  chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: clockIcons_38[iteration]}, function(response) {});;
+  chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: {'38': clockIcons_38[iteration], '19': clockIcons_19[iteration]}}, function(response) {});;
   iteration--;
   
   if(iteration < 0) {iteration = clockIcons_38.length - 1;}
