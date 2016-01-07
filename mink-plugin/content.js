@@ -316,7 +316,7 @@ function processResponseFromAggregator(xhr) {
 	}
 }
 
-
+/* LIKELY OBSOLETE
 function queryTimegate(tgURI) {
 	if(debug){console.log('Querying timegate at ' + tgURI);}
 	// TODO: if tgURI's URI-R is https, take a different path so as to not have a cross-scheme violation
@@ -333,13 +333,17 @@ function queryTimegate(tgURI) {
 			return;
 	}
 
+    if(debug) {
+      console.log('Fetching TM at ' + tgURI);
+    }
+
 	$.ajax({
 		url: tgURI,
 		type: "HEAD"
 	}).done(function(data,textStatus,xhr) {
 		processResponseFromAggregator(xhr);
 	});
-}
+}*/
 
 function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 	console.log('creatTimemapFromURI() - includes write to localstorage');
@@ -434,13 +438,20 @@ function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
 		timemaploc = memgator_json + window.location;
 	}
 
+    if(debug) {
+      console.log('Fetching TimeMap at ' + timemaploc);
+    }
+
 	if(uri){
 		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
 	}
     
     //TODO: set 'working' icon
     chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')}, function(response) {});
+    chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function(response) {});
+
     animateBrowserActionIcon = true;
+
     setTimeout(animatePageActionIcon, 500);
 
     console.log('in getMementos, sending "fetchTimeMap" message');

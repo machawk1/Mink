@@ -335,6 +335,10 @@ function setBadgeText(value, tabid) {
 	    badgeColor = "#900"
 	}
 	
+	if(!badgeValue) {
+	  badgeValue = '';
+	}
+	
 	chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid});
 	chrome.browserAction.setBadgeBackgroundColor({color: badgeColor, tabId: tabid});
 }
@@ -553,17 +557,22 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	}
     
 	if(linkHeaderAsString) {
-	    console.log('A link header exists:');
-	    console.log(linkHeaderAsString);
+	    if(debug) {
+	      console.log('A link header exists:');
+	      console.log(linkHeaderAsString);
+	    }
+	    
 		var tm = new Timemap(linkHeaderAsString);
 		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
 		}
 
-
-        console.log('calling setTimemapInStorage with:');
-        console.log(url);
-        console.log(tm);
+        if(debug) {
+          console.log('calling setTimemapInStorage with:');
+          console.log(url);
+          console.log(tm);
+        }
+        
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  if(debug){console.log('The current page did not send a link header');}
