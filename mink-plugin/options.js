@@ -41,23 +41,23 @@ function clearBlacklist() {
 function saveBlacklist(){
   var blacklistJSON = {};
   var uris = [];
-  $('#options span').each(function(){
+  $('#options li:not(.strike) span').each(function(){
     uris.push($(this).text());
   });
+  console.log('a');
   blacklistJSON.blacklist = uris;
   chrome.storage.local.set(blacklistJSON);
   $('.newEntry').removeClass('newEntry'); // Disable indicator for unsaved data
   updateSaveButtonStatus();
+  console.log('done');
   document.location.reload();
 }
 
 function updateSaveButtonStatus(){
   var saveBlacklistButton = $('#saveBlacklist');
   if($('.glyphicon-ok').length > 0 || $('.newEntry').length > 0) {
-    console.log('a');
     saveBlacklistButton.removeAttr('disabled').removeClass('disabled');
   }else {
-    console.log('b');
     saveBlacklistButton.attr('disabled','disabled').addClass('disabled');
   }
 }
