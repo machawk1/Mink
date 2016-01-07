@@ -40,7 +40,7 @@ function removeBlacklist() {
 function saveBlacklist(){
   var blacklistJSON = {};
   var uris = [];
-  $('.newEntry span').each(function(){
+  $('#options span').each(function(){
     uris.push($(this).text());
   });
   blacklistJSON.blacklist = uris;
