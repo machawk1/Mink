@@ -38,7 +38,6 @@ function appendHTMLToShadowDOM() {
 
    console.log('TODO displayMinkUI.js: change UI to show viewing memento if applicable');
    console.warn(mementos);
-
    
    console.warn('BB');
 
@@ -48,7 +47,17 @@ function appendHTMLToShadowDOM() {
 	  };
       var mCount = mementos.length;
       
+      console.log('pp');
+      /*console.log(memgator_json);
+      console.log(items.timemaps);
+      console.log(memgator_json + document.URL);
+      console.log(items.timemaps[memgator_json + document.URL]);
+      console.log(items.timemaps[memgator_json + document.URL].mementos);
+      console.log(items.timemaps[memgator_json + document.URL].datetime);*/
+      var uri_t = memgator_json + document.URL;
+
 	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
+	    console.log('qq');
 	    mCount = items.timemaps[document.URL].mementos.length;
 	    console.log('c');
 	    console.log('isAMemento, hide ALL THE THINGS!');
@@ -61,11 +70,12 @@ function appendHTMLToShadowDOM() {
 	    $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)));
 	    cb = createShadowDOM;
       }else if(mCount > MAX_MEMENTOS_IN_DROPDOWN) {
+         console.log('rr');
 	      $('.dropdown').addClass('hidden');
           $('#steps .action').removeClass('active');
           $('#title_drilldown').addClass('active');
           buildDropDown([]);
-          buildDrilldown_Year(items.timemaps[document.URL].mementos);
+          buildDrilldown_Year(items.timemaps[uri_t].mementos.list);
           console.log('a');
 	   }else if(mCount === 0) {
 	      console.log('b');
@@ -149,6 +159,7 @@ function switchToArchiveNowInterface() {
   
   $('#archiveNow').addClass('noMementos');
   $('#archiveNowInterface').removeClass('hidden');  
+  $('.hideInNoMementosInterface').addClass('hidden');
 }
  
 function appendCSSToShadowDOM(cb) {
@@ -258,8 +269,11 @@ function buildDrilldown_Year(mementos){
 	years = null;
 	years = {};
 	var yearDataFromLastIteration = '';
-
-	$(mementos).each(function(mI,m){
+    
+    console.warn('building drilldown');
+    console.log(mementos);
+    
+	$(mementos).each(function(mI,m) {
 		var dt = moment(m.datetime);
 		if(!years[dt.year()]){years[dt.year()] = [];}
 		years[dt.year()].push(m);

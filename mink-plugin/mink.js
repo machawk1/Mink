@@ -9,6 +9,7 @@ var tabBadgeCount = {}; // Maintain tabId-->count association
 
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento';
 var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web';
+var browserActionTitle_noMementos = 'Mink - No Mementos Available';
 
 var badgeImages_disabled = {
   '38' : chrome.extension.getURL('images/minkLogo38_disabled.png'),
@@ -28,11 +29,6 @@ var badgeImages_noMementos = {
 var badgeImages_mink = {
   '38' : chrome.extension.getURL('images/minkLogo38.png'),
   '19' : chrome.extension.getURL('images/minkLogo19.png')
-};
-
-var badgeImages_disabled = {
-  '38' : chrome.extension.getURL('images/minkLogo38_disabled.png'),
-  '19' : chrome.extension.getURL('images/minkLogo19_disabled.png')
 };
 
 var badgeImages_isAMemento = {
@@ -112,26 +108,35 @@ function setBadgeTextBasedOnBrowserActionState(tabid) {
 	//TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
 	// - maybe rely on the title, since the icon's src path cannot be had.
 	chrome.browserAction.getBadgeText({tabId: tabid}, function(result) {
-	  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
-		  chrome.browserAction.getTitle({tabId: tabid}, function(result) {
-			// Only set badge text if not viewing a memento
-			if(result !== browserActionTitle_viewingMemento) {
-			  setBadgeText(stillProcessingBadgeDisplay, tabid);
-			} else {
-			  console.log('Show "Viewing Memento" Mink UI in page content.');
-			}
-		  });
+		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
+			 chrome.browserAction.getTitle({tabId: tabid}, function(result) {
+					// Only set badge text if not viewing a memento
+					console.log('XXXX');
+					console.log(result);
+					if(result === browserActionTitle_noMementos) {
+					  displayMinkUI(tabid);
+					  return;
+					}
+					
+					if(result !== browserActionTitle_viewingMemento) {
+					  setBadgeText(stillProcessingBadgeDisplay, tabid);
+					} else {
+					  console.log('Show "Viewing Memento" Mink UI in page content.');
+					  displayMinkUI(tabid);
+					}
+			  });
 					  
-
-		  return; // Badge has not yet been set
-	  }
-	  displayMinkUI(tabid);
+	          console.log('x');
+			  return; // Badge has not yet been set
+		  }
+	      console.log('u');
+	      displayMinkUI(tabid);
   
 	});
 }
 
 function displayMinkUI(tabId) {
-  console.log('Injecting displayMinkUI.js');
+  if(debug){console.log('Injecting displayMinkUI.js');}
   chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData) + "; var tabId = " + tabId + ";"}, 
     function() {
 	  chrome.tabs.executeScript(tabId, {
@@ -140,8 +145,10 @@ function displayMinkUI(tabId) {
 	  //     thrown. Handle this more gracefully.
 		file: "js/displayMinkUI.js"
 	  }, function(res) {
-	    console.log('mink ui injected. res = ');
-	    console.log(res);
+	    if(debug) {
+	        console.log('mink ui injected. res = ');
+	        console.log(res);
+	    }
 	  });
   });
 
@@ -332,6 +339,11 @@ function setBadgeText(value, tabid) {
 	chrome.browserAction.setBadgeBackgroundColor({color: badgeColor, tabId: tabid});
 }
 
+function setBadgeTitle(newTitle, tabid) {
+  console.warn('setting title');
+  chrome.browserAction.setTitle({title: newTitle, tabId: tabid});
+}
+
 function setBadgeIcon(icons, tabid) {
     /*console.log('setting '+iconPath+ ' tab:'+tabid);
 	
@@ -487,6 +499,7 @@ function nukeLocalStorage(){
 }
 
 function showArchiveNowUI(){
+  console.warn('showing archive now ui');
  	chrome.tabs.query({
         'active': true,
         'currentWindow': true
@@ -639,6 +652,7 @@ function showInterfaceForZeroMementos(tabid) {
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   setBadgeText('', tabid);
   setBadgeIcon(badgeImages_noMementos, tabid);  
+  setBadgeTitle(browserActionTitle_noMementos, tabid);
 }
 
 /* Duplicate of code in content.js so https URIs can be used to query timemaps.

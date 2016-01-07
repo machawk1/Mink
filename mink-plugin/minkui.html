@@ -14,7 +14,7 @@
  <img src="images/iaLogo.png" alt="Internet Archive" id="archivelogo_ia" class="archiveNowInterface archiveLogo" />
  <img src="images/archiveisLogo.png" alt="Archive.is" id="archivelogo_ais" class="archiveNowInterface archiveLogo" />
  <img src="images/allListedArchives.png" alt="All Listed Archives" id="archivelogo_ala" class="archiveNowInterface archiveLogo" />
- <button class="archiveNowInterface" id="goBackButton">&lt; Go Back</button>
+ <button class="archiveNowInterface hideInNoMementosInterface" id="goBackButton">&lt; Go Back</button>
 </span>
 <span id="viewingMementoInterface" class="hidden">
   <button id="backToLiveWeb">Back to Live Web</button><!--
@@ -52,7 +52,7 @@ $(document).ready(function() {
   
   $('#viewMementoButton').click(function() {
     window.location = $(this).attr('alt');
-});
+  });
 });
 
 function replaceContentScriptImagesWithChromeExtensionImages() {
@@ -61,9 +61,6 @@ function replaceContentScriptImagesWithChromeExtensionImages() {
 	document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png');
 	document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png');
 	document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png');
-
-   console.log('done');
-   console.log(document.getElementById('archivelogo_ia'));
 }
 
 function bindSteps() {
