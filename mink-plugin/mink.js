@@ -59,6 +59,12 @@ chrome.webNavigation.onCommitted.addListener(function(e) {
 
 
 chrome.browserAction.onClicked.addListener(function(tab) {
+    var scheme = (new URL(tab.url)).origin.substr(0, 4);
+    if(scheme !== 'http') {
+      if(debug){console.log('Invalid scheme for Mink: ' + scheme);}
+      return;
+    }
+
     // Check if isA Memento
     chrome.storage.local.get('timemaps', function(items) {
         console.log('waiting 2?');
