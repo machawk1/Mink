@@ -44,12 +44,12 @@ function saveBlacklist(){
   $('#options li:not(.strike) span').each(function(){
     uris.push($(this).text());
   });
-  console.log('a');
+
   blacklistJSON.blacklist = uris;
   chrome.storage.local.set(blacklistJSON);
   $('.newEntry').removeClass('newEntry'); // Disable indicator for unsaved data
   updateSaveButtonStatus();
-  console.log('done');
+  
   document.location.reload();
 }
 
@@ -196,6 +196,26 @@ function removeTMFromCache(originalURI) {
   });
 }
 
+function clearTimemapCache() {
+  chrome.storage.local.set({'timemaps':{}},
+      function() {
+        console.log('Remove all cached TMs');
+        $('#cachedTimemaps').empty();
+        populatedCachedTimeMapsUI();
+      }
+    );
+}
+
+function saveAndCloseOptionsPanel() {
+  saveBlacklist();
+  window.close();
+}
+
+function restoreDefaults() {
+  clearBlacklist();
+  clearTimemapCache();
+}
+
 document.addEventListener('DOMContentLoaded', restore_options);
 document.addEventListener('DOMContentLoaded', createAddURIBinder);
 document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI);
@@ -206,17 +226,11 @@ $('#removeSelectedTMFromCache').click(function() {
   removeTMFromCache(oURI);
 });
 
-$('#removeAllTMsFromCache').click(function() {
-    chrome.storage.local.set({'timemaps':{}},
-      function() {
-        console.log('Remove all cached TMs');
-        $('#cachedTimemaps').empty();
-        populatedCachedTimeMapsUI();
-      }
-    );
-});
+$('#removeAllTMsFromCache').click(clearTimemapCache);
 
 $('#saveBlacklist').click(saveBlacklist);
 $('#clearBlacklist').click(clearBlacklist);
+$('#doneButton').click(saveAndCloseOptionsPanel);
+$('#restoreDefaultsButton').click(restoreDefaults);
 //document.getElementById('save').addEventListener('click',
 //    save_options);

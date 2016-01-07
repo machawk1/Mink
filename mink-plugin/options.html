@@ -28,11 +28,13 @@
 
     .nevermind {color: white; background-color: red; font-weight: bold; margin-left: 1.0em; width: 1.0em; height: 1.0em; border-radius: 15px;}
     
-    #resetButton {bottom: 15px; right: 15px; position: fixed;}
+    #bottomButtons {bottom: 15px; right: 15px; position: fixed;}
     
     select#cachedTimemaps {width: 200px;}
     
     p#mementoCount {height: 1.0em;}
+    
+    .hidden {display: none;}
     </style>
   <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
@@ -59,7 +61,7 @@
     
   </fieldset>
   
-  <fieldset>
+  <fieldset class="hidden">
   <legend>Memento Aggregator</legend>
   <select>
     <option>memgator.cs.odu.edu</option>
@@ -68,14 +70,17 @@
   </select>
   </fieldset>
 
-  <fieldset disabled>
+  <fieldset disabled  class="hidden">
   <legend>Additional Archives</legend>
   <select>
     <option>localhost via WAIL</option>
   </select>
   </fieldset>
   
-  <button id="resetButton">Reset</button>
+  <div id="bottomButtons">
+    <button id="restoreDefaultsButton">Restore Defaults</button>
+    <button id="doneButton">Done</button>
+  </div>
   
   <script src="options.js"></script>
 </body>

@@ -470,8 +470,7 @@ function addToBlackList(){
             'method': 'addToBlacklist',
             'uri': tabs[0].url
         });
-        
-        console.log(tabs[0]);
+
         setBadgeIcon(badgeImages_blacklisted, tabs[0].id);
         setBadgeText('', tabs[0].id);
     });
