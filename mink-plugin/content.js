@@ -74,10 +74,6 @@ function addToHistory(uri_r,memento_datetime,mementos,callback){
 	});
 }
 
-function clearHistory() {
-	chrome.runtime.sendMessage({method: "nukeFromOrbit", value: "It's the only way to be sure"}, function(response) {});
-}
-
 
 /** When viewing a memento, handles the UI and navigation change of jumping to another memento
  *  @param index A value representative of the location of the new memento on the list, 1 = next, -1 = prev, 0/null = selected in UI
@@ -111,21 +107,28 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 }
 
 function displayUIBasedOnContext() {
-    console.log('displayUIBasedOnContext()');
-    chrome.storage.local.get('timemaps', function(items) {
-      console.log('localStorage test:');
-      console.log(document.URL);
-      console.log(items);
-	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].datetime) {
-	    console.log('has a timemap in cache.');
-	    console.log('TODO: check that has Memento-Datetime header');
-	    console.log('isAMemento, changing icons');
-	    console.log(items.timemaps);
-	    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: {'38' : chrome.extension.getURL('images/mLogo38_isAMemento.png'), '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')}}, function(response) {});
-	    if(debug){console.log('attach viewing memento interface here');}
-	  }else {
-	    console.log('calling getMementos() from displayUIBasedOnContext');
-	    getMementos();
+    if(debug) {console.log('displayUIBasedOnContext()'); console.log(document.URL);}
+    chrome.storage.local.get('timemaps', function(items) {     
+      var hasATimeMapInCache = items.timemaps && items.timemaps[document.URL];
+      
+	  if(hasATimeMapInCache) {
+	    var isAMemento = items.timemaps[document.URL].datetime;
+
+        if(isAMemento) {	    
+	      chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: {
+	          '38' : chrome.extension.getURL('images/mLogo38_isAMemento.png'), 
+	          '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')
+	         }
+	      }, function(response) {});
+	    }else { // Live web page revisited w/ a TM in cache
+	      console.log('TODO: pull memento data from cache, try setting tmData to the cache contents');
+	      chrome.runtime.sendMessage({
+	          method: 'setTMData', 
+	          value: items.timemaps[document.URL]
+	        });
+	    }
+	  }else { // Not a Memento, no TM in cache
+	    getMementos(document.URL);
 	  }
 	});
     
@@ -212,18 +215,7 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if(debug){console.log('in listener with ' + request.method);}
-    
-	if(request.method == 'hideUI'){
-		$('#minkContainer').fadeOut();
-		return;
-	}
-	
-	if(request.method == 'startMinkExecution') {
-	    if(debug) {console.log('firing off displayUIBasedOnContext from startMinkExecution');}
-	    displayUIBasedOnContext();
-	    return;
-	}
-	
+    	
 	if(request.method === 'addToBlacklist'){
 		getBlacklist(addToBlacklist, request.uri); // And add uri
 		return;
@@ -234,13 +226,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         animateBrowserActionIcon = false;
         return;
     }
-
-	if(request.method === 'echoBlacklist') {
-		console.log('Here is the current blacklist:');
-		console.log(request.blacklist);
-		return;
-	}
-
+    
 	if(request.method === 'showArchiveNowUI'){
 		if(debug){console.log('Hide logo here');}
 		logoInFocus = true;
@@ -279,6 +265,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.log(request.timemap);
 			console.log(request.uri);
 			console.log('-----');
+			console.warn('no special handling, calling fallthrough');
 		}
 	}
     
@@ -368,40 +355,8 @@ function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 				//Recursing to find more TMs
 				return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
 			}
-			if(debug){console.log('Executing set of promises');}
-			
-			return;
-			
-			
-			
-			Promise.resolve(accumulatedArrayOfTimemaps.concat(tm)).then(function(tms){
-				storeTimeMapData(tms,displayUIBasedOnStoredTimeMapData);
-			});
 		}
 	});
-}
-
-
-function fetchTimeMap(uri) {
-	  if(debug){console.log('Created promise to fetch TimeMap at '+uri);}
-		var prom = new Promise(
-			function(resolve, reject) {
-
-				$.ajax({
-					url: uri
-				}).done(function(tmData){
-					resolve(tmData);
-				}).fail(function(xhr,status,err){
-					if(debug){
-						console.log('A ajax request within a promise failed!');
-						console.log(xhr);
-						console.log(status);
-						console.log(err);
-					}
-				});
-			}
-		);
-		return prom;
 }
 
 function countNumberOfMementos(arrayOfTimeMaps) {
@@ -416,49 +371,28 @@ function countNumberOfMementos(arrayOfTimeMaps) {
 		return totalNumberOfMementos;
 }
 
-function storeTimeMapData(arrayOfTimeMaps, cbIn){
-	var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
-	if(debug){console.log('executing storeTimeMapData');}
 
-	chrome.storage.local.set({
-			'uri_r': arrayOfTimeMaps[0].original_uri,
-			'timemaps': arrayOfTimeMaps
-	}, cb); //end set
-}
-
-function displayUIBasedOnStoredTimeMapData() {
-    alert('displayUIBasedOnStoredTImeMapData');
-    return;
-}
-
-
-function getMementos(uri,alreadyAcquiredTimemaps,stopAtOneTimemap,timemaploc){
+function getMementos(uri) {
     if(debug) {console.log('getMementosWithTimemap()');}
-	if(!timemaploc){ //use the aggregator
-		timemaploc = memgator_json + window.location;
-	}
-
-    if(debug) {
-      console.log('Fetching TimeMap at ' + timemaploc);
-    }
-
-	if(uri){
-		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
-	}
+	var timemapLocation = memgator_json + uri;
     
-    //TODO: set 'working' icon
-    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')}, function(response) {});
+    chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: 
+      {
+        '38': clockIcons_38[clockIcons_38.length - 1],
+        '19': clockIcons_19[clockIcons_19.length - 1]
+      }
+    });
     chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function(response) {});
 
     animateBrowserActionIcon = true;
 
     setTimeout(animatePageActionIcon, 500);
 
-    console.log('in getMementos, sending "fetchTimeMap" message');
+    if(debug){console.log('in getMementos, sending "fetchTimeMap" message');}
 	chrome.runtime.sendMessage({
 	    method: 'fetchTimeMap',
-	    value: timemaploc
-	}, function(response) {});
+	    value: timemapLocation
+	});
 }
 
 

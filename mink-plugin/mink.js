@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';
@@ -37,21 +37,13 @@ var badgeImages_isAMemento = {
 };
 
 
-/*
-chrome.webNavigation.onCommitted.addListener(function(e) {
-    if(e.frameId !== 0) { // Not main frame
-      return;
-    }
-    console.log("StartingX");
- 
 
-	 chrome.runtime.sendMessage({
-	   'method': 'startMinkExecution'
-	 });
-   
-    
-    //displayUIBasedOnContext();
-});*/
+chrome.webNavigation.onCommitted.addListener(function(e) {
+    if(debug) {
+      console.warn('NAVIGATION OCCURRED!');
+      console.log(e);
+    }
+});
 
 
 chrome.browserAction.onClicked.addListener(function(tab) {
@@ -62,16 +54,13 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     }
 
     // Check if isA Memento
-    chrome.storage.local.get('timemaps', function(items) {
-        console.log('waiting 2?');
-        console.log('TODO: check if Memento-Datetime is set here in the cache. Just TMs being present in the cache is not indicative of this being a memento. Related to Issue #150.');
-                
+    chrome.storage.local.get('timemaps', function(items) {                
         if(items.timemaps && items.timemaps[tab.url]) {
-	        console.log('Clicked button and we are viewing a memento');
+	        if(debug){console.log('Clicked button and we are viewing a memento');}
 	        displayMinkUI(tab.id);
 	        return;
         }else {
-	        console.log('No timemap stored in cache for ' + tab.url);
+	        if(debug){console.log('No timemap stored in cache for ' + tab.url);}
 	        showMinkBadgeInfoBasedOnProcessingState(tab.id);
         }
 	});
@@ -79,8 +68,10 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
 function setEnabledBasedOnURIInBlacklist(cb) {
   chrome.tabs.query({active: true}, function(tab) {
-    console.log('is URI in blacklist?');
-    console.log(tab);
+    if(debug){
+      console.log('is URI in blacklist?');
+      console.log(tab);
+    }
     
     if(cb) {cb();}
   });
@@ -99,7 +90,7 @@ function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 		var cb = function() {setBadgeTextBasedOnBrowserActionState(tabid);};
 		
 		//TODO: check if URI is in blacklist
-		console.warn('about to call setEnabledBasedOnURIBlacklist');
+		if(debug){console.warn('about to call setEnabledBasedOnURIBlacklist');}
 		setEnabledBasedOnURIInBlacklist(cb);       
 	});
 }
@@ -111,8 +102,6 @@ function setBadgeTextBasedOnBrowserActionState(tabid) {
 		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
 			 chrome.browserAction.getTitle({tabId: tabid}, function(result) {
 					// Only set badge text if not viewing a memento
-					console.log('XXXX');
-					console.log(result);
 					if(result === browserActionTitle_noMementos) {
 					  displayMinkUI(tabid);
 					  return;
@@ -126,10 +115,10 @@ function setBadgeTextBasedOnBrowserActionState(tabid) {
 					}
 			  });
 					  
-	          console.log('x');
+	          if(debug){console.log('x');}
 			  return; // Badge has not yet been set
 		  }
-	      console.log('u');
+	      if(debug){console.log('u');}
 	      displayMinkUI(tabid);
   
 	});
@@ -171,21 +160,7 @@ chrome.runtime.onMessage.addListener(
         mementos: localStorage.getItem('mementos'),
         memento_datetime: localStorage.getItem('memento_datetime')
       });
-    } else if (request.method == 'retrieveFromLocalStorage'){
-    	if(debug){console.log('Retrieving items from localStorageX');}
-
-      sendResponse({
-        value: localStorage.getItem('minkURI'),
-        mementos: localStorage.getItem('mementos'),
-        memento_datetime: localStorage.getItem('memento_datetime')
-      });
-    }else if (request.method == 'nukeFromOrbit') {
-    	localStorage.removeItem('minkURI');
     }else if (request.method == 'fetchTimeMap') {
-      if(debug) {
-        console.log('received message for method = fetchTimemap, value:');
-        console.log(request.value);
-      }
       fetchTimeMap(request.value, sender.tab.id);
     }else if (request.method == 'notify') {
 		  var notify = chrome.notifications.create(
@@ -196,42 +171,18 @@ chrome.runtime.onMessage.addListener(
 				  iconUrl: 'images/icon128.png'
 			  },function() {}
 		   );
-    }else if (request.method == 'refreshAggregatorTimeMap') {
-      var refreshAggregatorTimeMapURI = request.value;
-      $.ajax({
-        method: 'HEAD',
-        url: refreshAggregatorTimeMapURI,
-        beforeSend: function(request) {
-          request.setRequestHeader('cache-control', 'no-cache	')
-        }
-      }).done(function(data, textStatus, xhr) {
-          if (debug) {
-            console.log('success');
-            console.log(data);
-          }
-      }).fail(function(xhr, textStatus, error) {
-          if (debug){
-            console.log('failed');
-            console.log(error);
-            console.log(textStatus);
-          }
-      });
-    }else if(request.method == 'startSpinningActionButton') {
-        console.log('starting animation.....');
-        iconState = 0;
-        setTimeout(nextAnimationStep, 250);            
     }else if(request.method == 'setBadgeText') {
         setBadgeText(request.value, sender.tab.id)
 
         sendResponse({
           value: 'stopAnimation'
         });
-    }else if(request.method == 'setDropdownContents') {
+    }else if(request.method == 'setDropdownContents' || request.method == 'setTMData') {
       tmData = request.value;
     }else if(request.method == 'setBadge') {
         setBadge(request.text, request.iconPath, sender.tab.id);
     }else if(request.method === 'openOptionsPage') {
-      console.log('opening options page');
+      if(debug){console.log('opening options page');}
       chrome.runtime.openOptionsPage();
     }else if(request.method == 'stopWatchingRequests') {
       stopWatchingRequests()
@@ -273,7 +224,7 @@ chrome.runtime.onMessage.addListener(
 
 		});
     }else if(request.method === 'minkUICreated') {
-      console.log('**** mink ui created');
+      if(debug){console.log('**** mink ui created');}
     }else {
       if(debug){console.log('Message sent using chrome.runtime not caught: ' + request.method);}
     }
@@ -281,32 +232,22 @@ chrome.runtime.onMessage.addListener(
 );
 
 function fetchTimeMap(uri, tabid) {
-    if(debug) {
-      console.log('in fetchTimeMap with params:');
-      console.log('* uri: ' + uri);
-      console.log('* tab id: ' + tabid);
-    }
+    console.log('Fetching TimeMap for ' + uri + ' in tab ' + tabid);
+
 	$.ajax({
 		url: uri,
 		type: "GET"
-	}).done(function(data,textStatus,xhr,a,b){ 
+	}).done(function(data, textStatus, xhr, a, b){ 
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
-      if(debug) {
-        console.log('TODO: set chrome.storage cached TM here');
-        console.log('in ajax -- tab id = ' + tabid);
-      }
+      console.log(tmData);
+
       displaySecureSiteMementos(data.mementos.list, tabid);
-      // TODO: set cache here
-      //chrome.storage.local.set({'timemaps':tms},function(bytesUsed) {
-      setTimemapInStorage(tmData, uri);
-      
-      
-	}).fail(function(xhr, data, error){
+      setTimemapInStorage(tmData, data.original_uri);
+	}).fail(function(xhr, data, error) {
 	  if(xhr.status === 404) {
 		if(debug){console.log('querying secure FAILED, Display zero mementos interface');}
 		showInterfaceForZeroMementos(tabid);
-		return;
 	  }
 	  if(debug){console.log('Some error occurred with a secure site that was not a 404');console.log(xhr);}
 	}).always(function() {
@@ -344,7 +285,7 @@ function setBadgeText(value, tabid) {
 }
 
 function setBadgeTitle(newTitle, tabid) {
-  console.warn('setting title');
+  if(debug){console.warn('setting badge title');}
   chrome.browserAction.setTitle({title: newTitle, tabId: tabid});
 }
 
@@ -390,15 +331,15 @@ function nextAnimationStep() {
 	  if(iconState <= 0) {
 		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-37_5'}});
 		iconState = 1;
-		console.log('1');
+		if(debug){console.log('1');}
 	  }else if(iconState == 1) {
 		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-45.png'}});  
 		iconState = 2;
-		console.log('2');
+		if(debug){console.log('2');}
 	  }else {
 		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-30.png'}}); 
 		iconState = 0;
-		console.log('0');
+		if(debug){console.log('0');}
 	  }
 	  
 	  if(iconState == -1){ return;}
@@ -494,16 +435,16 @@ function addToBlackList(){
 
 function nukeBlacklistCache(){
   chrome.storage.local.clear();
-  console.log('chrome.storage.local cleared');
+  if(debug){console.log('chrome.storage.local cleared');}
 }
 
 function nukeLocalStorage(){
   chrome.storage.local.clear();
-  console.log('chrome.storage.local cleared');
+  if(debug){console.log('chrome.storage.local cleared');}
 }
 
 function showArchiveNowUI(){
-  console.warn('showing archive now ui');
+  if(debug){console.warn('showing archive now ui');}
  	chrome.tabs.query({
         'active': true,
         'currentWindow': true
@@ -526,8 +467,7 @@ function getMementosForHTTPSWebsite(){
 }
 
 chrome.webRequest.onCompleted.addListener(function(deets){
-   console.log('*************');
-
+   if(debug){console.log('*************');}
     chrome.tabs.query({
         'active': true,
         'currentWindow': true
@@ -538,6 +478,7 @@ chrome.webRequest.onCompleted.addListener(function(deets){
     });
 },
 {urls: ['*://twitter.com/*/status/*'],types: ['xmlhttprequest']},['responseHeaders']);
+
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	var url = deets.url;
@@ -563,6 +504,11 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	    }
 	    
 		var tm = new Timemap(linkHeaderAsString);
+		if(debug){console.log('TG?: ' + tm.timegate);}
+		if(tm.timegate) { //specified own TimeGate, query this
+		  findTMURI(tm.timegate);
+		}
+		
 		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
 		}
@@ -583,6 +529,25 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
 
 
+function findTMURI(uri) {
+  if(debug){
+    console.log('finding TM URI');
+    console.log(uri);
+  }
+  $.ajax({
+    url: uri,
+    dataType: 'jsonp'
+  }).done(function(data, status, xhr){
+    //console.log('XXXXX');
+    //console.log(xhr.getResponseHeader('link'));
+    var tmX = new Timemap(xhr.getResponseHeader('link'));
+    if(debug){
+      console.warn(tmX.timemap);
+      console.log(tmX);
+    }
+  });
+}
+
 function setTimemapInStorage(tm, url) {
 	chrome.storage.local.get('timemaps', function(items) {
 		var tms;
@@ -592,6 +557,8 @@ function setTimemapInStorage(tm, url) {
 		}else if(tm.original) {
 		  originalURI = tm.original;
 		}
+		
+		console.log('setting TM for uri in storage, uri:' + url);
 		
 		
 		if(!items.timemaps) {
@@ -603,7 +570,7 @@ function setTimemapInStorage(tm, url) {
 		
 		// Trim the cache if overfull
 		if(items.timemaps) {
-			console.warn('******* Number of cached TMs:');
+			if(debug){console.warn('******* Number of cached TMs:');}
 			var cachedTMKeys = Object.keys(items.timemaps);
 			if(cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
 			  var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
@@ -612,30 +579,21 @@ function setTimemapInStorage(tm, url) {
 			}
         }
         
-		console.log('Setting chrome.storage.local: timemaps: ');
-		console.log(url);
-		console.log(tms);
-		console.log('original uri?');
-		console.log(tm);
 		
 		chrome.storage.local.set({'timemaps':tms}, function() {
-			console.warn('chrome.storage.local.setting');
-			
-			chrome.storage.local.get('timemaps', function(res) {
-			  console.log('here is the current state of the cache after setting');
-			  console.log(res);
-			});
 			chrome.storage.local.getBytesInUse('timemaps', function(bytesUsed) {
-			  console.log('current bytes used:' + bytesUsed);
+			  if(debug){console.log('current bytes used:' + bytesUsed);}
 			});
 			if(chrome.runtime.lastError) {
-				console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
+				if(debug){console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);}
 				if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
 					// Chicken wire and duct tape! Clear the cache, do it again, yeah!
-					console.warn('LOCALSTORAGE full! clearing!');
+					if(debug){console.warn('LOCALSTORAGE full! clearing!');}
 					chrome.storage.local.clear();
-					console.log('Re-setting chrome.storage.local with:');
-					console.log(tms);
+					if(debug){
+					  console.log('Re-setting chrome.storage.local with:');
+					  console.log(tms);
+					}
 					chrome.storage.local.set({'timemaps':tms},function(){});
 				}
 			}
@@ -651,7 +609,7 @@ function displaySecureSiteMementos(mementos, tabid){
 
 
 function showInterfaceForZeroMementos(tabid) {
-  console.log('Displaying zero mementos');
+  if(debug){console.log('Displaying zero mementos');}
   tmData = {};
   tmData.mementos = {};
   tmData.mementos.list = [];
@@ -662,121 +620,4 @@ function showInterfaceForZeroMementos(tabid) {
   setBadgeText('', tabid);
   setBadgeIcon(badgeImages_noMementos, tabid);  
   setBadgeTitle(browserActionTitle_noMementos, tabid);
-}
-
-/* Duplicate of code in content.js so https URIs can be used to query timemaps.
-   Is there a reason that the below should even be in content.js? 
-function getMementosWithTimemap(uri, tabid){
-    var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/';
-	var timemaploc = memgator_json + window.location;
-
-    console.log('in getMementosWithTimemap with uri ' + uri + ' and tabid ' +tabid);
-
-	if(uri){
-	    if(debug) {
-	      console.log('in uri ' + uri);
-	    }
-		timemaploc = uri; //for recursive calls to this function, if a value is passed in, use it instead of the default, accommodates paginated timemaps
-	}
-
-
-	if(debug){console.log('Mink.js: About to fire off Ajax request for ' + timemaploc);}
-	$.ajax({
-		url: timemaploc,
-		type: 'GET'
-	}).done(function(data,textStatus,xhr){
-		if(xhr.status == 200){
-			if(debug){console.log(data);}
-			if(debug){console.log(xhr.getAllResponseHeaders());}
-			
-			var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
-
-	         // The MemGator service currently returns a 404 w/ no X-Memento-Count 
-	         //    HTTP Header
-	         //  Q: Does a 404 cause the above AJAX to invoke this "fail" handler
-			if(debug){console.log(numberOfMementos + ' mementos availableX');}
-            
-			if (numberOfMementos == 0) {
-				  if (debug) {console.log('We still need to fetch the TimeMap in mink.js');}
-				  revamp_fetchTimeMaps(data.timemap_index, displaySecureSiteMementos);
-
-				  return;
-			}
-           tmData = data;
-           displaySecureSiteMementos(data.mementos.list, tabid);
-
-      return;
-		}
-	}).fail(function(xhr,textStatus) {
-	    // TODO: Handler the scenario when the user does not have an internet connection 
-	    //   Also, Timeout from server
-	    if(debug) {
-	      console.log('we encountered an error');
-	      console.log(xhr);
-	      console.log(xhr.getResponseHeader('X-Memento-Count'));
-	      console.log('fin');
-	      return;
-	    }
-		if(debug){
-			console.log('ERROR');
-			console.log(textStatus);
-			console.log(xhr);
-		}
-		if(xhr.status == 404){
-		console.log('creating new tm ppppp');
-      var tm = new Timemap();
-      tm.original = uri;
-
-      chrome.tabs.query({
-        'active': true,
-        'currentWindow': true
-      }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          method: 'displaySecureSiteMementos',
-          value: tm
-        });
-      });
-
-			if(debug){console.log('404'); console.log("report no mementos, show appropriate interface");}
-		}
-	});
-}*/
-
-/* Redundant of content.js. Does content.js really need this function? */
-function revamp_fetchTimeMaps(tms, cb) {
-  if (debug) {console.log('mink.js revamp_fetchTimeMaps()');}
-		var tmFetchPromises = [];
-		for(var tm = 0; tm < tms.length; tm++){ // Generate Promises
-			tmFetchPromises.push(fetchTimeMap(tms[tm].uri));
-		}
-		if(debug){console.log('Fetching ' + tms.length + ' TimeMaps');}
-		Promise.all(tmFetchPromises).then(function(val){
-        storeTimeMapData(val);
-        var tm = val[0];
-
-        for(var tmI = 0; tmI < val.length; tmI++) {
-          Array.prototype.push.apply(tm.mementos.list, val[tmI].mementos.list);
-        }
-
-        if(cb) {cb(tm);}
-    }).catch(function(e) {
-			if(debug){
-				console.log('A promise failed: ');
-				console.log(e);
-			}
-		});
-
-		return;
-}
-
-/* Redundant of content.js. Does content.js really need this function? */
-function storeTimeMapData(arrayOfTimeMaps, cbIn){
-	//var cb = cbIn ? cbIn : displayUIBasedOnStoredTimeMapData;
-	if(debug){console.log('executing storeTimeMapData with no functionality');}
-/*
-	chrome.storage.local.set({
-			'uri_r': arrayOfTimeMaps[0].original_uri,
-			'timemaps': arrayOfTimeMaps
-	}); //end set
-*/
 }

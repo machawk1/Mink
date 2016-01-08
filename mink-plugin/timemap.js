@@ -14,8 +14,10 @@ function Timemap(fromString){
 	//console.log(this.str);
 	// Check if the string passed in is an Object, e.g., https://github.com/
 	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
-	console.log(this.str);
-	console.log(typeof this.str);
+	if(debug) {
+	  console.log(this.str);
+	  console.log('type: ' + typeof this.str);
+	}
 	if (strIsAnObject) {
 		if (debug) {
 		  console.log('Handle fromString as an object, akin to github.com');
@@ -58,15 +60,19 @@ function Timemap(fromString){
 			/* Splitting into multiple ifs instead of if-else allows for e.g., rel="timegate original" */
 			if(partsOfEntry[partOfEntry].match(mtimegateregex)){
 				timegate = url;
+				console.log('found tg: ' + url);
 			}
 			if(partsOfEntry[partOfEntry].match(mtimemapregex)){
 				timemap = url;
+				console.log('found tm: ' + url);
 			}
 			if(partsOfEntry[partOfEntry].match(moriginalregex)){
 				original = url;
+				console.log('found orig: ' + url);
 			}
 			if(partsOfEntry[partOfEntry].match(mselfregex)){
 				self = url;
+				console.log('found self: ' + url);
 			}
 			if(partsOfEntry[partOfEntry].match(mementoregex)){
 				this.mementos.push(new Memento(linkHeaderEntries[lhe]+linkHeaderEntries[lhe+1]));
@@ -92,6 +98,8 @@ function Timemap(fromString){
 			console.log(linkHeaderEntries);
 		}
 	}
+	
+	console.warn('the tm: ' + this.timemap);
 }
 
 function Memento(fromStr){

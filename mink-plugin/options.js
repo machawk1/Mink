@@ -1,3 +1,5 @@
+var debug = false;
+
 var tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>';
 var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>';
 
@@ -64,8 +66,10 @@ function updateSaveButtonStatus(){
 
 function updateRemoveAllBlacklistButtonStatus() {
   var clearBlacklistButton = $('#clearBlacklist');
-  console.log($('#options li').length);
-  console.log($('#options li'));
+  if(debug){
+    console.log($('#options li').length);
+    console.log($('#options li'));
+  }
   if($('#options li').length > 0) {
     clearBlacklistButton.removeAttr('disabled').removeClass('disabled');
   }else {
@@ -125,8 +129,10 @@ function removeEntry() {
 
 function populatedCachedTimeMapsUI() {
   chrome.storage.local.get('timemaps',function(items) {
-    console.log('items in the TM localstorage');
-    console.log(items);
+    if(debug){
+      console.log('items in the TM localstorage');
+      console.log(items);
+    }
   
     var tms = items.timemaps;
 
@@ -154,6 +160,8 @@ function populatedCachedTimeMapsUI() {
 
 function updateMementoCount() {
   chrome.storage.local.get('timemaps',function(items) {
+    console.log(items.timemaps);
+    console.log(items.timemaps[$('#cachedTimemaps').val()]);
 	$('#mementoCount').html(items.timemaps[$('#cachedTimemaps').val()].mementos.list.length + ' mementos available');
   });
 }

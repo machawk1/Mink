@@ -8,8 +8,10 @@ function createShadowDOM(cb) {
    //var clone = document.importNode(template, true);
    shadow.appendChild(template);
    
-   console.log('in createShadowDOM()');
-   console.log(cb);
+   if(debug){
+     console.log('in createShadowDOM()');
+     console.log(cb);
+   }
    if(cb) {
      cb();
    }
@@ -23,23 +25,15 @@ function setupDrilldownInteractions() {
 function appendHTMLToShadowDOM() {
  $.ajax(chrome.extension.getURL('minkui.html'))
  .done(function(data) {
-   console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');
+   if(debug){console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');}
    
-   console.warn('CC');
    $('body').append(data);
-   console.warn('DD');
    var mementos;
    if(tmData && tmData.mementos) {
       mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
    }else {
       mementos = [];
    }
-   
-
-   console.log('TODO displayMinkUI.js: change UI to show viewing memento if applicable');
-   console.warn(mementos);
-   
-   console.warn('BB');
 
    chrome.storage.local.get('timemaps',function(items) {
       var cb = function() {
@@ -47,7 +41,6 @@ function appendHTMLToShadowDOM() {
 	  };
       var mCount = mementos.length;
       
-      console.log('pp');
       /*console.log(memgator_json);
       console.log(items.timemaps);
       console.log(memgator_json + document.URL);
@@ -57,10 +50,12 @@ function appendHTMLToShadowDOM() {
       var uri_t = memgator_json + document.URL;
 
 	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
-	    console.log('qq');
+	    if(debug){console.log('qq');}
 	    mCount = items.timemaps[document.URL].mementos.length;
-	    console.log('c');
-	    console.log('isAMemento, hide ALL THE THINGS!');
+	    if(debug){
+	      console.log('c');
+	      console.log('isAMemento, hide ALL THE THINGS!');
+	    }
 	    $('.dropdown').addClass('hidden');
 	    $('#drilldownBox').addClass('hidden');
 	    $('#steps').addClass('hidden');
@@ -70,18 +65,18 @@ function appendHTMLToShadowDOM() {
 	    $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)));
 	    cb = createShadowDOM;
       }else if(mCount > MAX_MEMENTOS_IN_DROPDOWN) {
-         console.log('rr');
+          if(debug){console.log('rr');}
 	      $('.dropdown').addClass('hidden');
           $('#steps .action').removeClass('active');
           $('#title_drilldown').addClass('active');
           buildDropDown([]);
           buildDrilldown_Year(items.timemaps[uri_t].mementos.list);
-          console.log('a');
+          if(debug){console.log('a');}
 	   }else if(mCount === 0) {
-	      console.log('b');
+	      if(debug){console.log('b');}
           switchToArchiveNowInterface(); 
 	   }else {
-          console.log('d');
+          if(debug){console.log('d');}
           buildDropDown(mementos);
           buildDrilldown_Year(mementos);
           $('#drilldownBox').addClass('hidden');
@@ -89,9 +84,9 @@ function appendHTMLToShadowDOM() {
           $('#title_dropdown').addClass('active');
         }
         
-        console.warn('** About to append CSS1');
+        if(debug){console.warn('** About to append CSS1');}
         $('#mementosAvailable span').html(mCount);
-        console.warn('** About to append CSS2');
+        if(debug){console.warn('** About to append CSS2');}
         appendCSSToShadowDOM(cb);
     });
     
@@ -163,8 +158,11 @@ function switchToArchiveNowInterface() {
 }
  
 function appendCSSToShadowDOM(cb) {
-  console.log('APPENDING CSS!');
-  console.log(cb);
+  if(debug){
+    console.log('APPENDING CSS!');
+    console.log(cb);
+  }
+  
   $.ajax(chrome.extension.getURL('css/minkui.css'))
    .done(function(data) {
      var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
@@ -220,7 +218,7 @@ function archiveURI_archiveDotIs(cb) {
 				method: 'notify',
 				title: 'Mink',
 				body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
-			}, function(response) {});
+			});
 			cb();
 			
 			$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
@@ -270,8 +268,10 @@ function buildDrilldown_Year(mementos){
 	years = {};
 	var yearDataFromLastIteration = '';
     
-    console.warn('building drilldown');
-    console.log(mementos);
+    if(debug){
+      console.warn('building drilldown');
+      console.log(mementos);
+    }
     
 	$(mementos).each(function(mI,m) {
 		var dt = moment(m.datetime);
@@ -287,14 +287,14 @@ function buildDrilldown_Year(mementos){
 	memCountList += '</ul>';
 
     var drilldown = document.getElementById('drilldownBox');
-    console.log(memCountList);
+    if(debug){console.log(memCountList);}
 	$('body #drilldownBox').append(memCountList);
 }
 
 function setupDrilldownInteraction_Year() {
     if(!tmData) {console.log('There are likely no mementos'); return;}
     var mementos = tmData.mementos.list;
-    console.log('setting up...');
+    if(debug){console.log('setting up...');}
     var shadow = document.getElementById('minkWrapper').shadowRoot;
 
     var yearsNode = shadow.getElementById('years');
@@ -324,7 +324,7 @@ function setupDrilldownInteraction_Year() {
       	  $(this).addClass('selectedOption');
       };
     }
-    console.log('Done setting up drilldown');
+    if(debug){console.log('Done setting up drilldown');}
  } 
 
 
