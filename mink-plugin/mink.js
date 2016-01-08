@@ -223,8 +223,6 @@ chrome.runtime.onMessage.addListener(
 			}
 
 		});
-    }else if(request.method === 'minkUICreated') {
-      if(debug){console.log('**** mink ui created');}
     }else {
       if(debug){console.log('Message sent using chrome.runtime not caught: ' + request.method);}
     }

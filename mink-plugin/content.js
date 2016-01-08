@@ -121,17 +121,22 @@ function displayUIBasedOnContext() {
 	         }
 	      }, function(response) {});
 	    }else { // Live web page revisited w/ a TM in cache
-	      console.log('TODO: pull memento data from cache, try setting tmData to the cache contents');
-	      chrome.runtime.sendMessage({
-	          method: 'setTMData', 
-	          value: items.timemaps[document.URL]
-	        });
+	      displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
 	    }
 	  }else { // Not a Memento, no TM in cache
 	    getMementos(document.URL);
 	  }
 	});
-    
+}
+
+function displayUIBasedOnStoredTimeMap(tmDataIn) {
+  chrome.runtime.sendMessage({
+	  method: 'setTMData', 
+	  value: tmDataIn
+  });
+  var mementoCountFromCache = tmDataIn.mementos.list.length;
+  chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
+  console.log('Sending message to set badge to ' + mementoCountFromCache);
 }
 
 function isEmpty(o){ //returns if empty object is passed in
