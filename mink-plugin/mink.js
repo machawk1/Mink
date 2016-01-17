@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';
@@ -487,8 +487,10 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 		}
 	}
     
-    console.log('Checking ' + url);
-    console.log(headers);
+    if(debug) {
+      console.log('Checking ' + url);
+      console.log(headers);
+    }
     
 	if(linkHeaderAsString) {
 	    if(debug) {
