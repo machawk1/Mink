@@ -70,7 +70,7 @@ function appendHTMLToShadowDOM() {
           $('#steps .action').removeClass('active');
           $('#title_drilldown').addClass('active');
           buildDropDown([]);
-          buildDrilldown_Year(items.timemaps[uri_t].mementos.list);
+          buildDrilldown_Year(items.timemaps[document.URL].mementos.list);
           if(debug){console.log('a');}
 	   }else if(mCount === 0) {
 	      if(debug){console.log('b');}

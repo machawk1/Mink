@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 var tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>';
 var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>';
@@ -40,7 +40,7 @@ function clearBlacklist() {
   document.location.reload();
 }
 
-function saveBlacklist(){
+function saveBlacklist(dontReload){
   var blacklistJSON = {};
   var uris = [];
   $('#options li:not(.strike) span').each(function(){
@@ -52,7 +52,9 @@ function saveBlacklist(){
   $('.newEntry').removeClass('newEntry'); // Disable indicator for unsaved data
   updateSaveButtonStatus();
   
-  document.location.reload();
+  if(!dontReload) {
+    document.location.reload();
+  }
 }
 
 function updateSaveButtonStatus(){
@@ -224,14 +226,27 @@ function restoreDefaults() {
   clearTimemapCache();
 }
 
+function removeSelectedURIFromTimeMapCache() {
+  var oURI = $('#cachedTimemaps option:selected').text();
+  removeTMFromCache(oURI);
+}
+
+function addSelectedURIToBlacklist() {
+  var oURI = $('#cachedTimemaps option:selected').text();
+  $('#options').append('<li class="strike"><span>' + oURI + '</li>');
+  
+}
+
 document.addEventListener('DOMContentLoaded', restore_options);
 document.addEventListener('DOMContentLoaded', createAddURIBinder);
 document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI);
 
-$('#removeSelectedTMFromCache').click(function() {
-  var oURI = $('#cachedTimemaps option:selected').text();
-  console.log(oURI);
-  removeTMFromCache(oURI);
+$('#removeSelectedTMFromCache').click(removeSelectedURIFromTimeMapCache);
+$('#removeSelectedTMFromCacheAndBlacklist').click(function() {
+  addSelectedURIToBlacklist();
+  var dontReloadAfterSavingBlacklist = true;
+  saveBlacklist(dontReloadAfterSavingBlacklist);
+  removeSelectedURIFromTimeMapCache();
 });
 
 $('#removeAllTMsFromCache').click(clearTimemapCache);

@@ -136,7 +136,6 @@ function displayUIBasedOnStoredTimeMap(tmDataIn) {
   });
   var mementoCountFromCache = tmDataIn.mementos.list.length;
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
-  console.log('Sending message to set badge to ' + mementoCountFromCache);
 }
 
 function isEmpty(o){ //returns if empty object is passed in
@@ -240,11 +239,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 
-	if(request.method === 'getMementosFromSecureSource'){
-		logoInFocus = true;
-		hideLogo = true;
-	}
-
 	if(request.method === 'displayThisMementoData'){
 		//Parse the data received from the secure source and display the number of mementos
 		if(request.data.timemap_uri) { // e.g., twitter.com
@@ -307,35 +301,6 @@ function processResponseFromAggregator(xhr) {
 		console.log('Do something with 302 here');
 	}
 }
-
-/* LIKELY OBSOLETE
-function queryTimegate(tgURI) {
-	if(debug){console.log('Querying timegate at ' + tgURI);}
-	// TODO: if tgURI's URI-R is https, take a different path so as to not have a cross-scheme violation
-	var isHTTPSSite = tgURI.indexOf('https:') > -1;
-
-	if (isHTTPSSite) {
-			// Send message to mink.js to query https URI-R to aggregator
-			chrome.runtime.sendMessage({
-				method: 'fetchSecureSitesTimeMap',
-				value: memgator_json + tgURI.substr(tgURI.indexOf('https:'))
-			}, function(response) {
-				if(debug) {console.log('We have a response!'); } // This will not occur due to async exec in mink.js
-			});
-			return;
-	}
-
-    if(debug) {
-      console.log('Fetching TM at ' + tgURI);
-    }
-
-	$.ajax({
-		url: tgURI,
-		type: "HEAD"
-	}).done(function(data,textStatus,xhr) {
-		processResponseFromAggregator(xhr);
-	});
-}*/
 
 function createTimemapFromURI(uri,accumulatedArrayOfTimemaps) {
 	console.log('creatTimemapFromURI() - includes write to localstorage');

@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';
@@ -375,15 +375,15 @@ function stopWatchingRequests() {
 		  'onclick': startWatchingRequests
 	  });
       
-      chrome.tabs.query({active: true}, function(tab) {
+      
+      
+      chrome.tabs.query({
+        active: true,
+        'currentWindow': true
+      }, function(tab) {
         setBadge(' ', badgeImages_disabled, tab[0].id);
         setBadgeText('', tab[0].id);
       });
-	  
-	  // Without an id, the current tab's badge won't be updated
-	  //chrome.tabs.getCurrent(function(tab) {
-	  //    setBadge(' ', chrome.extension.getURL('images/minkLogo38_disabled.png'), tab.id);
-	  //});
   });
 }
 
@@ -453,17 +453,6 @@ function showArchiveNowUI(){
     });
 }
 
-function getMementosForHTTPSWebsite(){
- 	chrome.tabs.query({
-        'active': true,
-        'currentWindow': true
-    }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-            'method': 'getMementosFromSecureSource'
-        });
-    });
-}
-
 chrome.webRequest.onCompleted.addListener(function(deets){
    if(debug){console.log('*************');}
     chrome.tabs.query({
@@ -494,6 +483,9 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 			linkHeaderAsString = headers[headerI].value;
 		}
 	}
+    
+    console.log('Checking ' + url);
+    console.log(headers);
     
 	if(linkHeaderAsString) {
 	    if(debug) {
