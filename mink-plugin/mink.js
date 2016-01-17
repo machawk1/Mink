@@ -360,7 +360,10 @@ function startWatchingRequests() {
 		  'onclick': stopWatchingRequests
 	  });
 	  
-      chrome.tabs.query({active: true}, function(tab) {
+      chrome.tabs.query({
+        active: true,
+        'currentWindow': true
+      }, function(tab) {
         setBadge('', badgeImages_mink, tab[0].id);
         setBadgeText('', tab[0].id);
       });
