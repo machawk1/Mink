@@ -230,7 +230,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 function fetchTimeMap(uri, tabid) {
-    console.log('Fetching TimeMap for ' + uri + ' in tab ' + tabid);
+    if(debug) {console.log('Fetching TimeMap for ' + uri + ' in tab ' + tabid);}
 
 	$.ajax({
 		url: uri,
@@ -238,7 +238,7 @@ function fetchTimeMap(uri, tabid) {
 	}).done(function(data, textStatus, xhr, a, b){ 
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
-      console.log(tmData);
+      if(debug) {console.log(tmData);}
 
       displaySecureSiteMementos(data.mementos.list, tabid);
       setTimemapInStorage(tmData, data.original_uri);
@@ -553,7 +553,7 @@ function setTimemapInStorage(tm, url) {
 		  originalURI = tm.original;
 		}
 		
-		console.log('setting TM for uri in storage, uri:' + url);
+		if(debug) {console.log('setting TM for uri in storage, uri:' + url);}
 		
 		
 		if(!items.timemaps) {

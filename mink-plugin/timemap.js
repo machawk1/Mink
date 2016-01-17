@@ -24,7 +24,9 @@ function Timemap(fromString){
 		}
 	//		this = this.str;
 	}
-	console.log(fromString);
+	if(debug) {
+	  console.log(fromString);
+	}
 	var linkHeaderEntries = this.str.split(",");
 
 	var mementoUrlExpression = /<[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?>/gi;
@@ -60,19 +62,19 @@ function Timemap(fromString){
 			/* Splitting into multiple ifs instead of if-else allows for e.g., rel="timegate original" */
 			if(partsOfEntry[partOfEntry].match(mtimegateregex)){
 				timegate = url;
-				console.log('found tg: ' + url);
+				if(debug) {console.log('found tg: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(mtimemapregex)){
 				timemap = url;
-				console.log('found tm: ' + url);
+				if(debug) {console.log('found tm: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(moriginalregex)){
 				original = url;
-				console.log('found orig: ' + url);
+				if(debug) {console.log('found orig: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(mselfregex)){
 				self = url;
-				console.log('found self: ' + url);
+				if(debug) {console.log('found self: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(mementoregex)){
 				this.mementos.push(new Memento(linkHeaderEntries[lhe]+linkHeaderEntries[lhe+1]));
@@ -99,7 +101,7 @@ function Timemap(fromString){
 		}
 	}
 	
-	console.warn('the tm: ' + this.timemap);
+	if(debug) {console.warn('the tm: ' + this.timemap);}
 }
 
 function Memento(fromStr){
