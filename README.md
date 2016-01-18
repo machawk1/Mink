@@ -24,7 +24,7 @@ If no mementos exist in the archive, the extension will indicate this with a red
 ### Use Case 1: A niche site with few mementos
 
 1. After installing Mink, visit a web page and note the badge on the Mink button bar icon indicating the number of mementos (archived captures over time) available.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/1.png)
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/1withCutout.png)
 2. Clicking on the icon reveals the Mink interface.
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/2.png)
 3. Select the dropdown list to display the captures available.
