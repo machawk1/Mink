@@ -481,7 +481,7 @@ function buildDrilldown_Time(year, month, date){
 	for(var timeIndex in times){
 		var li = document.createElement('li');
 		li.setAttribute('data-time', timeIndex);
-		li.setAttribute('data-day', day);
+		li.setAttribute('data-day', date);
 		li.setAttribute('data-month', month);
 		li.setAttribute('data-year', year);
 		li.appendChild(document.createTextNode(times[timeIndex].time));
