@@ -10,7 +10,7 @@ function restore_options(){
       });
       updateSaveButtonStatus();
       updateRemoveAllBlacklistButtonStatus();
-      
+
       $(".remove").click(function(){
         if($(this).hasClass('glyphicon-remove')){
           var uriToStrike = $(this).parent().text();
@@ -22,7 +22,7 @@ function restore_options(){
         }
         updateSaveButtonStatus();
         updateRemoveAllBlacklistButtonStatus();
-        
+
       });
     });
 }
@@ -51,7 +51,7 @@ function saveBlacklist(dontReload){
   chrome.storage.local.set(blacklistJSON);
   $('.newEntry').removeClass('newEntry'); // Disable indicator for unsaved data
   updateSaveButtonStatus();
-  
+
   if(!dontReload) {
     document.location.reload();
   }
@@ -89,7 +89,7 @@ function createAddURIBinder(){
 function bindAddBlacklistEntryUI() {
   $('.uriTextField').keyup(function() {
     var uriFieldValue = $(this).val();
-    if(uriFieldValue.length == 0) {
+    if(uriFieldValue.length === 0) {
       $(this).parent().find('button.addToBlacklist').attr('disabled',true);
     }else {
       $(this).parent().find('button.addToBlacklist').removeAttr('disabled');
@@ -135,15 +135,15 @@ function populatedCachedTimeMapsUI() {
       console.log('items in the TM localstorage');
       console.log(items);
     }
-  
+
     var tms = items.timemaps;
 
     var keys = tms ? Object.keys(tms) : 0;
     var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs';
-    
+
     if(keys.length) {
 		$('#cachedTimemaps').append(tmDropdownString);
-		for(var tm = 0; tm < keys.length; tm++) {      
+		for(var tm = 0; tm < keys.length; tm++) {
 		  var originalURI = tms[keys[tm]].original_uri;
 		  if(!tms[keys[tm]].original_uri) {
 		    originalURI = keys[tm];
@@ -234,7 +234,7 @@ function removeSelectedURIFromTimeMapCache() {
 function addSelectedURIToBlacklist() {
   var oURI = $('#cachedTimemaps option:selected').text();
   $('#options').append('<li class="strike"><span>' + oURI + '</li>');
-  
+
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);

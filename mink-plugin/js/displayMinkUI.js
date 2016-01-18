@@ -2,12 +2,12 @@ var MAX_MEMENTOS_IN_DROPDOWN = 500;
 
 function createShadowDOM(cb) {
    var selector = '#minkuiX';
-   
+
    var shadow = document.querySelector('#minkWrapper').createShadowRoot();
    var template = document.querySelector(selector);
    //var clone = document.importNode(template, true);
    shadow.appendChild(template);
-   
+
    if(debug){
      console.log('in createShadowDOM()');
      console.log(cb);
@@ -26,7 +26,7 @@ function appendHTMLToShadowDOM() {
  $.ajax(chrome.extension.getURL('minkui.html'))
  .done(function(data) {
    if(debug){console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');}
-   
+
    $('body').append(data);
    var mementos;
    if(tmData && tmData.mementos) {
@@ -40,7 +40,7 @@ function appendHTMLToShadowDOM() {
 	      createShadowDOM(setupDrilldownInteractions);
 	  };
       var mCount = mementos.length;
-      
+
       /*console.log(memgator_json);
       console.log(items.timemaps);
       console.log(memgator_json + document.URL);
@@ -74,7 +74,7 @@ function appendHTMLToShadowDOM() {
           if(debug){console.log('a');}
 	   }else if(mCount === 0) {
 	      if(debug){console.log('b');}
-          switchToArchiveNowInterface(); 
+          switchToArchiveNowInterface();
 	   }else {
           if(debug){console.log('d');}
           buildDropDown(mementos);
@@ -83,15 +83,15 @@ function appendHTMLToShadowDOM() {
           $('#steps .action').removeClass('active');
           $('#title_dropdown').addClass('active');
         }
-        
+
         if(debug){console.warn('** About to append CSS1');}
         $('#mementosAvailable span').html(mCount);
         if(debug){console.warn('** About to append CSS2');}
         appendCSSToShadowDOM(cb);
     });
-    
-   
-   
+
+
+
   });
 }
 
@@ -102,20 +102,20 @@ function addZ(n){
 function buildBreadcrumbs(mementos) {
    var years = {};
 
-   for(var m = 0; m < mementos.length; m++) { 
-       console.log(m);  
+   for(var m = 0; m < mementos.length; m++) {
+       console.log(m);
 	   var dr = Date.parse(mementos[0].datetime);
 	   var dt = new Date(dr);
 	   var year = addZ(dt.getFullYear());
 	   var month = addZ(dt.getMonth() + 1);
 	   var day = addZ(dt.getDate());
-   
+
 	   var hr = addZ(dt.getHours());
 	   var min = addZ(dt.getMinutes());
 	   var sec = addZ(dt.getSeconds());
-	   
+
 	   var time = hr + ':' + min + ':' + sec;
-   
+
 
        if(!(year in years)) {
           years.year = {};
@@ -126,7 +126,7 @@ function buildBreadcrumbs(mementos) {
        if(!(day in years.year.month)) {
           years.year.month.day = [];
        }
-       
+
        years.year.month.day.push(time);
    }
    console.log(years);
@@ -140,7 +140,7 @@ function buildDropDown(mementos) {
 
    $('#mementosDropdown').attr('data-memento-count', mementos.length);
    if(mementos.length === 0) {
-         $('#title_dropdown').addClass('disabled'); 
+         $('#title_dropdown').addClass('disabled');
     }
    $('#mementosDropdown').append(mementoSelections);
 }
@@ -150,22 +150,22 @@ function switchToArchiveNowInterface() {
   $('#drilldownBox').addClass('noMementos');
   $('#viewMementoButton').addClass('noMementos');
   $('#minkStatus #steps').addClass('noMementos');
-  
-  
+
+
   $('#archiveNow').addClass('noMementos');
-  $('#archiveNowInterface').removeClass('hidden');  
+  $('#archiveNowInterface').removeClass('hidden');
   $('.hideInNoMementosInterface').addClass('hidden');
 }
- 
+
 function appendCSSToShadowDOM(cb) {
   if(debug){
     console.log('APPENDING CSS!');
     console.log(cb);
   }
-  
+
   $.ajax(chrome.extension.getURL('css/minkui.css'))
    .done(function(data) {
-     var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';  
+     var styleElement = '<style type="text/css">\n' + data + '\n</style>\n';
      $('#minkuiX').prepend(styleElement);
      cb();
   });
@@ -184,11 +184,11 @@ function archiveURI_archiveOrg(cb) {
 				body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
 			}, function(response) {});
 			cb();
-			
-			
+
+
 			var shadow = document.getElementById('minkWrapper').shadowRoot;
 			shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess');
-			
+
 			//$('#archiveNow_archivedotorg').html('View on Archive.org');
 			var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
 			var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
@@ -196,7 +196,7 @@ function archiveURI_archiveOrg(cb) {
 			shadow.getElementById('archivelogo_ia').onclick = function() {
 			  window.location = $(this).attr('title');
 			};
-				
+
 
 			//refreshAggregatorsTimeMap(document.URL);
 		}
@@ -220,7 +220,7 @@ function archiveURI_archiveDotIs(cb) {
 				body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
 			});
 			cb();
-			
+
 			$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
 
 			var linkHeader = xhr.getResponseHeader('link');
@@ -228,10 +228,10 @@ function archiveURI_archiveDotIs(cb) {
 			var tmFromLinkHeader = new Timemap(linkHeader);
 
 			var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
-			
+
 			var shadow = document.getElementById('minkWrapper').shadowRoot;
 			shadow.getElementById('archivelogo_ais').classList.add('archiveNowSuccess');
-			
+
 			shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI);
 			shadow.getElementById('archivelogo_ais').onclick = function() {
 			  window.location = $(this).attr('title');
@@ -267,17 +267,17 @@ function buildDrilldown_Year(mementos){
 	years = null;
 	years = {};
 	var yearDataFromLastIteration = '';
-    
+
     if(debug){
       console.warn('building drilldown');
       console.log(mementos);
     }
-    
+
 	$(mementos).each(function(mI,m) {
 		var dt = moment(m.datetime);
 		if(!years[dt.year()]){years[dt.year()] = [];}
 		years[dt.year()].push(m);
-	})
+	});
 
 	var memCountList = '<ul id="years">';
 	for(var year in years){
@@ -308,7 +308,7 @@ function setupDrilldownInteraction_Year() {
           var existingDaysUL = shadow.getElementById('days');
           var existingTimesUL = shadow.getElementById('times');
           var drilldownShadow = shadow.getElementById('drilldownBox');
-    
+
           if(existingMonthsUL) {
               drilldownShadow.removeChild(existingMonthsUL);
           }
@@ -317,28 +317,28 @@ function setupDrilldownInteraction_Year() {
           }
           if(existingTimesUL) {
               drilldownShadow.removeChild(existingTimesUL);
-          } 
-      
+          }
+
       	  buildDrilldown_Month($(this).data('year'));
       	  $(this).siblings().removeClass('selectedOption');
       	  $(this).addClass('selectedOption');
       };
     }
     if(debug){console.log('Done setting up drilldown');}
- } 
+ }
 
 
 
 
 function buildDrilldown_Month(year){
-    var mementos = tmData.mementos.list;	
-    
+    var mementos = tmData.mementos.list;
+
 	var monthUL = document.createElement('ul');
 	monthUL.id = 'months';
-	
-	var months = {}
 
-	for(memento in mementos){
+	var months = {};
+
+	for(var memento in mementos) {
         var datetime = moment(mementos[memento].datetime);
         if(datetime.year() !== year) {
             continue;
@@ -349,17 +349,17 @@ function buildDrilldown_Month(year){
 		}
 		months[monthName].push(year[memento]);
 	}
-    
-	for(month in months){
+
+	for(var month in months){
 		var li = document.createElement('li');
 		li.setAttribute('data-month', month);
 		li.setAttribute('data-year', year);
 		li.appendChild(document.createTextNode(month));
-		
+
 		var liSpan = document.createElement('span');
 		liSpan.className = 'memCount';
 		liSpan.appendChild(document.createTextNode(months[month].length));
-		
+
 		//console.log(month);
 		li.appendChild(liSpan);
 		li.onclick = function(event){
@@ -367,18 +367,18 @@ function buildDrilldown_Month(year){
       	    $(this).siblings().removeClass('selectedOption');
       	    $(this).addClass('selectedOption');
         };
-		
+
 		monthUL.appendChild(li);
-	} 
-        
+	}
+
     var drilldown = document.getElementById('drilldownBox');
     var shadow = document.getElementById('minkWrapper').shadowRoot;
-    
+
     var existingMonthsUL = shadow.getElementById('months');
     var existingDaysUL = shadow.getElementById('days');
     var existingTimesUL = shadow.getElementById('times');
     var drilldownShadow = shadow.getElementById('drilldownBox');
-    
+
     if(existingMonthsUL) {
         drilldownShadow.removeChild(existingMonthsUL);
     }
@@ -387,24 +387,24 @@ function buildDrilldown_Month(year){
     }
     if(existingTimesUL) {
         drilldownShadow.removeChild(existingTimesUL);
-    }    
-    
+    }
+
     drilldownShadow.appendChild(monthUL);
 }
 
 
 
 function buildDrilldown_Day(year, month){
-    var mementos = tmData.mementos.list;	
-    
+    var mementos = tmData.mementos.list;
+
 	var dayUL = document.createElement('ul');
 	dayUL.id = 'days';
-	
-	var days = {}
 
-	for(memento in mementos){
+	var days = {};
+
+	for(var memento in mementos){
         var datetime = moment(mementos[memento].datetime);
-        
+
         if(datetime.year() !== year || monthNames[datetime.month()] !== month) {
             continue;
         }
@@ -414,56 +414,56 @@ function buildDrilldown_Day(year, month){
 		}
 		days[dayName].push(mementos[memento]);
 	}
-    
-	for(day in days){
+
+	for(var day in days){
 		var li = document.createElement('li');
 		li.setAttribute('data-date', day);
 		li.setAttribute('data-month', month);
 		li.setAttribute('data-year', year);
 		li.appendChild(document.createTextNode(day));
-		
+
 		var liSpan = document.createElement('span');
 		liSpan.className = 'memCount';
 		liSpan.appendChild(document.createTextNode(days[day].length));
-		
+
 		li.appendChild(liSpan);
 		li.onclick = function(event){
       	    buildDrilldown_Time($(this).data('year'), $(this).data('month'), parseInt($(this).data('date')));
-      	    $(this).siblings().removeClass('selectedOption');;
+      	    $(this).siblings().removeClass('selectedOption');
       	    $(this).addClass('selectedOption');
         };
-		
+
 		dayUL.appendChild(li);
-	} 
-        
+	}
+
     var drilldown = document.getElementById('drilldownBox');
     var shadow = document.getElementById('minkWrapper').shadowRoot;
-    
+
     var existingDaysUL = shadow.getElementById('days');
     var existingTimesUL = shadow.getElementById('times');
     var drilldownShadow = shadow.getElementById('drilldownBox');
-    
+
     if(existingDaysUL) {
         drilldownShadow.removeChild(existingDaysUL);
     }
     if(existingTimesUL) {
         drilldownShadow.removeChild(existingTimesUL);
-    }    
-    
+    }
+
     drilldownShadow.appendChild(dayUL);
 }
 
 function buildDrilldown_Time(year, month, date){
-    var mementos = tmData.mementos.list;	
-    
+    var mementos = tmData.mementos.list;
+
 	var timeUL = document.createElement('ul');
 	timeUL.id = 'times';
-	
+
 	var times = [];
 
-	for(memento in mementos){
+	for(var memento in mementos){
         var datetime = moment(mementos[memento].datetime);
-        
+
         if(datetime.year() !== year || monthNames[datetime.month()] !== month || datetime.date() !== date) {
             //console.log('Reject: ' + year + '!=' + datetime.year() + ' ' + month + '!=' + monthNames[datetime.month()] + ' ' + date + '!=' + datetime.date() + ' >> ' + mementos[memento].datetime);
             //console.log(datetime.year() !== year);
@@ -477,37 +477,37 @@ function buildDrilldown_Time(year, month, date){
         mementos[memento].time = time;
 		times.push(mementos[memento]);
 	}
-    
-	for(time in times){
+
+	for(var timeIndex in times){
 		var li = document.createElement('li');
-		li.setAttribute('data-time', time);
+		li.setAttribute('data-time', timeIndex);
 		li.setAttribute('data-day', day);
 		li.setAttribute('data-month', month);
 		li.setAttribute('data-year', year);
-		li.appendChild(document.createTextNode(times[time].time));
-		
+		li.appendChild(document.createTextNode(times[timeIndex].time));
+
 		li.onclick = function(event){
 			$(this).siblings().removeClass('selectedOption');
-		    $(this).addClass('selectedOption');
-      	    window.location = times[time].uri;
-        };
-		
+		  $(this).addClass('selectedOption');
+      window.location = times[timeIndex].uri;
+    };
+
 		timeUL.appendChild(li);
-	} 
-        
+	}
+
     var drilldown = document.getElementById('drilldownBox');
     var shadow = document.getElementById('minkWrapper').shadowRoot;
-    
+
     var existingTimesUL = shadow.getElementById('times');
     var drilldownShadow = shadow.getElementById('drilldownBox');
-    
+
     if(existingTimesUL) {
         drilldownShadow.removeChild(existingTimesUL);
     }
     drilldownShadow.appendChild(timeUL);
 }
 
-if($('#minkWrapper').length == 0) {
+if($('#minkWrapper').length === 0) {
   if(debug) {console.log('appending HTML to Shadow DOM');}
   appendHTMLToShadowDOM();
 } else {

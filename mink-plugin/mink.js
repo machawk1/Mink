@@ -54,7 +54,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     }
 
     // Check if isA Memento
-    chrome.storage.local.get('timemaps', function(items) {                
+    chrome.storage.local.get('timemaps', function(items) {
         if(items.timemaps && items.timemaps[tab.url]) {
 	        if(debug){console.log('Clicked button and we are viewing a memento');}
 	        displayMinkUI(tab.id);
@@ -72,7 +72,7 @@ function setEnabledBasedOnURIInBlacklist(cb) {
       console.log('is URI in blacklist?');
       console.log(tab);
     }
-    
+
     if(cb) {cb();}
   });
 
@@ -86,12 +86,12 @@ function showMinkBadgeInfoBasedOnProcessingState(tabid) {
 		  //TODO: show alternate interface
 		  return;
 		}
-				
+
 		var cb = function() {setBadgeTextBasedOnBrowserActionState(tabid);};
-		
+
 		//TODO: check if URI is in blacklist
 		if(debug){console.warn('about to call setEnabledBasedOnURIBlacklist');}
-		setEnabledBasedOnURIInBlacklist(cb);       
+		setEnabledBasedOnURIInBlacklist(cb);
 	});
 }
 
@@ -99,14 +99,14 @@ function setBadgeTextBasedOnBrowserActionState(tabid) {
 	//TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
 	// - maybe rely on the title, since the icon's src path cannot be had.
 	chrome.browserAction.getBadgeText({tabId: tabid}, function(result) {
-		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {		  
+		  if(!result.length && !Number.isInteger(result) && result != maxBadgeDisplay) {
 			 chrome.browserAction.getTitle({tabId: tabid}, function(result) {
 					// Only set badge text if not viewing a memento
 					if(result === browserActionTitle_noMementos) {
 					  displayMinkUI(tabid);
 					  return;
 					}
-					
+
 					if(result !== browserActionTitle_viewingMemento) {
 					  setBadgeText(stillProcessingBadgeDisplay, tabid);
 					} else {
@@ -114,23 +114,23 @@ function setBadgeTextBasedOnBrowserActionState(tabid) {
 					  displayMinkUI(tabid);
 					}
 			  });
-					  
+
 	          if(debug){console.log('x');}
 			  return; // Badge has not yet been set
 		  }
 	      if(debug){console.log('u');}
 	      displayMinkUI(tabid);
-  
+
 	});
 }
 
 function displayMinkUI(tabId) {
   if(debug){console.log('Injecting displayMinkUI.js');}
-  chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData) + "; var tabId = " + tabId + ";"}, 
+  chrome.tabs.executeScript(tabId, {code: "var tmData = " + JSON.stringify(tmData) + "; var tabId = " + tabId + ";"},
     function() {
 	  chrome.tabs.executeScript(tabId, {
 	  // TODO: Account for data: URIs like the "connection unavailable" page.
-	  //   Currently, because this scheme format is not in the manifest, an exception is   
+	  //   Currently, because this scheme format is not in the manifest, an exception is
 	  //     thrown. Handle this more gracefully.
 		file: "js/displayMinkUI.js"
 	  }, function(res) {
@@ -172,7 +172,7 @@ chrome.runtime.onMessage.addListener(
 			  },function() {}
 		   );
     }else if(request.method == 'setBadgeText') {
-        setBadgeText(request.value, sender.tab.id)
+        setBadgeText(request.value, sender.tab.id);
 
         sendResponse({
           value: 'stopAnimation'
@@ -185,9 +185,9 @@ chrome.runtime.onMessage.addListener(
       if(debug){console.log('opening options page');}
       chrome.runtime.openOptionsPage();
     }else if(request.method == 'stopWatchingRequests') {
-      stopWatchingRequests()
+      stopWatchingRequests();
     }else if(request.method == 'stopWatchingRequests_blacklisted') {
-      stopWatchingRequests_blacklisted()
+      stopWatchingRequests_blacklisted();
     }else if(request.method == 'getMementosForHTTPSSource') {
     	//ideally, we would talk to an HTTPS version of the aggregator,
     	// instead, we will communicate with Mink's bg script to get around scheme issue
@@ -235,7 +235,7 @@ function fetchTimeMap(uri, tabid) {
 	$.ajax({
 		url: uri,
 		type: "GET"
-	}).done(function(data, textStatus, xhr, a, b){ 
+	}).done(function(data, textStatus, xhr, a, b){
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
       if(debug) {console.log(tmData);}
@@ -267,17 +267,17 @@ function setBadgeText(value, tabid) {
     // Cache query data for eventually restoring when back button is hit (UNIMPLEMENTED)
 	//chrome.tabs.get(tabid, function(tab) {
 	//	tabBadgeCount['tab' + tabid] = {mementoCount: value, url: tab.url};
-	//}); 
-	
+	//});
+
 	var badgeColor = "#090";
 	if(value === stillProcessingBadgeDisplay) {
-	    badgeColor = "#900"
+	    badgeColor = "#900";
 	}
-	
+
 	if(!badgeValue) {
 	  badgeValue = '';
 	}
-	
+
 	chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid});
 	chrome.browserAction.setBadgeBackgroundColor({color: badgeColor, tabId: tabid});
 }
@@ -289,7 +289,7 @@ function setBadgeTitle(newTitle, tabid) {
 
 function setBadgeIcon(icons, tabid) {
     /*console.log('setting '+iconPath+ ' tab:'+tabid);
-	
+
 	var img = document.createElement('img');
 	img.width = 38;
 	img.height = 38;
@@ -299,12 +299,12 @@ function setBadgeIcon(icons, tabid) {
 	canvas.height = 38;
 	var context = canvas.getContext('2d');
 	context.drawImage(img, 0, 0, 38, 38);
-	
+
 	chrome.browserAction.setIcon({tabId: tabid,
 	  imageData: {'38': context.getImageData(0, 0, 38, 38)}
 	});*/
 
-    chrome.browserAction.setIcon({tabId: tabid, path: icons}); 
+    chrome.browserAction.setIcon({tabId: tabid, path: icons});
 }
 
 function setBadge(value, icon, tabid) {
@@ -315,9 +315,9 @@ function setBadge(value, icon, tabid) {
     }else {
       setBadgeText(value + '', tabid);
     }
-    
+
     setBadgeIcon(icon, tabid);
-    
+
     if(icon === badgeImages_isAMemento) {
       chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento});
     }else {
@@ -331,15 +331,15 @@ function nextAnimationStep() {
 		iconState = 1;
 		if(debug){console.log('1');}
 	  }else if(iconState == 1) {
-		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-45.png'}});  
+		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-45.png'}});
 		iconState = 2;
 		if(debug){console.log('2');}
 	  }else {
-		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-30.png'}}); 
+		//chrome.pageAction.setIcon({tabId: tab.id, path: {'19':'images/mementoLogo-19px-30.png'}});
 		iconState = 0;
 		if(debug){console.log('0');}
 	  }
-	  
+
 	  if(iconState == -1){ return;}
 	  //setTimeout(nextAnimationStep, 250);
 }
@@ -359,7 +359,7 @@ function startWatchingRequests() {
 		  'title': 'Stop Watching Requests',
 		  'onclick': stopWatchingRequests
 	  });
-	  
+
       chrome.tabs.query({
         active: true,
         'currentWindow': true
@@ -372,14 +372,14 @@ function startWatchingRequests() {
 
 function stopWatchingRequests() {
   if(debug){console.log('stopWatchingRequests() executing');}
-  chrome.storage.local.set({'disabled': true}, function() {        
+  chrome.storage.local.set({'disabled': true}, function() {
 	  chrome.contextMenus.update('mink_stopStartWatching', {
 		  'title': 'Restart Live-Archived Web Integration',
 		  'onclick': startWatchingRequests
 	  });
-      
-      
-      
+
+
+
       chrome.tabs.query({
         active: true,
         'currentWindow': true
@@ -392,8 +392,8 @@ function stopWatchingRequests() {
 
 function stopWatchingRequests_blacklisted() {
   if(debug){console.log('stopWatchingRequests_blacklisted() executing');}
-  
-  
+
+
   chrome.tabs.query({
     active: true,
     'currentWindow': true
@@ -475,12 +475,12 @@ chrome.webRequest.onCompleted.addListener(function(deets){
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	var url = deets.url;
-	var timemap, timegate, original, url;
+	var timemap, timegate, original;
 
 	var headers = deets.responseHeaders;
 	var mementoDateTimeHeader;
 	var linkHeaderAsString;
-	
+
 	// Enumerate through the HTTP response headers to grab those related to Memento (if applicable)
 	for(var headerI = 0; headerI < headers.length; headerI++){
 		if(headers[headerI].name == 'Memento-Datetime'){
@@ -489,24 +489,24 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 			linkHeaderAsString = headers[headerI].value;
 		}
 	}
-    
+
     if(debug) {
       console.log('Checking ' + url);
       console.log(headers);
     }
-    
+
 	if(linkHeaderAsString) {
 	    if(debug) {
 	      console.log('A link header exists:');
 	      console.log(linkHeaderAsString);
 	    }
-	    
+
 		var tm = new Timemap(linkHeaderAsString);
 		if(debug){console.log('TG?: ' + tm.timegate);}
 		if(tm.timegate) { //specified own TimeGate, query this
 		  findTMURI(tm.timegate);
 		}
-		
+
 		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
 		}
@@ -516,13 +516,13 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
           console.log(url);
           console.log(tm);
         }
-        
+
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  if(debug){console.log('The current page did not send a link header');}
 	}
-	
-	
+
+
 },
 {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
 
@@ -555,17 +555,17 @@ function setTimemapInStorage(tm, url) {
 		}else if(tm.original) {
 		  originalURI = tm.original;
 		}
-		
+
 		if(debug) {console.log('setting TM for uri in storage, uri:' + url);}
-		
-		
+
+
 		if(!items.timemaps) {
 			tms = {};
 		}else {
 			tms = items.timemaps;
 		}
 		tms[url] = tm;
-		
+
 		// Trim the cache if overfull
 		if(items.timemaps) {
 			if(debug){console.warn('******* Number of cached TMs:');}
@@ -576,8 +576,8 @@ function setTimemapInStorage(tm, url) {
 			  delete tms[keyOfIndex];
 			}
         }
-        
-		
+
+
 		chrome.storage.local.set({'timemaps':tms}, function() {
 			chrome.storage.local.getBytesInUse('timemaps', function(bytesUsed) {
 			  if(debug){console.log('current bytes used:' + bytesUsed);}
@@ -612,10 +612,10 @@ function showInterfaceForZeroMementos(tabid) {
   tmData.mementos = {};
   tmData.mementos.list = [];
   tmData.original_uri = 'doWeKnowThisHere';
-  
-  
+
+
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   setBadgeText('', tabid);
-  setBadgeIcon(badgeImages_noMementos, tabid);  
+  setBadgeIcon(badgeImages_noMementos, tabid);
   setBadgeTitle(browserActionTitle_noMementos, tabid);
 }

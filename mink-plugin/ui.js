@@ -13,7 +13,7 @@ function destroyMementoCountsByYear(){
 function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
-			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() != ''){
+			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() !== ''){
 				if(debug) {console.log('returning, ui is empty');}
 				$('#drilldownBox').removeClass('hiddenUI');
 				return;
@@ -28,18 +28,18 @@ function showMementoCountsByYear(){
 				for(var year in years){
 					yearData += year + ': ' +years[year].length + '\n';
 				}
-				console.log(yearData)
+				console.log(yearData);
 				if(yearData == yearDataFromLastIteration) return;
 				yearDataFromLastIteration = yearData;
 				setTimeout(updateProgress, 3000);
 			}
 
-			$(localStore.timemaps).each(function(tmI,tm){
-				$(tm.mementos.list).each(function(mI,m){
+			$(localStore.timemaps).each(function(tmI,tm) {
+				$(tm.mementos.list).each(function(mI,m) {
 					var dt = moment(m.datetime);
 					if(!years[dt.year()]){years[dt.year()] = [];}
 					years[dt.year()].push(m);
-				})
+				});
 			});
 
 			if($('#years').html()){ // We already created Miller UI, return
@@ -73,7 +73,7 @@ function showMementoCountsByYear(){
 			//ensure that the new display is visible (it won't be without this for few mementos)
 			//$('#drilldownBox').css('display','block');
 	}); //end local.get(
-};
+}
 
 
 function adjustDrilldownPositionalOffset(){
@@ -94,9 +94,9 @@ function showMementoCountsByMonths(year){
 	$('#months,#day,#time').remove();
 	//console.log('showing mementos for months in '+year);
 	var memCountList = '<ul id="months">';
-	var months = {}
+	var months = {};
 
-	for(memento in years[year]){
+	for (var memento in years[year]) {
 
 		var monthName = monthNames[moment(years[year][memento].datetime).month()];
 		if(!months[monthName]){
@@ -105,7 +105,7 @@ function showMementoCountsByMonths(year){
 		months[monthName].push(years[year][memento]);
 	}
 
-	for(month in months){
+	for(var month in months){
 		memCountList += '<li data-month="' + month + '">' + month + '<span class="memCount">' + months[month].length + '</span></li>\r\n';
 	}
 
@@ -129,7 +129,7 @@ function showMementoCountsByDays(mementos){
 					'11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
 					'21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th','31st'];
 
-	for(memento in mementos){
+	for(var memento in mementos){
 		var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
 		if(!days[dayNumber]){
 			days[dayNumber] = [];
@@ -137,7 +137,7 @@ function showMementoCountsByDays(mementos){
 		days[dayNumber].push(mementos[memento]);
 	}
 	var memCountList = '<ul id="day">';
-	for(day in days){
+	for(var day in days){
 		memCountList += '<li data-day="' + day + '">' + day + '<span class="memCount">' + days[day].length + '</span></li>\r\n';
 	}
 
@@ -157,7 +157,7 @@ function showMementoCountsByDays(mementos){
 function showMementoCountsByTime(mementos){
 	var times = {};
 	var uris = {};
-	for(memento in mementos){
+	for(var memento in mementos){
 		var mom = moment(mementos[memento].datetime);
 		var time = mom.format('HH:mm:ss');
 
@@ -169,8 +169,8 @@ function showMementoCountsByTime(mementos){
 		uris[time] = mementos[memento].uri;
 	}
 	var memCountList = '<ul id="time">';
-	for(time in times){
-		memCountList += '<li data-time="' + uris[time]+ '">' + time + '</li>\r\n';
+	for(var timeIndex in times){
+		memCountList += '<li data-time="' + uris[timeIndex]+ '">' + timeIndex + '</li>\r\n';
 	}
 
 	memCountList += '</ul>';
