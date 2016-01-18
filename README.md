@@ -5,15 +5,15 @@ Mink is a Google Chrome extension to indicate that a page a user is viewing on t
 
 ##Installation
 
-The extension is publicly available from the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)!
+The extension is available for download from the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)!
 
 ##Usage
 
-The extension works by querying the archives when you browse the web as usual. For each page you visit, Mink sends an asynchronous request to a Memento aggregator and displays the number of mementos (web pages for the URL in the archives) using a badge over the Mink/Memento icon in the bottom right of the browser.
+The extension works by querying the archives when you browse the web. For each page you visit, Mink sends an asynchronous request to a Memento aggregator and displays the number of mementos (web pages for the URL in the archives) using a badge over the Mink/Memento icon in the browser's button bar.
 
 ###Selecting a Memento
 
-For the case when a small number of mementos is displayed, the dropdown menu is the most accessible way to view the memento in the web archive. To do so, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button". When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
+For web pages with not many mementos, the dropdown menu is the most accessible way to view the memento in the web archive. To do this, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button". When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
 
 ###No mementos? No problem!
 
