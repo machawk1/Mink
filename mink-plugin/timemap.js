@@ -2,7 +2,7 @@ function Timemap(fromString){
 	if(debug){console.log("In timemap.js");}
 	var timemap, timegate, original, url, self;
 	this.str = fromString;
-  if (!this.str) {
+    if (!this.str) {
 			if (debug) {
 			  console.log('data passed in was null');
 			}
@@ -14,13 +14,18 @@ function Timemap(fromString){
 	//console.log(this.str);
 	// Check if the string passed in is an Object, e.g., https://github.com/
 	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
-	console.log(this.str);
-	console.log(typeof this.str);
+	if(debug) {
+	  console.log(this.str);
+	  console.log('type: ' + typeof this.str);
+	}
 	if (strIsAnObject) {
 		if (debug) {
 		  console.log('Handle fromString as an object, akin to github.com');
 		}
 	//		this = this.str;
+	}
+	if(debug) {
+	  console.log(fromString);
 	}
 	var linkHeaderEntries = this.str.split(",");
 
@@ -57,15 +62,19 @@ function Timemap(fromString){
 			/* Splitting into multiple ifs instead of if-else allows for e.g., rel="timegate original" */
 			if(partsOfEntry[partOfEntry].match(mtimegateregex)){
 				timegate = url;
+				if(debug) {console.log('found tg: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(mtimemapregex)){
 				timemap = url;
+				if(debug) {console.log('found tm: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(moriginalregex)){
 				original = url;
+				if(debug) {console.log('found orig: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(mselfregex)){
 				self = url;
+				if(debug) {console.log('found self: ' + url);}
 			}
 			if(partsOfEntry[partOfEntry].match(mementoregex)){
 				this.mementos.push(new Memento(linkHeaderEntries[lhe]+linkHeaderEntries[lhe+1]));
@@ -85,9 +94,14 @@ function Timemap(fromString){
 	if(!timemap && !timegate && !original){
 		if(debug){
 			console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
+			console.log('link header: ');
+			console.log(this.str);
+			console.log(linkHeaderEntries);
 			console.log(linkHeaderEntries);
 		}
 	}
+	
+	if(debug) {console.warn('the tm: ' + this.timemap);}
 }
 
 function Memento(fromStr){

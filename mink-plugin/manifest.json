@@ -1,17 +1,25 @@
 {
    "manifest_version": 2,
    "name": "Mink",
-   "version": "1.4.3",
+   "version": "2.0",
    "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
    "homepage_url": "http://matkelly.com/mink",
-   "author": "Mat Kelly <me@matkelly.com>",
+   "author": "Mat Kelly <mink@matkelly.com>",
    "background": {
-       "scripts": ["js/jquery-2.1.1.min.js","timemap.js","mink.js"],
+       "scripts": ["js/jquery-2.1.1.min.js","js/date.js","timemap.js","mink.js"],
        "persistent": true
    },
-   "icons": { "128": "images/minkLogo_128.png"},
+   "browser_action": {
+     "default_title": "Mink - Integrating the Live and Archived Web",
+     "default_icon": {
+     	"19": "images/minkLogo19.png",
+     	"38": "images/minkLogo38.png"}
+   },
+   
+   "icons": { "128": "images/mink_marvel_128.png"},
    "permissions": [
        "webRequest",
+       "webNavigation",
        "<all_urls>",
        "webRequestBlocking",
        "tabs",
@@ -19,7 +27,8 @@
        "unlimitedStorage",
        "cookies",
        "notifications",
-       "contextMenus"
+       "contextMenus",
+       "activeTab"
     ],
     "content_scripts": [
     {
@@ -48,13 +57,28 @@
     "minimum_chrome_version": "40",
     "options_ui": {
       "page": "options.html",
-      "chrome_style": false
+      "chrome_style": true
     },
     "web_accessible_resources": [
-    	"images/icon-on-19.png","images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
+    	
+"images/mementoLogo-19px-30.png", "images/mementoLogo-19px-37_5.png", "images/mementoLogo-19px-45.png", "images/mementoLogo38_working.png",       	"images/icon-on-19.png","images/icon128.png","images/icon128flipped.png","images/icon128_error.png",
+"images/minkLogo38_noMementos.png",
+"images/m38_isAMemento.png",
+"images/archives/iaLogo.png","images/archives/archiveisLogo.png","images/archives/allListedArchives.png",
+"images/archives/iaLogo_success.png","images/archives/archiveisLogo_success.png",
+"images/spinner.gif",
+
+"images/mementoLogos/mLogo38_7.5.png","images/mementoLogos/mLogo38_15.png","images/mementoLogos/mLogo38_22.5.png","images/mementoLogos/mLogo38_30.png","images/mementoLogos/mLogo38_37.5.png","images/mementoLogos/mLogo38_45.png","images/mementoLogos/mLogo38_52.5.png","images/mementoLogos/mLogo38_60.png",
+
+"images/mementoLogos/mLogo19_7.5.png","images/mementoLogos/mLogo19_15.png","images/mementoLogos/mLogo19_22.5.png","images/mementoLogos/mLogo19_30.png","images/mementoLogos/mLogo19_37.5.png","images/mementoLogos/mLogo19_45.png","images/mementoLogos/mLogo19_52.5.png","images/mementoLogos/mLogo19_60.png",
+
     	"images/archives/ia.png",
     	"style.css",
     	"js/jquery-2.1.1.min.js","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
+        "js/date.js",
+
+"js/displayMinkUI.js", "minkui.html", "css/minkui.css", "images/minkLogo_300.png",
+"images/mink_marvel_80.png",
     	"Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     	"jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
     	"bootstrap/css/bootstrap.min.css","bootstrap/css/bootstrap-theme.min.css",

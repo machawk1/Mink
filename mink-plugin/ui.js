@@ -5,417 +5,6 @@ var iconUrl = chrome.extension.getURL('images/icon128.png');
 var iconUrlFlipped = chrome.extension.getURL('images/icon128flipped.png');
 var previousPanelHTML = ''; //a means of saving the UI to revert to once in the archiveNow panel
 
-function setMementoButtonInteractivityBasedOnMementoDropdown(){
-	$('#mdts').change(function(){
-		// If we're on the select box title or the original value, disable view button
-		if($(this)[0].selectedIndex == 0 || $(this)[0].selectedIndex == $($(this)[0]).attr('alt')){
-			$('#viewMementoButton').attr('disabled','disabled');
-		}else {
-			$('#viewMementoButton').removeAttr('disabled');
-		}
-	});
-
-	$('#nextMementoButton').click(function(){viewDifferentMemento(1);});
-	$('#prevMementoButton').click(function(){viewDifferentMemento(-1);});
-}
-
-function showArchiveOptions(){ //TODO: rename this function to say "toggle" instead of "show"
-	if($('#archiveOptions').css('marginLeft') == '-700px'){ //draw is already open, close it
-		$('#archiveOptions').animate({
-			marginLeft: '0px',
-			opacity: '0.0'
-		},500,function(){
-			if(previousPanelHTML != ''){ //revert to original UI
-				if(previousPanelHTML.indexOf('Archive now?') > -1){return;}
-				$('#archiveOptions').html(previousPanelHTML);
-				//previousPanelHTML = '';
-			}else {
-				if(debug){console.log('NOT restoring');}
-			}
-		});
-
-	}else { //open the drawer
-		$('#archiveOptions').animate({
-			marginLeft: "-700px",
-			opacity: "1.0"
-		},500,null);
-
-		//RESTORE view button behavior
-		setMementoButtonInteractivityBasedOnMementoDropdown(); //re-attach dropdown change to affect button state
-		$('#viewMementoButton').attr('disabled','disabled'); //reset button state to disabled (default dropdown view)
-		$('#viewMementoButton').click(function(){window.location = $('#mdts').val();}); //re-attach button functionality
-		//TODO: restore archiveNow and helpButton behavior
-		addExtraButtonBehaviors();
-	}
-}
-
-/**
- * After the query for the memento list via the URI's timemap, show a numerical count atop the logo
- */
-function displayMementoCountAtopLogo(){
-	var count = $('#numberOfMementos').text();
-
-	$('#mLogo').after('<span id="countOverLogo">' + count + '</span>');
-	$('#countOverLogo').click(
-		function(){
-			showArchiveOptions();
-		}
-	);
-	$('#countOverLogo').fadeIn();
-}
-
-/**
- * If no mementos are returned on a query to the archives, provide the buttons
- * that fire off a request to crawl the page to the archives
- */
-function addArchiveNowButtons(addText){
-	if(!addText){addText = '';}
-
-	$('#archiveOptions').html(
-			'<div id="archiveNowOptions">' +
-			addText + 'Archive now? ' +
-			'<button id="archiveNow_archivedotorg">Archive.org</button>' +
-			'<button id="archiveNow_archivedotis">Archive.is</button>' +
-			//'<button id="archiveNow_webcite"     disabled="disabled">WebCite</button>'+
-			//'<button id="archiveNow_permadotcc"  disabled="disabled">Perma.cc</button>'+
-			'<button id="archiveNow_all">All</button>' +
-			//'<button id="archiveNow_org"         >Other...</button>' +
-			'</div>'
-
-		);
-
-	function refreshAggregatorsTimeMap(forURI){
-		chrome.runtime.sendMessage({
-			method: "refreshAggregatorTimeMap",
-			value: aggregator_wdi_json + forURI
-		});
-
-		return;
-
-		var refreshAggregatorTimeMapURI = aggregator_wdi_json + forURI;
-		$.ajax({
-			method: 'HEAD',
-			url: refreshAggregatorTimeMapURI,
-			beforeSend: function(request) {
-			  request.setRequestHeader('cache-control', 'no-cache	')
-			}
-		}).done(function(data, textStatus, xhr) {
-			  if (debug) {
-				  console.log('success');
-				  console.log(data);
-				}
-		}).fail(function(xhr, textStatus, error) {
-		    if (debug){
-					console.log('failed');
-				  console.log(error);
-				  console.log(textStatus);
-				}
-		});
-	}
-
-	$('#archiveNow_archivedotorg').click(function(){
-		$.ajax({
-			method: 'GET',
-			url: 'https://web.archive.org/save/' + document.URL
-		})
-		.done(function(a,b,c){
-			//console.log(a);
-			if(b == 'success'){
-				chrome.runtime.sendMessage({
-					method: 'notify',
-					title: 'Mink',
-					body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
-				}, function(response) {});
-				$('#archiveNow_archivedotorg').addClass('archiveNowSuccess');
-				$('#archiveNow_archivedotorg').html('View on Archive.org');
-				var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g);
-				var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1,parsedRawArchivedURI[0].length - 1);
-				//console.log(archiveURI);
-				$('#archiveNow_archivedotorg').attr('title', archiveURI);
-				$('.archiveNowSuccess').click(function(){
-					window.open($(this).attr('title'));
-				});
-
-				refreshAggregatorsTimeMap(document.URL);
-			}
-		});
-	});
-
-	$('#archiveNow_archivedotis').click(function(){
-		$.ajax({
-			method: 'POST',
-			url: 'http://archive.is/submit/',
-			data: { coo: '', url: document.URL}
-		})
-		.done(function(a,b,c){
-			//console.log(a);
-			if(b == 'success'){
-				chrome.runtime.sendMessage({
-					method: 'notify',
-					title: 'Mink',
-					body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
-				}, function(response) {});
-				$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
-				$('#archiveNow_archivedotis').html('View on Archive.is');
-
-				var linkHeader = c.getResponseHeader('link');
-				var tmFromLinkHeader = new Timemap(linkHeader);
-				var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
-
-				$('#archiveNow_archivedotis').attr('title', archiveURI);
-				$('.archiveNowSuccess').click(function(){
-					window.open($(this).attr('title'));
-				});
-
-				refreshAggregatorsTimeMap(document.URL);
-			}else {
-				console.log(b);
-
-			}
-			//console.log(c);
-		});
-	});
-
-	$('#archiveNow_all').click(function(){
-		$('#archiveNow_archivedotorg').trigger('click');
-		$('#archiveNow_archivedotis').trigger('click');
-		$(this).html('View All');
-		$(this).addClass('archiveNowSuccess');
-	});
-
-}
-
-/**
- * Animate the memento logo by modifying the image width on a timer until logoInFocus is set
- */
-function flip(){
-	$('#mLogo').fadeIn();
-	$('#mLogo').css('opacity', '0.5');
-	var w = '0px';
-	if(shrinking){w = '50px';}
-
-	if(logoInFocus && w == '0px' && $('#mLogo').attr('src') == iconUrl){
-		$('#mLogo').css('opacity','1.0');
-		if(hideLogo){
-			$('#mLogo').attr('src', chrome.extension.getURL('images/icon128_error.png'));
-			addArchiveNowButtons('0 mementos found. ');
-			/*chrome.runtime.sendMessage({ //for #66, eventually turn this into a user option
-					method: 'notify',
-					title: 'Mink',
-					body: 'Page not found in the archives\r\nSelect exclamation icon to archive now!'
-			}, function(response) {});*/
-		}else {
-			displayMementoCountAtopLogo();
-		}
-		return;
-	}
-
-	shrinking = !shrinking;
-	$('#mLogo').animate({
-		width: w,
-		height: '50px'
-	},800,
-		function(){
-			if($('#mLogo').css('width') == '0px'){
-				if($('#mLogo').attr('src') == iconUrl){
-					$('#mLogo').attr('src', iconUrlFlipped);
-				}else {
-					$('#mLogo').attr('src', iconUrl);
-				}
-			}
-			flip();
-		}
-	);
-}
-
-
-/** Show mementos UI from JSON, logic similar to live web drop down display
- *  @param jsonStr A JSON string representative of memento objects, format defined within
- *  @param activeSelectionDatetime The current Memento-Datetime of the active memento, based on localStorage value
- *  @return String representative of the HTML UI elements to appear when viewing a memento
- */
-function getMementosNavigationBasedOnJSON(jsonStr,activeSelectionDatetime){
-	console.log('Hit obsolete function');
-	/*
-	var mementoObjects = JSON.parse(jsonStr); // format: [{'uri':(uri),'datetime':(datetime),...]
-	var dropdownOptions, selectedIndex = 0;
-	$(mementoObjects).each(function(i,v){
-		var selectedString = "";	//set which option is selected based on the select box text, NOT the value. Can probably be better done with selectors
-		if($(v).attr("datetime") == activeSelectionDatetime){
-			selectedString = "selected";
-			selectedIndex = i;
-		}
-
-		dropdownOptions += '\t<option value="' + $(v).attr('uri') + '" ' + selectedString + '>' + $(v).attr('datetime') + '</option>\r\n';
-	});
-
-	var selectBox = '<select id="mdts" alt="' + (selectedIndex + 1) + '"><option>Select a Memento to view</option>' +
-					dropdownOptions +
-					'</select>';
-	delete mementoObjects; //garbage collection, probably not necessary but neither is coffee
-	delete dropdownOptions;
-
-	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
-
-	var previousMementoDisabledValue = "";
-	var nextMementoDisabledValue = "";
-	var disabledValue = 'disabled="disabled"';
-
-	if(selectedIndex == 0){previousMementoDisabledValue = disabledValue;}
-	if(selectedIndex == mementoObjects.length -1){nextMementoDisabledValue = disabledValue;}
-
-	var previousMementoButton = '<input type="button" value="&lt;&lt;prev" id="prevMementoButton" ' + previousMementoDisabledValue + ' />';
-	var nextMementoButton = '<input type="button" value="&gt;&gt;next" id="nextMementoButton" ' + nextMementoDisabledValue + ' />';
-
-
-
-	return selectBox + viewMementoButton + previousMementoButton + nextMementoButton;
-	*/
-}
-
-function displayDatepicker(){
-	if($('#datepickerContainer').length){return;} //to prevent multiple datepicker UIs from appearing
-
-	$('body').append('<div id="datepickerContainer"><div id="datepickerOptions"></div></div>');
-
-	var yearbuckets = [];
-	var completeCSV = 'year,month,datetime,uri,src';
-	var tsv = '';
-	$('#mdts option').each(function(i,v){
-		if(i==0){return;} // The first entry in the list is not a date but a directive
-
-		var mom = moment($(v).text());
-		var year = mom.format('YYYY');
-		var month = mom.format('MM');
-
-		var host = $(v).val().match(/\/\/(.*?)\//g)[0].substr(2);
-
-		if(yearbuckets[year]){ //a previous entry exists, append!
-			yearbuckets[year].push(new Memento($(v).val(),$(v).text()));
-		}else {
-			yearbuckets[year] = [];
-			yearbuckets[year].push(new Memento($(v).val(),$(v).text()));
-		}
-
-		tsv += year + ' ' + month + '\t' + $(v).val() + '\r\n';
-	});
-
-	var yearList = '<ul>\r\n';
-
-	for(var key in Object.keys(yearbuckets)){
-		yearList += '\t<li>' + Object.keys(yearbuckets)[key]+ ': ' +yearbuckets[Object.keys(yearbuckets)[key]].length + '</li>\r\n';
-	}
-	yearList += '</ul>';
-
-	var daterangepicker = '<input type="text" style="width: 300px" name="reservation" id="reservationtime" class="form-control" value="08/01/2013 1:00 PM - 08/01/2013 1:30 PM"  class="span4"/>';
-
-
-	$('#datepickerOptions').append(daterangepicker);
-	//$('#datepickerOptions').append(yearList);
-
-	$('#reservationtime').daterangepicker({
-		timePicker: true,
-		format: 'MM/DD/YYYY h:mm A',
-		timePickerIncrement: 1
-	});
-
-
-
-     $('#datepickerOptions').append(getHighchartsData());
-     $('#tsv').text(tsv);
-
-
-	doThatHighchartsThingYouDo();
-
-
-
-	//$('body').append('<span id="csvdata">' + csv + '</span>');
-	//renderChart();
-	//$("#datepickerContainer").css("bottom",$("#datepickerContainer").css("bottom")+$("#datepickerContainer").css("height"));
-}
-
-
-function addExtraButtonBehaviors(){
-	$('#helpButton').click(function(){
-		window.open('http://matkelly.com/mink');
-	});
-
-	$('#archiveNow').click(function(){
-		if($('#archiveOptions').html().indexOf('Archive now?') == -1){// Save the HTML from the original panel
-			previousPanelHTML = $('#archiveOptions').html();
-		}
-		$('#archiveOptions').html('');
-		addArchiveNowButtons();
-	});
-}
-
-function addInterfaceComponents(nMementos,nTimemaps,tmVerbiage,select){
-	var viewMementoButton = '<input type="button" value="View" id="viewMementoButton" disabled="disabled" />';
-	var archiveNowButton = '<input type="button" value="Archive Now!" id="archiveNow" />';
-	var helpButton = '<input type="button" value="?" id="helpButton" />';
-    var LARGE_NUMBER_OF_MEMENTOS_THRESHOLD = 101;
-
-	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
-	  var classAttributeInjectionPoint = viewMementoButton.length - ' />'.length;
-		viewMementoButton = viewMementoButton.substr(0, classAttributeInjectionPoint) + ' class="hiddenUI" ' + viewMementoButton.substr(classAttributeInjectionPoint + 1);
-	}
-
-	$('#archiveOptions').html('<div id="largerNumberButtons"><p>List Mementos By:</p>' +
-		'<button class="largeNumberOfMementoOption activeButton" id="largeNumberOfMementoOption1"><span>&#9673;</span>Dropdown</button>' +
-		'<button class="largeNumberOfMementoOption" id="largeNumberOfMementoOption2"><span>&#9678;</span>Drill Down</button>' +
-		'</div>' +
-		'<div id="drilldownBox"></div>' +
-		'<span id="info">' +
-			'<span id="numberOfMementos">' + nMementos + '</span> mementos available in ' +
-			'<span id="timemapCount">' + nTimemaps + '</span> ' +
-			'<span id="timemapPlurality">' + tmVerbiage + '</span>' +
-		select +
-		viewMementoButton +
-		archiveNowButton +
-		helpButton
-	);
-
-	if(nMementos > LARGE_NUMBER_OF_MEMENTOS_THRESHOLD) { // 101 is a "a lot", don't show dropdown, only drilldown
-		setActiveButtonStyle('largeNumberOfMementoOption2');
-		$('#mdts').addClass('hiddenUI'); // Hide the dropdown if we have sufficient memento count.
-	}else {
-		$('#drilldownBox').addClass('hiddenUI');
-	}
-
-	addExtraButtonBehaviors();
-
-	$('.largeNumberOfMementoOption').click(function(){
-		setActiveButtonStyle($(this).attr('id'));
-	});
-
-	function setActiveButtonStyle(bId){
-		var activeButtonId = '#' + bId;
-		$('.largeNumberOfMementoOption').removeClass("activeButton");
-		$('.largeNumberOfMementoOption span').text("◎");
-		$(activeButtonId + ' span').text("◉");
-		$(activeButtonId).addClass('activeButton');
-
-		if(activeButtonId == '#largeNumberOfMementoOption2'){
-			if(debug){console.log('Hiding dropdown UI, showing miller columns');}
-			showMementoCountsByYear();
-			// Hide non-relevant UI elements
-			$('#mdts').addClass('hiddenUI');
-			$('#viewMementoButton').addClass('hiddenUI');
-			$('#drilldownBox').removeClass('hiddenUI');
-
-		} else {
-			if(debug){console.log('Hiding Miller column UI, showing dropdown');}
-			$('#drilldownBox').addClass('hiddenUI');
-
-			$('#mdts').removeClass('hiddenUI');
-			$('#viewMementoButton').removeClass('hiddenUI');
-			//destroyMementoCountsByYear();
-			//$('#mdts').addClass('hiddenUI');
-
-		}
-	}
-
-}
 
 function destroyMementoCountsByYear(){
 	$('#drilldownBox').addClass('hiddenUI');
@@ -424,7 +13,7 @@ function destroyMementoCountsByYear(){
 function showMementoCountsByYear(){
 	chrome.storage.local.get('timemaps',
 		function(localStore){
-			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() != ''){
+			if($('#drilldownBox').hasClass('hiddenUI') && $('#drilldownBox').html() !== ''){
 				if(debug) {console.log('returning, ui is empty');}
 				$('#drilldownBox').removeClass('hiddenUI');
 				return;
@@ -439,18 +28,18 @@ function showMementoCountsByYear(){
 				for(var year in years){
 					yearData += year + ': ' +years[year].length + '\n';
 				}
-				console.log(yearData)
+				console.log(yearData);
 				if(yearData == yearDataFromLastIteration) return;
 				yearDataFromLastIteration = yearData;
-				setTimeout(updateProgress,3000);
+				setTimeout(updateProgress, 3000);
 			}
 
-			$(localStore.timemaps).each(function(tmI,tm){
-				$(tm.mementos.list).each(function(mI,m){
+			$(localStore.timemaps).each(function(tmI,tm) {
+				$(tm.mementos.list).each(function(mI,m) {
 					var dt = moment(m.datetime);
 					if(!years[dt.year()]){years[dt.year()] = [];}
 					years[dt.year()].push(m);
-				})
+				});
 			});
 
 			if($('#years').html()){ // We already created Miller UI, return
@@ -484,7 +73,7 @@ function showMementoCountsByYear(){
 			//ensure that the new display is visible (it won't be without this for few mementos)
 			//$('#drilldownBox').css('display','block');
 	}); //end local.get(
-};
+}
 
 
 function adjustDrilldownPositionalOffset(){
@@ -505,9 +94,9 @@ function showMementoCountsByMonths(year){
 	$('#months,#day,#time').remove();
 	//console.log('showing mementos for months in '+year);
 	var memCountList = '<ul id="months">';
-	var months = {}
+	var months = {};
 
-	for(memento in years[year]){
+	for (var memento in years[year]) {
 
 		var monthName = monthNames[moment(years[year][memento].datetime).month()];
 		if(!months[monthName]){
@@ -516,7 +105,7 @@ function showMementoCountsByMonths(year){
 		months[monthName].push(years[year][memento]);
 	}
 
-	for(month in months){
+	for(var month in months){
 		memCountList += '<li data-month="' + month + '">' + month + '<span class="memCount">' + months[month].length + '</span></li>\r\n';
 	}
 
@@ -540,7 +129,7 @@ function showMementoCountsByDays(mementos){
 					'11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
 					'21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th','31st'];
 
-	for(memento in mementos){
+	for(var memento in mementos){
 		var dayNumber = dayNames[moment(mementos[memento].datetime).date()];
 		if(!days[dayNumber]){
 			days[dayNumber] = [];
@@ -548,7 +137,7 @@ function showMementoCountsByDays(mementos){
 		days[dayNumber].push(mementos[memento]);
 	}
 	var memCountList = '<ul id="day">';
-	for(day in days){
+	for(var day in days){
 		memCountList += '<li data-day="' + day + '">' + day + '<span class="memCount">' + days[day].length + '</span></li>\r\n';
 	}
 
@@ -568,7 +157,7 @@ function showMementoCountsByDays(mementos){
 function showMementoCountsByTime(mementos){
 	var times = {};
 	var uris = {};
-	for(memento in mementos){
+	for(var memento in mementos){
 		var mom = moment(mementos[memento].datetime);
 		var time = mom.format('HH:mm:ss');
 
@@ -580,8 +169,8 @@ function showMementoCountsByTime(mementos){
 		uris[time] = mementos[memento].uri;
 	}
 	var memCountList = '<ul id="time">';
-	for(time in times){
-		memCountList += '<li data-time="' + uris[time]+ '">' + time + '</li>\r\n';
+	for(var timeIndex in times){
+		memCountList += '<li data-time="' + uris[timeIndex]+ '">' + timeIndex + '</li>\r\n';
 	}
 
 	memCountList += '</ul>';
