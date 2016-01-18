@@ -394,7 +394,10 @@ function stopWatchingRequests_blacklisted() {
   if(debug){console.log('stopWatchingRequests_blacklisted() executing');}
   
   
-  chrome.tabs.query({active: true}, function(tab) {
+  chrome.tabs.query({
+    active: true,
+    'currentWindow': true
+  }, function(tab) {
 	setBadge(' ', badgeImages_blacklisted, tab[0].id);
 	setBadgeText('', tab[0].id);
   });
