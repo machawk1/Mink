@@ -13,40 +13,36 @@ The extension works by querying the archives when you browse the web as usual. F
 
 ###Selecting a Memento
 
-For the case when a small number of mementos is displayed, the dropdown menu is the most accessible way to view the memento in the web archive. To do so, click the icon overlaying the bottom-right of the webpage, select the date/time from the dropdown and click the "View" button". When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
-
-If many mementos are returned, Mink fetches a subset of the mementos and give the user a means of fetching the datetimes for all mementos in the archive, which can be a time consuming task, as a recursive process is done to accumulate all mementos.
+For the case when a small number of mementos is displayed, the dropdown menu is the most accessible way to view the memento in the web archive. To do so, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button". When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
 
 ###No mementos? No problem!
 
-If no mementos exist in the archive, the extension will say so and give the option to submit the URL to various archives for preservation.
+If no mementos exist in the archive, the extension will indicate this with a red "no mementos" icon and give the option to submit the URL to various archives for preservation.
 
 ## Examples
 
 ### Use Case 1: A niche site with few mementos
 
-1. After installing Mink, visit a web page and note the icon overlaying the page in the bottom right corner indicating the number of mementos (archived captures over time) available.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/1.png)
+1. After installing Mink, visit a web page and note the badge on the Mink button bar icon indicating the number of mementos (archived captures over time) available.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/1.png)
 2. Clicking on the icon reveals the Mink interface.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/2.png)
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/2.png)
 3. Select the dropdown list to display the captures available.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/3.png)
-4. Select a time and choose the View button.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/4.png)
-5. You are then viewing an archived version of the web page on the live web!
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/5.png)
-6. Select the Mink icon again to review the interface to return to the live web.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple/6.png)
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/3.png)
+4. Select a time and choose the View button to view a memento.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/4.png)
+5. You will then be viewing an archived version of the web page on the live web!
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/5.png)
+6. Select the Mink icon again to reveal the interface to return to the live web.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/6.png)
 
 ### Use Case 2: A popular site with many mementos
 
-1. After installing Mink, visit a very popular web page (one that is likely to have many captures, e.g., cnn.com) and noticed the "1000+" badge, indicating that there are more mementos available beyond the initial memento timemap.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/1.png)
-2. Clicking on the icon reveals displays the initial memento listing (in the dropdown) as well as an active "Fetch All" button.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/2.png)
-3. Clicking this button tells Mink to follow the trail of mementos, which can be a length iterative process. The number of timemaps with mementos discovered so far is displayed as more are discovered.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/3.png)
-4. Once complete, the Miller Columns view will be automatically displayed (because your browser would not like a dropdown with over 40,000 items).
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/4.png)
-5. Drilling down in this date-organized list will allow you to easily select the memento with date and time you desire.
-![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex/5.png)
+1. After installing Mink, visit a very popular web page (one that is likely to have many captures, e.g., cnn.com) and noticed the "999+" badge, indicating that many archive captures (mementos) are available.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex2.0/1.png)
+2. Clicking the Mink icon, displays the date-based "Miller Columns" of the many mementos.
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex2.0/2.png)
+3. The date-based drilldown list allows you to easily select the memento with date and time you desire. This interface is also available for web pages with fewer mementos
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex2.0/3.png)
+4. If no mementos exist or you would like to create a capture of the current web page, clicking the "Archive Page To..." button will display one-click submission to the supported archives (current Internet Archive and Archive.is).
+![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/complex2.0/4.png)
