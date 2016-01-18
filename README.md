@@ -31,7 +31,7 @@ If no mementos exist in the archive, the extension will indicate this with a red
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/3.png)
 4. Select a time and choose the View button to view a memento.
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/4.png)
-5. You will then be viewing an archived version of the web page on the live web!
+5. You will then be viewing an archived version of the web page on the live web! When viewing an archived web page, the Mink logo changes to a "eyeball" icon to indicate that you are viewing a memento.
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/5.png)
 6. Select the Mink icon again to reveal the interface to return to the live web.
 ![](https://github.com/machawk1/Mink/blob/master/meta/screenshots/simple2.0/6.png)
