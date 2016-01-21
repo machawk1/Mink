@@ -496,6 +496,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
     }
 
 	if(linkHeaderAsString) {
+	    var linkHeaderHasMementoData = false;
 	    if(debug) {
 	      console.log('A link header exists:');
 	      console.log(linkHeaderAsString);
@@ -505,10 +506,12 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 		if(debug){console.log('TG?: ' + tm.timegate);}
 		if(tm.timegate) { //specified own TimeGate, query this
 		  findTMURI(tm.timegate);
+		  linkHeaderHasMementoData = true;
 		}
 
 		if(mementoDateTimeHeader){
 			tm.datetime = mementoDateTimeHeader;
+			linkHeaderHasMementoData = true;
 		}
 
         if(debug) {
@@ -517,6 +520,9 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
           console.log(tm);
         }
 
+        if(!linkHeaderHasMementoData) { // Had a link header sans Memento data
+          return;
+        }
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  if(debug){console.log('The current page did not send a link header');}
