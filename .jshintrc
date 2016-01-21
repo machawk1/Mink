@@ -1,4 +1,13 @@
 {
+  "debug" : true,
+  "loopfunc" : true,
+  "latedef" : false,
+  "curly" : true,
+  "newcap" : true,
+  "nonstandard" : true,
+  "jquery" : true,
+  "devel" : true,
+  "browser" : true,
   "globals" : {
     "chrome" : true
   }
