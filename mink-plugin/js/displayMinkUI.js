@@ -1,5 +1,5 @@
 var MAX_MEMENTOS_IN_DROPDOWN = 500;
-var debug = true;
+var debug = false;
 function createShadowDOM(cb) {
     var selector = '#minkuiX';
 
@@ -322,8 +322,6 @@ function archiveURI_archiveDotIs(cb) {
                 var linkHeader = xhr.getResponseHeader('link');
                 console.log('creating new tm iiui');
                 var tmFromLinkHeader = new Timemap(linkHeader);
-
-                console.log(tmFromLinkHeader);
 
                 var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
 

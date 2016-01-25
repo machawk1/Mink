@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 //var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/';
@@ -45,11 +45,6 @@ function setActiveBasedOnDisabledProperty(cb) {
 function setActiveBasedOnBlacklistedProperty(cb) {
   chrome.storage.local.get('blacklist', function(items) {
     var inBlacklist = false;
-    if(debug){
-        console.log('loging setactivebasedOnBlackListedProperty items');
-        console.log(items);
-        console.log(cb);
-    }
     if(!items.blacklist) {cb(); return;}
 
     for(var ii = items.blacklist.length - 1; ii >= 0; ii--) {
@@ -139,17 +134,7 @@ function displayUIBasedOnStoredTimeMap(tmDataIn) {
         method: 'setTMData',
         value: tmDataIn
     });
-    if(debug){
-        console.log('displayUIBasedOnStoredTimeMap');
-        console.log(tmDataIn);
-
-    }
-    //var mementoCountFromCache = 0;
-    ////fix for when
-    //if(tmDataIn.mementos.list){
-    //    mementoCountFromCache = tmDataIn.mementos.list.length;
-    //}
-
+    //Issue when trying to view sites like heavyblogisheavy.com
     var mementoCountFromCache = tmDataIn.mementos.list.length;
     chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
 }
