@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';

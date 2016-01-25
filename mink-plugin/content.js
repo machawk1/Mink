@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 
 //var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/';
@@ -45,6 +45,11 @@ function setActiveBasedOnDisabledProperty(cb) {
 function setActiveBasedOnBlacklistedProperty(cb) {
   chrome.storage.local.get('blacklist', function(items) {
     var inBlacklist = false;
+    if(debug){
+        console.log('loging setactivebasedOnBlackListedProperty items');
+        console.log(items);
+        console.log(cb);
+    }
     if(!items.blacklist) {cb(); return;}
 
     for(var ii = items.blacklist.length - 1; ii >= 0; ii--) {
@@ -60,7 +65,7 @@ function setActiveBasedOnBlacklistedProperty(cb) {
   });
 }
 
-
+//TODO: Does this have any significance
 var jsonizedMementos = '[';
 var jsonizedMementos;
 
@@ -130,12 +135,23 @@ function displayUIBasedOnContext() {
 }
 
 function displayUIBasedOnStoredTimeMap(tmDataIn) {
-  chrome.runtime.sendMessage({
-	  method: 'setTMData',
-	  value: tmDataIn
-  });
-  var mementoCountFromCache = tmDataIn.mementos.list.length;
-  chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
+    chrome.runtime.sendMessage({
+        method: 'setTMData',
+        value: tmDataIn
+    });
+    if(debug){
+        console.log('displayUIBasedOnStoredTimeMap');
+        console.log(tmDataIn);
+
+    }
+    //var mementoCountFromCache = 0;
+    ////fix for when
+    //if(tmDataIn.mementos.list){
+    //    mementoCountFromCache = tmDataIn.mementos.list.length;
+    //}
+
+    var mementoCountFromCache = tmDataIn.mementos.list.length;
+    chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
 }
 
 function isEmpty(o){ //returns if empty object is passed in

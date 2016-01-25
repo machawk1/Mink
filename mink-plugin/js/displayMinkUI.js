@@ -25,7 +25,10 @@ function setupDrilldownInteractions() {
 function appendHTMLToShadowDOM() {
     $.ajax(chrome.extension.getURL('minkui.html'))
         .done(function(data) {
-            if(debug){console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');}
+            if(debug){
+                console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');
+
+            }
 
             $('body').append(data);
             var mementos;
@@ -216,7 +219,7 @@ function randomEmail() {
     return text;
 }
 
-function archiveURI_WebCite() {
+function archiveURI_WebCite(cb) {
     if (debug) {
         console.log("Archiving for WebCite");
     }
@@ -236,13 +239,23 @@ function archiveURI_WebCite() {
                 title: 'Mink',
                 body: 'WebCitation.org Successfully Preserved page.\r\nSelect again to view.'
             });
-            //cb();
-            var archivelink = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0];
+            if(cb){
+                cb();
+            }
+            $('#webcite').addClass('archiveNowSuccess');
+            var shadow = document.getElementById('minkWrapper').shadowRoot;
+            //shadow.getElementById('webcite').classList.add('archiveNowSuccess');
+            //verbose regex but wanted to ensure exact capture
+            var archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0];
+            shadow.getElementById('webcite').setAttribute('title', archiveURI);
+            shadow.getElementById('webcite').onclick = function() {
+                window.location = $(this).attr('title');
+            };
             if(debug){
                 console.log("\nattempting to extract url: ");
                 //very verbose but want exactly the shortend link
                 console.log(data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g));
-                console.log(archivelink);
+                console.log(archiveURI);
             }
         } else {
             chrome.runtime.sendMessage({
@@ -256,7 +269,6 @@ function archiveURI_WebCite() {
 
 
 function archiveURI_archiveOrg(cb) {
-    archiveURI_WebCite();
     $.ajax({
             method: 'GET',
             url: 'https://web.archive.org/save/' + document.URL
@@ -310,6 +322,8 @@ function archiveURI_archiveDotIs(cb) {
                 var linkHeader = xhr.getResponseHeader('link');
                 console.log('creating new tm iiui');
                 var tmFromLinkHeader = new Timemap(linkHeader);
+
+                console.log(tmFromLinkHeader);
 
                 var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
 

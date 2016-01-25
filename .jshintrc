@@ -1,4 +1,5 @@
 {
+  "esversion": 5,
   "debug" : true,
   "loopfunc" : true,
   "latedef" : false,
