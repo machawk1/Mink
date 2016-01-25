@@ -218,12 +218,11 @@
                     } else if ($(this).attr('id') === 'archivelogo_ais') {
                         archiveURI_archiveDotIs(cb);
                     } else if ($(this).attr('id') === 'webcite'){
-                        console.log('WebCite clicked');
                         archiveURI_WebCite(cb);
                     } else if ($(this).attr('id') === 'archivelogo_ala') {
-                        archiveURI_WebCite();
                         archiveURI_archiveOrg();
                         archiveURI_archiveDotIs();
+                        archiveURI_WebCite();
                     }
                 });
             }

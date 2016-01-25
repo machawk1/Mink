@@ -346,6 +346,7 @@ function archiveURI_allServices() {
     $('#archiveNow_all').click(function(){
         $('#archiveNow_archivedotorg').trigger('click');
         $('#archiveNow_archivedotis').trigger('click');
+        $('#webcite').trigger('click');
         $(this).html('View All');
         $(this).addClass('archiveNowSuccess');
     });
