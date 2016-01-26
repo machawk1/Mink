@@ -1,70 +1,56 @@
 {
-  "manifest_version": 2,
-  "name": "Mink",
-  "version": "2.0",
-  "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
-  "homepage_url": "http://matkelly.com/mink",
-  "author": "Mat Kelly <mink@matkelly.com>",
-  "background": {
-    "scripts": [
-      "js/jquery-2.1.1.min.js",
-      "js/date.js",
-      "timemap.js",
-      "mink.js"
+   "manifest_version": 2,
+   "name": "Mink",
+   "version": "2.0.1",
+   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
+   "homepage_url": "http://matkelly.com/mink",
+   "author": "Mat Kelly <mink@matkelly.com>",
+   "background": {
+       "scripts": ["js/jquery-2.1.1.min.js","js/date.js","timemap.js","mink.js"],
+       "persistent": true
+   },
+   "browser_action": {
+     "default_title": "Mink - Integrating the Live and Archived Web",
+     "default_icon": {
+     	"19": "images/minkLogo19.png",
+     	"38": "images/minkLogo38.png"}
+   },
+   
+   "icons": { "128": "images/mink_marvel_128.png"},
+   "permissions": [
+       "webRequest",
+       "webNavigation",
+       "<all_urls>",
+       "webRequestBlocking",
+       "tabs",
+       "storage",
+       "unlimitedStorage",
+       "cookies",
+       "notifications",
+       "contextMenus",
+       "activeTab"
     ],
-    "persistent": true
-  },
-  "browser_action": {
-    "default_title": "Mink - Integrating the Live and Archived Web",
-    "default_icon": {
-      "19": "images/minkLogo19.png",
-      "38": "images/minkLogo38.png"
-    }
-  },
-  "icons": {
-    "128": "images/mink_marvel_128.png"
-  },
-  "permissions": [
-    "webRequest",
-    "webNavigation",
-    "<all_urls>",
-    "webRequestBlocking",
-    "tabs",
-    "storage",
-    "unlimitedStorage",
-    "cookies",
-    "notifications",
-    "contextMenus",
-    "activeTab"
-  ],
-  "content_scripts": [
+    "content_scripts": [
     {
-      "js": [
-        "js/jquery-2.1.1.min.js",
-        "jQuery-Scoped/jquery.scoped.js",
-        "moment-with-langs.min.js",
-        "jquery.miller.js/js/jquery.miller.js",
-        "bootstrap-daterangepicker/daterangepicker.js",
-        "d3.v3/d3.v3.min.js",
-        "dimple.v1.1.2.min.js",
-        "d3.makechart.js",
-        "Highcharts-4.0.3/js/highcharts.js",
-        "Highcharts-4.0.3/js/modules/data.js",
-        "Highcharts-4.0.3/js/modules/drilldown.js",
-        "highchartsdata.js",
-        "doThatHighchartsThingYouDo.js",
-        "ui.js",
-        "content.js",
-        "timemap.js"
-      ],
-      "matches": [
-        "<all_urls>"
-      ],
-      "css": [
-        "style.css",
-        "font-awesome-4.0.3/css/font-awesome-modified.css",
-        "jquery.miller.js/css/jquery.miller.css"
-      ]
+    	"js": [
+    		"js/jquery-2.1.1.min.js",
+    		"jQuery-Scoped/jquery.scoped.js",
+    		"moment-with-langs.min.js",
+    		"jquery.miller.js/js/jquery.miller.js",
+
+    		"bootstrap-daterangepicker/daterangepicker.js",
+
+    		"d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
+    		"Highcharts-4.0.3/js/highcharts.js","Highcharts-4.0.3/js/modules/data.js","Highcharts-4.0.3/js/modules/drilldown.js",
+			"highchartsdata.js","doThatHighchartsThingYouDo.js",
+
+    		"ui.js","content.js","timemap.js"],
+    	"matches": ["<all_urls>"],
+    	"css": ["style.css",
+    		"font-awesome-4.0.3/css/font-awesome-modified.css",
+    		"jquery.miller.js/css/jquery.miller.css"
+
+    		]
     }
   ],
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
