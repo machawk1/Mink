@@ -125,13 +125,18 @@ function bindDrilldown() {
 		var mementosDropdown = shadow.getElementById('mementosDropdown');
 		var viewMementoButton = shadow.getElementById('viewMementoButton');
 		var drilldownBox = shadow.getElementById('drilldownBox');
+		var drilldownTitle = shadow.getElementById('title_drilldown');
+		var dropdownTitle = shadow.getElementById('title_dropdown');
 
-		mementosDropdown.className = 'dropdown hidden';
-		viewMementoButton.className = 'dropdown hidden';
-		shadow.getElementById('title_dropdown').className = '';
-		drilldownBox.className = '';
 
-		shadow.getElementById('title_drilldown').className = 'active';
+		if(!dropdownTitle.classList.contains('disabled')) {
+		  mementosDropdown.className = 'dropdown hidden';
+		  viewMementoButton.className = 'dropdown hidden';
+		  shadow.getElementById('title_dropdown').className = '';
+		  drilldownBox.className = '';
+
+		  drilldownTitle.className = 'active';
+		}
 	};
 }
 
