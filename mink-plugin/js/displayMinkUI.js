@@ -1,5 +1,5 @@
 var MAX_MEMENTOS_IN_DROPDOWN = 500;
-
+var debug = false;
 function createShadowDOM(cb) {
    var selector = '#minkuiX';
 
@@ -171,6 +171,100 @@ function appendCSSToShadowDOM(cb) {
   });
 }
 
+function randomEmail() {
+    var emails = ['gmail.com','outlook.com','yahoo.com','me.com'];
+    //create random function
+    var randy = function(min,max) {
+        return Math.floor(Math.random() * (max-min + 1)+ min);
+    };
+
+    //choices for the email character pool
+    var alpha = 'abcdefghijklmnopqrstuvwxyz';
+    var choices = 'abcdefghijklmnopqrstuvwxyz' + '0123456789';
+    var domain = ['.com', '.org', '.edu', '.co.uk', '.net'][randy(0,4)];
+
+    var text = '';
+
+    //have a function that will make a unique part of an
+    //email 1 to 3 characters long
+    var getPart = function (pool){
+        var len = randy(1,3);
+        var it = '';
+        for(var i = 0; i < len; ++i){
+            it += pool.charAt(randy(0,pool.length-1));
+        }
+        return it;
+    };
+
+    var len = randy(2,4);
+    //get user portion of email
+    for(var i = 0; i < len; ++i){
+        text += getPart(choices);
+    }
+
+    text += '@';
+
+    len = randy(2,3);
+    //get email host
+    for(i = 0; i < len; ++i){
+        text += getPart(alpha);
+    }
+
+    //append the domain
+    text += domain;
+
+    return text;
+}
+
+function archiveURI_WebCite(cb) {
+    if (debug) {
+        console.log("Archiving for WebCite");
+    }
+
+    var remail = randomEmail();
+    $.ajax({
+        method: 'POST',
+        url: 'http://www.webcitation.org/archive',
+        data: {
+            url: document.URL,
+            email: remail
+        }
+    }).done(function (data, status,xhr) {
+        if(status == 'success'){
+            chrome.runtime.sendMessage({
+                method: 'notify',
+                title: 'Mink',
+                body: 'WebCitation.org Successfully Preserved page.\r\nSelect again to view.'
+            });
+            if(cb){
+                cb();
+            }
+            $('#webcite').addClass('archiveNowSuccess');
+            var shadow = document.getElementById('minkWrapper').shadowRoot;
+            //shadow.getElementById('webcite').classList.add('archiveNowSuccess');
+            //verbose regex but wanted to ensure exact capture
+            var archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0];
+            shadow.getElementById('webcite').setAttribute('title', archiveURI);
+            shadow.getElementById('webcite').onclick = function() {
+                window.location = $(this).attr('title');
+            };
+            if(debug){
+                console.log("\nattempting to extract url: ");
+                //very verbose but want exactly the shortend link
+                console.log(data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g));
+                console.log(archiveURI);
+            }
+        } else {
+            chrome.runtime.sendMessage({
+                method: 'notify',
+                title: 'Mink',
+                body: 'WebCitation.org Did Not Successfully Preserved page.\r\n'
+            });
+        }
+    });
+}
+
+
 function archiveURI_archiveOrg(cb) {
 	$.ajax({
 		method: 'GET',
@@ -247,12 +341,13 @@ function archiveURI_archiveDotIs(cb) {
 }
 
 function archiveURI_allServices() {
-	$('#archiveNow_all').click(function(){
-		$('#archiveNow_archivedotorg').trigger('click');
-		$('#archiveNow_archivedotis').trigger('click');
-		$(this).html('View All');
-		$(this).addClass('archiveNowSuccess');
-	});
+    $('#archiveNow_all').click(function(){
+        $('#archiveNow_archivedotorg').trigger('click');
+        $('#archiveNow_archivedotis').trigger('click');
+        $('#webcite').trigger('click');
+        $(this).html('View All');
+        $(this).addClass('archiveNowSuccess');
+    });
 }
 
 

@@ -14,6 +14,7 @@
  <img src="images/iaLogo.png" alt="Internet Archive" id="archivelogo_ia" class="archiveNowInterface archiveLogo" />
  <img src="images/archiveisLogo.png" alt="Archive.is" id="archivelogo_ais" class="archiveNowInterface archiveLogo" />
  <img src="images/allListedArchives.png" alt="All Listed Archives" id="archivelogo_ala" class="archiveNowInterface archiveLogo" />
+ <img src="images/allListedArchives.png" alt="WebCite" id="webcite" class="archiveNowInterface archiveLogo"/>
  <button class="archiveNowInterface hideInNoMementosInterface" id="goBackButton">&lt; Go Back</button>
 </span>
 <span id="viewingMementoInterface" class="hidden">
@@ -49,7 +50,7 @@ $(document).ready(function() {
   bindGoBackToMainInterfaceButton();
   bindArchiveLogos();
   bindGoBackToLiveWebButton();
-  
+
   $('#viewMementoButton').click(function() {
     window.location = $(this).attr('alt');
   });
@@ -61,6 +62,7 @@ function replaceContentScriptImagesWithChromeExtensionImages() {
 	document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png');
 	document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png');
 	document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png');
+    document.getElementById('webcite').src = chrome.extension.getURL('images/archives/webcitelogo.png');
 }
 
 function bindSteps() {
@@ -77,7 +79,7 @@ function bindSteps() {
 
 function bindOptions() {
 	$('#options').click(function(){
-		chrome.runtime.sendMessage({method: "openOptionsPage"}, function(response) {		
+		chrome.runtime.sendMessage({method: "openOptionsPage"}, function(response) {
 		});
 	});
 }
@@ -102,17 +104,17 @@ function bindDropdown() {
 		var mementosDropdown = shadow.getElementById('mementosDropdown');
 		var viewMementoButton = shadow.getElementById('viewMementoButton');
 		var drilldownBox = shadow.getElementById('drilldownBox');
-	
+
 		if(mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
 			alert('Dropdown available for large collections of mementos due to major browser performance degradation.');
 			return;
 		}
-	
+
 		mementosDropdown.className = 'dropdown';
 		viewMementoButton.className = 'dropdown';
 		shadow.getElementById('title_dropdown').className = 'active';
 		drilldownBox.className = 'hidden';
-	
+
 		shadow.getElementById('title_drilldown').className = '';
 	};
 }
@@ -123,12 +125,12 @@ function bindDrilldown() {
 		var mementosDropdown = shadow.getElementById('mementosDropdown');
 		var viewMementoButton = shadow.getElementById('viewMementoButton');
 		var drilldownBox = shadow.getElementById('drilldownBox');
-	
+
 		mementosDropdown.className = 'dropdown hidden';
 		viewMementoButton.className = 'dropdown hidden';
 		shadow.getElementById('title_dropdown').className = '';
 		drilldownBox.className = '';
-	
+
 		shadow.getElementById('title_drilldown').className = 'active';
 	};
 }
@@ -163,17 +165,17 @@ function bindArchiveNowButton() {
   $('#minkuiX #archiveNow').click(function(){
     var show = ['archiveNowInterface'];
     var hide = ['archiveNow','steps'];
-    
+
     var shadow = document.getElementById('minkWrapper').shadowRoot;
     var dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active');
     var drilldownActive = shadow.getElementById('title_drilldown').classList.contains('active');
-    
+
     if(dropdownActive) {
       hide.push('mementosDropdown','viewMementoButton');
     }else if(drilldownActive) {
       hide.push('drilldownBox');
     }
-    
+
     displayAndHideShadowDOMElements(show, hide);
   });
 
@@ -187,13 +189,13 @@ function bindGoBackToMainInterfaceButton() {
     var shadow = document.getElementById('minkWrapper').shadowRoot;
     var dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active');
     var drilldownActive = shadow.getElementById('title_drilldown').classList.contains('active');
-    
+
     if(dropdownActive) {
       show.push('mementosDropdown','viewMementoButton');
     }else if(drilldownActive) {
       show.push('drilldownBox');
     }
-    
+
     displayAndHideShadowDOMElements(show, hide);
   });
 }
@@ -201,38 +203,38 @@ function bindGoBackToMainInterfaceButton() {
 function bindArchiveLogos() {
   $('.archiveLogo').click(function() {
     if($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
-     
+
       return;
     }
-  
+
     var that = this;
     var newSrc = $(this).attr('src').replace('.png', '_success.png');
     $(this).attr('src',chrome.extension.getURL('./images/spinner.gif'));
-    
+
     var id = $(this).attr('id');
     var cb = function(){changeIconFor(that, newSrc); };
-    
+
     if($(this).attr('id') === 'archivelogo_ia') {
         archiveURI_archiveOrg(cb);
     }else if($(this).attr('id') === 'archivelogo_ais') {
         archiveURI_archiveDotIs(cb);
-    }else if($(this).attr('id') === 'archivelogo_ala') {
-        archiveURI_archiveOrg(); 
-        archiveURI_archiveDotIs();   
+    }else if ($(this).attr('id') === 'webcite'){
+        archiveURI_WebCite(cb);
+    } else if ($(this).attr('id') === 'archivelogo_ala') {
+        archiveURI_archiveOrg();
+        archiveURI_archiveDotIs();
+        archiveURI_WebCite();
     }
   });
 }
 
-function bindGoBackToLiveWebButton() {
-	$('#backToLiveWeb').click(function() {
-		chrome.storage.local.get('timemaps', function(items) {
-		  window.location = items.timemaps[document.URL].original;
-		});
-	  });
-}
-
-
-
-</script>
-</div>
+            function bindGoBackToLiveWebButton() {
+                $('#backToLiveWeb').click(function () {
+                    chrome.storage.local.get('timemaps', function (items) {
+                        window.location = items.timemaps[document.URL].original;
+                    });
+                });
+            }
+        </script>
+    </div>
 </div>
