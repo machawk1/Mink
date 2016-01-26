@@ -60,7 +60,7 @@ function setActiveBasedOnBlacklistedProperty(cb) {
   });
 }
 
-//TODO: Does this have any significance
+
 var jsonizedMementos = '[';
 var jsonizedMementos;
 
@@ -130,13 +130,12 @@ function displayUIBasedOnContext() {
 }
 
 function displayUIBasedOnStoredTimeMap(tmDataIn) {
-    chrome.runtime.sendMessage({
-        method: 'setTMData',
-        value: tmDataIn
-    });
-    //Issue when trying to view sites like heavyblogisheavy.com
-    var mementoCountFromCache = tmDataIn.mementos.list.length;
-    chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
+  chrome.runtime.sendMessage({
+	  method: 'setTMData',
+	  value: tmDataIn
+  });
+  var mementoCountFromCache = tmDataIn.mementos.list.length;
+  chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
 }
 
 function isEmpty(o){ //returns if empty object is passed in
