@@ -64,7 +64,7 @@ function setActiveBasedOnBlacklistedProperty(cb) {
 var jsonizedMementos = '[';
 var jsonizedMementos;
 
-function addToHistory(uri_r,memento_datetime,mementos,callback){
+function addToHistory(uri_r,memento_datetime,mementos,callback) {
 	var mementosToStore = mementos;
 	if(!mementosToStore){mementosToStore = jsonizedMementos;}
 	chrome.runtime.sendMessage({method: "store", value: ""+uri_r, memento_datetime: memento_datetime, mementos: mementosToStore}, function(response) {
@@ -148,7 +148,7 @@ function displayUIBasedOnStoredTimeMap(tmDataIn) {
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
 }
 
-function isEmpty(o){ //returns if empty object is passed in
+function isEmpty(o) { //returns if empty object is passed in
     for(var i in o){
         if(o.hasOwnProperty(i)){
             return false;
@@ -158,7 +158,7 @@ function isEmpty(o){ //returns if empty object is passed in
 }
 
 
-function getBlacklist(cb){
+function getBlacklist(cb) {
 	var callbackArguments = arguments;
 	chrome.storage.local.get('blacklist', function(items){
 		if(debug){
@@ -183,9 +183,6 @@ function addToBlacklist(currentBlacklist, uriIn){
 		'blacklist': null
 	};
 
-    console.log('current blacklistX');
-    console.log(currentBlacklist);
-
 	if($.isEmptyObject(currentBlacklist)){
 			save.blacklist = [];
 	} else {
@@ -195,6 +192,8 @@ function addToBlacklist(currentBlacklist, uriIn){
 	if(!save.blacklist){
 		save.blacklist = [];
 	}
+
+    //TODO (#191): Normalize uriIn?
 
 	// Check if URI is already in blacklist before adding
 	if(save.blacklist.indexOf(uriIn) > -1){
