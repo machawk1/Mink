@@ -119,28 +119,31 @@ function displayUIBasedOnContext() {
 	          '38' : chrome.extension.getURL('images/mLogo38_isAMemento.png'),
 	          '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')
 	         }
-	      }, function(response) {});
+	      });
 	    }else { // Live web page revisited w/ a TM in cache
+	      if(debug) {
+	        console.log('Live web page revisited with a TM in cache');
+	      }
 	      displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
 	    }
 	  }else { // Not a Memento, no TM in cache
+	    if(debug) {
+	      console.log('not a memento, no TM in cache');
+	    }
 	    getMementos(document.URL);
 	  }
 	});
 }
 
 function displayUIBasedOnStoredTimeMap(tmDataIn) {
+  if(debug){console.log('displayUIBasedOnStoredTimeMap');}
   chrome.runtime.sendMessage({
 	  method: 'setTMData',
 	  value: tmDataIn
   });
-  if(!tmDataIn || !(tmDataIn.mementos) || !(tmDataIn.mementos.length)) {
-    console.warn('No mementos retrieved for this URI');
-    console.log(tmDataIn);
-    return;
-  }
-  console.warn('here');
-  console.log(tmDataIn);
+ 
+ 
+  if(debug){console.log(tmDataIn);}
   var mementoCountFromCache = tmDataIn.mementos.list.length;
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
 }

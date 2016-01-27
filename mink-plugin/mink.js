@@ -239,11 +239,31 @@ function fetchTimeMap(uri, tabid) {
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
       if(debug) {console.log(tmData);}
+     
+      if(!data.mementos) {
+        data = new Timemap(data);
+        // TODO: data.normalize();
+        var mems = data.mementos;
+        delete data.mementos;
+        data.mementos = {list: mems};
+        if(debug) {console.log(data);}
+      }
 
       displaySecureSiteMementos(data.mementos.list, tabid);
-      console.log('** ** displaySecureSiteMementos');
-      console.log(data.mementos.list);
-      setTimemapInStorage(tmData, data.original_uri);
+      if(debug) {
+        console.log('** ** displaySecureSiteMementos');
+        console.log(data.mementos.list);
+      }
+      
+      var original = data.origin_uri;
+      if(!original) { // Normalize storage
+        original = data.original;
+        data.original_uri = original; 
+      }
+      
+      data.matstest = 'foo';
+      tmData = data;
+      setTimemapInStorage(tmData, original);
 	}).fail(function(xhr, data, error) {
 	  if(xhr.status === 404) {
 		if(debug){console.log('querying secure FAILED, Display zero mementos interface');}
@@ -552,20 +572,22 @@ function findTMURI(uri) {
       console.log(tmX);
     }
   }).fail(function(xhr, status, err) {
-    console.error('Querying the tm ' + uri + ' failed');
-    console.error(xhr);
-    console.log(status);
-    console.log(err);
+    if(debug) {
+      console.error('Querying the tm ' + uri + ' failed');
+      console.error(xhr);
+      console.log(status);
+      console.log(err);
+    }
   
   });
 }
 
 function setTimemapInStorage(tm, url) {
-if(debug) {
- console.log('setting tm in storage');
- console.log(tm);
- console.log(url);
-}
+    if(debug) {
+      console.log('setting tm in storage');
+      console.log(tm);
+      console.log(url);
+    }
 
 	chrome.storage.local.get('timemaps', function(items) {
 		var tms;
@@ -597,8 +619,11 @@ if(debug) {
 			}
         }
 
-console.log('* * * setting tms');
-console.log(tms);
+        if(debug) {
+          console.log('* * * setting tms');
+          console.log(tms);
+        }
+
 		chrome.storage.local.set({'timemaps':tms}, function() {
 			chrome.storage.local.getBytesInUse('timemaps', function(bytesUsed) {
 			  if(debug){console.log('current bytes used:' + bytesUsed);}
