@@ -241,6 +241,8 @@ function fetchTimeMap(uri, tabid) {
       if(debug) {console.log(tmData);}
 
       displaySecureSiteMementos(data.mementos.list, tabid);
+      console.log('** ** displaySecureSiteMementos');
+      console.log(data.mementos.list);
       setTimemapInStorage(tmData, data.original_uri);
 	}).fail(function(xhr, data, error) {
 	  if(xhr.status === 404) {
@@ -514,15 +516,15 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 			linkHeaderHasMementoData = true;
 		}
 
-        if(debug) {
-          console.log('calling setTimemapInStorage with:');
-          console.log(url);
-          console.log(tm);
-        }
-
         if(!linkHeaderHasMementoData) { // Had a link header sans Memento data
           return;
         }
+                
+        if(tm.timemap && !mementoDateTimeHeader) { // e.g., w3c wiki          
+          fetchTimeMap(tm.timemap, deets.tabId);
+          return;
+        }
+                
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  if(debug){console.log('The current page did not send a link header');}
@@ -549,10 +551,22 @@ function findTMURI(uri) {
       console.warn(tmX.timemap);
       console.log(tmX);
     }
+  }).fail(function(xhr, status, err) {
+    console.error('Querying the tm ' + uri + ' failed');
+    console.error(xhr);
+    console.log(status);
+    console.log(err);
+  
   });
 }
 
 function setTimemapInStorage(tm, url) {
+if(debug) {
+ console.log('setting tm in storage');
+ console.log(tm);
+ console.log(url);
+}
+
 	chrome.storage.local.get('timemaps', function(items) {
 		var tms;
 		var originalURI;
@@ -583,7 +597,8 @@ function setTimemapInStorage(tm, url) {
 			}
         }
 
-
+console.log('* * * setting tms');
+console.log(tms);
 		chrome.storage.local.set({'timemaps':tms}, function() {
 			chrome.storage.local.getBytesInUse('timemaps', function(bytesUsed) {
 			  if(debug){console.log('current bytes used:' + bytesUsed);}

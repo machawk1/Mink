@@ -134,6 +134,13 @@ function displayUIBasedOnStoredTimeMap(tmDataIn) {
 	  method: 'setTMData',
 	  value: tmDataIn
   });
+  if(!tmDataIn || !(tmDataIn.mementos) || !(tmDataIn.mementos.length)) {
+    console.warn('No mementos retrieved for this URI');
+    console.log(tmDataIn);
+    return;
+  }
+  console.warn('here');
+  console.log(tmDataIn);
   var mementoCountFromCache = tmDataIn.mementos.list.length;
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
 }
@@ -209,8 +216,10 @@ function addToBlacklist(currentBlacklist, uriIn){
 
 	chrome.storage.local.set(save,
 		function() {
-			console.log('done adding ' + uri + ' to blacklist. Prev blacklist:');
-			console.log(currentBlacklist);
+		    if(debug) {
+			  console.log('done adding ' + uri + ' to blacklist. Prev blacklist:');
+			  console.log(currentBlacklist);
+			}
 			getBlacklist();
 		}
 );
