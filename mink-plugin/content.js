@@ -124,7 +124,13 @@ function displayUIBasedOnContext() {
 	      if(debug) {
 	        console.log('Live web page revisited with a TM in cache');
 	      }
-	      displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
+	      
+	      if(!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate && items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length == 0) {
+	        //DBPedia specifies its own TG but lists no mementos/TM 
+	        getTMThenCall(document.URL, function() {displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);});
+	      }else {
+	           displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
+	      }
 	    }
 	  }else { // Not a Memento, no TM in cache
 	    if(debug) {
@@ -135,6 +141,33 @@ function displayUIBasedOnContext() {
 	});
 }
 
+function getTMThenCall(uri, cb) {
+  $.ajax({
+	  url: uri
+  }).done(function(data,textStatus,xhr) {
+	  var tm = new Timemap(xhr.getResponseHeader('Link'));
+	  var tmBody = new Timemap(data);
+	  if(tm.timemap) {
+	    chrome.runtime.sendMessage({
+	        method: 'fetchTimeMap',
+	        value: tm.timemap
+	    },cb);
+	    return;
+	  }
+	  
+	  if(tm.mementos && tm.mementos.length < 3 && tm.timegate) {  
+	    var nextURI = tm.timegate;
+	    tm = null;
+	    tmBody = null;
+	    getTMThenCall(nextURI, cb);
+	  
+	  } else {
+	    cb();
+	  }
+  });
+
+}
+
 function displayUIBasedOnStoredTimeMap(tmDataIn) {
   if(debug){console.log('displayUIBasedOnStoredTimeMap');}
   chrome.runtime.sendMessage({
@@ -142,7 +175,7 @@ function displayUIBasedOnStoredTimeMap(tmDataIn) {
 	  value: tmDataIn
   });
  
- 
+  console.log(tmDataIn);
   if(debug){console.log(tmDataIn);}
   var mementoCountFromCache = tmDataIn.mementos.list.length;
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});

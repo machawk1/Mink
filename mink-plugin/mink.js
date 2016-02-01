@@ -66,6 +66,10 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 	});
 });
 
+//chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+// console.warn('tab updated!');
+//});
+
 function setEnabledBasedOnURIInBlacklist(cb) {
   chrome.tabs.query({active: true}, function(tab) {
     if(debug){
@@ -560,12 +564,11 @@ function findTMURI(uri) {
     console.log('finding TM URI');
     console.log(uri);
   }
+  
   $.ajax({
-    url: uri,
-    dataType: 'jsonp'
+    url: uri
+    ,dataType: 'jsonp'
   }).done(function(data, status, xhr){
-    //console.log('XXXXX');
-    //console.log(xhr.getResponseHeader('link'));
     var tmX = new Timemap(xhr.getResponseHeader('link'));
     if(debug){
       console.warn(tmX.timemap);
