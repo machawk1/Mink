@@ -275,12 +275,22 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return;
     }
 
-	if(request.method === 'showArchiveNowUI'){
+	if(request.method === 'showArchiveNowUI') {
 		if(debug){console.log('Hide logo here');}
 		logoInFocus = true;
 		hideLogo = true;
 
 		return;
+	}
+	
+	if(request.method === 'isSiteSolelyMadeUpOfFrames') {
+	  var frameCount = $('frame').size();
+	  var madeUpOfFrames = false;
+	  if(frameCount && frameCount > 0) {
+	    madeUpOfFrames = true;
+	  }
+	  sendResponse(madeUpOfFrames);
+	  return;
 	}
 
 	if(request.method === 'displayThisMementoData'){

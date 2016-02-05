@@ -8,6 +8,7 @@ var tabBadgeCount = {}; // Maintain tabId-->count association
 
 
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento';
+var browserActionTitle_viewingMemento_frames = 'Mink - Viewing Memento with frames';
 var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web';
 var browserActionTitle_noMementos = 'Mink - No Mementos Available';
 
@@ -36,6 +37,10 @@ var badgeImages_isAMemento = {
   '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')
 };
 
+var badgeImages_isAMemento_withFrames = {
+  '38' : chrome.extension.getURL('images/mLogo38_isAMemento_frames.png'),
+  '19' : chrome.extension.getURL('images/mLogo38_isAMemento_frames.png')
+};
 
 
 chrome.webNavigation.onCommitted.addListener(function(e) {
@@ -342,11 +347,24 @@ function setBadge(value, icon, tabid) {
       setBadgeText(value + '', tabid);
     }
 
-    setBadgeIcon(icon, tabid);
-
+    
     if(JSON.stringify(icon) === JSON.stringify(badgeImages_isAMemento)) {
       chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento});
+      chrome.tabs.sendMessage(tabid, {
+            'method': 'isSiteSolelyMadeUpOfFrames'
+      }, function(response) {
+	    if(!(response.madeUpOfFrames)) {
+	      setBadgeIcon(icon, tabid);
+	      return;
+	    }
+	    
+	    // Site is made up of frames
+	    if(debug) {console.log('TODO: change mink functionality on sites that are solely made up of frames.');}
+	    setBadgeIcon(badgeImages_isAMemento_withFrames, tabid);
+	    chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento_frames});
+	  });
     }else {
+      setBadgeIcon(icon, tabid);
       chrome.browserAction.setTitle({title: browserActionTitle_normal});
     }
 }
