@@ -344,7 +344,7 @@ function setBadge(value, icon, tabid) {
 
     setBadgeIcon(icon, tabid);
 
-    if(icon === badgeImages_isAMemento) {
+    if(JSON.stringify(icon) === JSON.stringify(badgeImages_isAMemento)) {
       chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento});
     }else {
       chrome.browserAction.setTitle({title: browserActionTitle_normal});
