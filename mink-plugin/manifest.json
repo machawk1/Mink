@@ -22,6 +22,10 @@
     "48": "images/mink_marvel_48.png",
     "128": "images/mink_marvel_128.png"
   },
+  "externally_connectable": {
+    "ids": ["kenncghfghgolcbmckhiljgaabnpcaaa"],
+    "matches": ["*://localhost/*"]
+  },
   "permissions": [
     "webRequest",
     "webNavigation",

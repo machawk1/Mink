@@ -148,6 +148,15 @@ function displayMinkUI(tabId) {
 }
 
 
+chrome.runtime.onMessageExternal.addListener(
+  function(request, sender, sendResponse) {
+    console.log('External message received!');
+    console.log(request);
+    console.log(sender);
+    console.log(sendResponse);
+  }
+);
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.method == 'store') {
