@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';
@@ -242,8 +242,8 @@ function fetchTimeMap(uri, tabid) {
 	}).done(function(data, textStatus, xhr, a, b){
       var numberOfMementos = xhr.getResponseHeader('X-Memento-Count');
       tmData = data;
-      if(debug) {console.log(tmData);}
-     
+      //if(debug) {console.log(tmData);}
+
       if(!data.mementos) {
         data = new Timemap(data);
         // TODO: data.normalize();
@@ -258,13 +258,13 @@ function fetchTimeMap(uri, tabid) {
         console.log('** ** displaySecureSiteMementos');
         console.log(data.mementos.list);
       }
-      
+
       var original = data.origin_uri;
       if(!original) { // Normalize storage
         original = data.original;
-        data.original_uri = original; 
+        data.original_uri = original;
       }
-      
+
       data.matstest = 'foo';
       tmData = data;
       setTimemapInStorage(tmData, original);
@@ -498,6 +498,40 @@ chrome.webRequest.onCompleted.addListener(function(deets){
 },
 {urls: ['*://twitter.com/*/status/*'],types: ['xmlhttprequest']},['responseHeaders']);
 
+function createTimemapFromURI(uri, accumulatedArrayOfTimemaps) {
+    console.log('creatTimemapFromURI() - includes write to localstorage');
+    if (!accumulatedArrayOfTimemaps) {
+        accumulatedArrayOfTimemaps = [];
+    }
+
+    $.ajax({
+        url: uri,
+        type: 'GET' /* The payload is in the response body, not the head */
+    }).done(function (data, textStatus, xhr) {
+        if (xhr.status === 200) {
+            console.log('creating new tm ll');
+            var tm = new Timemap(data);
+            // Move data from tm.mementos as array to tm.mementos as an object and
+            //  tm.mementos.list as array to conform to JSON API from LANL aggregator
+            var mementosFromTimeMap = tm.mementos;
+            tm.mementos = null;
+            tm.mementos = {};
+            tm.mementos.list = mementosFromTimeMap;
+
+            //delete tm.mementos;
+            if (tm.timemap && tm.self && tm.timemap !== tm.self) { // Paginated TimeMaps likely
+                //Recursing to find more TMs
+                console.log(accumulatedArrayOfTimemaps);
+                return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
+            }
+        }
+    });
+}
+
+
+function getTimeMap(timeGate){
+
+}
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	var url = deets.url;
@@ -506,9 +540,12 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	var headers = deets.responseHeaders;
 	var mementoDateTimeHeader;
 	var linkHeaderAsString;
-
+    //var isTimeGate = new RegExp("^\<(.+)\>;rel=(timegate)");
 	// Enumerate through the HTTP response headers to grab those related to Memento (if applicable)
 	for(var headerI = 0; headerI < headers.length; headerI++){
+        if(debug){
+            console.log(headers[headerI]);
+        }
 		if(headers[headerI].name == 'Memento-Datetime'){
 			mementoDateTimeHeader = headers[headerI].value;
 		}else if(headers[headerI].name == 'Link'){
@@ -527,7 +564,6 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 	      console.log('A link header exists:');
 	      console.log(linkHeaderAsString);
 	    }
-
 		var tm = new Timemap(linkHeaderAsString);
 		if(debug){console.log('TG?: ' + tm.timegate);}
 		if(tm.timegate) { //specified own TimeGate, query this
@@ -543,12 +579,13 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
         if(!linkHeaderHasMementoData) { // Had a link header sans Memento data
           return;
         }
-                
-        if(tm.timemap && !mementoDateTimeHeader) { // e.g., w3c wiki          
-          fetchTimeMap(tm.timemap, deets.tabId);
+
+        if(tm.timemap && !mementoDateTimeHeader) { // e.g., w3c wiki
+
+            fetchTimeMap(tm.timemap, deets.tabId);
           return;
         }
-                
+
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  if(debug){console.log('The current page did not send a link header');}
@@ -564,13 +601,13 @@ function findTMURI(uri) {
     console.log('finding TM URI');
     console.log(uri);
   }
-  
+
   $.ajax({
     url: uri
-    ,dataType: 'jsonp'
   }).done(function(data, status, xhr){
     var tmX = new Timemap(xhr.getResponseHeader('link'));
     if(debug){
+        Promise.resolve(createTimemapFromURI(tmX.timemap));
       console.warn(tmX.timemap);
       console.log(tmX);
     }
@@ -581,7 +618,7 @@ function findTMURI(uri) {
       console.log(status);
       console.log(err);
     }
-  
+
   });
 }
 
@@ -610,6 +647,7 @@ function setTimemapInStorage(tm, url) {
 			tms = items.timemaps;
 		}
 		tms[url] = tm;
+        if(debug) {console.log("The tm is",tm,tms);}
 
 		// Trim the cache if overfull
 		if(items.timemaps) {
