@@ -259,15 +259,18 @@ function fetchTimeMap(uri, tabid) {
         console.log(data.mementos.list);
       }
       
-      var original = data.origin_uri;
-      if(!original) { // Normalize storage
-        original = data.original;
-        data.original_uri = original; 
+      data.original = data.original ? data.original : data.original_uri;
+    
+      if(debug) {
+        data.matstest = 'foo';
+        console.log('#204: foo');
+        console.log(tmData);
+        console.log(data.original);
+        console.log(data);
       }
-      
-      data.matstest = 'foo';
       tmData = data;
-      setTimemapInStorage(tmData, original);
+      
+      setTimemapInStorage(tmData, data.original);
 	}).fail(function(xhr, data, error) {
 	  if(xhr.status === 404) {
 		if(debug){console.log('querying secure FAILED, Display zero mementos interface');}
@@ -548,7 +551,8 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
           fetchTimeMap(tm.timemap, deets.tabId);
           return;
         }
-                
+        
+        console.log('#204: bar');        
 		setTimemapInStorage(tm, url);
 	} else if(debug) {
 	  if(debug){console.log('The current page did not send a link header');}
