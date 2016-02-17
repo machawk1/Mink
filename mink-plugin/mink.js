@@ -534,8 +534,9 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
             var tm = new Timemap(linkHeaderAsString);
             if(debug){console.log('TG?: ' + tm.timegate);}
             if(tm.timegate) { //specified own TimeGate, query this
-                findTMURI(tm.timegate);
+                findTMURI(tm.timegate,deets.tabId);
                 linkHeaderHasMementoData = true;
+                return;
             }
 
             if(mementoDateTimeHeader){
@@ -562,7 +563,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
     },
     {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
 
-function createTimemapFromURI(uri, accumulatedArrayOfTimemaps) {
+function createTimemapFromURI(uri, tabId,accumulatedArrayOfTimemaps) {
     console.log('creatTimemapFromURI() - includes write to localstorage');
     if (!accumulatedArrayOfTimemaps) {
         accumulatedArrayOfTimemaps = [];
@@ -586,7 +587,7 @@ function createTimemapFromURI(uri, accumulatedArrayOfTimemaps) {
             if (tm.timemap && tm.self && tm.timemap !== tm.self) { // Paginated TimeMaps likely
                 //Recursing to find more TMs
                 console.log(accumulatedArrayOfTimemaps);
-                return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm));
+                return createTimemapFromURI(tm.timemap, tabId,accumulatedArrayOfTimemaps.concat(tm));
             } else {
                 console.log("tm.timemap && tm.self.... else ");
                 accumulatedArrayOfTimemaps.push(tm);
@@ -598,7 +599,13 @@ function createTimemapFromURI(uri, accumulatedArrayOfTimemaps) {
                         firstTm.mementos.list = firstTm.mementos.list.concat(elem.mementos.list);
                     });
 
+
+
                 console.log(firstTm);
+                setTimemapInStorage(firstTm,firstTm.original);
+                chrome.tabs.sendMessage(tabId, {
+                    'method': 'stopAnimatingBrowserActionIcon'
+                });
             }
         } else {
             console.log("status === 200 else done decending");
@@ -608,7 +615,7 @@ function createTimemapFromURI(uri, accumulatedArrayOfTimemaps) {
 
 
 
-function findTMURI(uri) {
+function findTMURI(uri,tabid) {
     if(debug){
         console.log('finding TM URI');
         console.log(uri);
@@ -623,7 +630,7 @@ function findTMURI(uri) {
             console.log(tmX);
         }
 
-        Promise.resolve(createTimemapFromURI(tmX.timemap));
+        Promise.resolve(createTimemapFromURI(tmX.timemap,tabid));
 
     }).fail(function(xhr, status, err) {
         if(debug) {

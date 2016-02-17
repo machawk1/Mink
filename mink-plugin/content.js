@@ -175,11 +175,17 @@ function getTMThenCall(uri, cb) {
     }).done(function (data, textStatus, xhr) {
         var tm = new Timemap(xhr.getResponseHeader('Link'));
         var tmBody = new Timemap(data);
+        if(debug){
+            console.log("Get TM Then call");
+        }
         if (tm.timemap) {
             chrome.runtime.sendMessage({
                 method: 'fetchTimeMap',
                 value: tm.timemap
             }, cb);
+            if(debug){
+                console.log("Get TM Then call sent message fetchTimeMap");
+            }
             return;
         }
 
@@ -187,6 +193,9 @@ function getTMThenCall(uri, cb) {
             var nextURI = tm.timegate;
             tm = null;
             tmBody = null;
+            if(debug){
+                console.log("getTMThenCall tm.mementos && tm.mementos.length < 3 && tm.timegate");
+            }
             getTMThenCall(nextURI, cb);
 
         } else {
