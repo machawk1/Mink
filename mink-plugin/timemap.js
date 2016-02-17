@@ -4,12 +4,11 @@ function Timemap(fromString){
 	var timemap, timegate, original, url, self;
 	this.str = fromString;
     if (!this.str) {
-			if (debug) {
-			  console.log('data passed in was null');
-			}
-			return;
+	    if (debug) {
+		    console.log('data passed in was null');
+		}
+		return;
 	}
-
 
 	//parse out timegate
 	//console.log(this.str);
