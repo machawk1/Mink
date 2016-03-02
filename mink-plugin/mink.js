@@ -522,6 +522,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
             console.log(headers);
         }
 
+    //TODO: this place we must check if cached first
         if(linkHeaderAsString) {
             var linkHeaderHasMementoData = false;
             if(debug) {
@@ -631,6 +632,7 @@ function findTMURI(uri,tabid) {
         }
 
         Promise.resolve(createTimemapFromURI(tmX.timemap,tabid));
+
 
     }).fail(function(xhr, status, err) {
         if(debug) {

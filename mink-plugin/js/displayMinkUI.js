@@ -1,5 +1,5 @@
 var MAX_MEMENTOS_IN_DROPDOWN = 500;
-var debug = false;
+var debug = true;
 function createShadowDOM(cb) {
    var selector = '#minkuiX';
 

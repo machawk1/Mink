@@ -401,7 +401,7 @@ function processResponseFromAggregator(xhr) {
 }
 
 function createTimemapFromURI(uri, accumulatedArrayOfTimemaps) {
-    console.log('creatTimemapFromURI() - includes write to localstorage');
+    console.log('content.js creatTimemapFromURI() - includes write to localstorage');
     if (!accumulatedArrayOfTimemaps) {
         accumulatedArrayOfTimemaps = [];
     }
