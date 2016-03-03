@@ -21,15 +21,38 @@ var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g;
 var animateBrowserActionIcon = false;
 var animationTimer;
 
+var clockIcons_38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_15.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_22.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_30.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_37.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_45.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_52.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')];
+var clockIcons_19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_15.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_22.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_30.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_37.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_45.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_52.5.png'),
+    chrome.extension.getURL('images/mementoLogos/mLogo19_60.png')];
+var iteration = clockIcons_38.length - 1;
+
+
+
+
 //TODO: check if in blacklist
 //getBlacklist();
 
 
 // Faux promises for enabling/disabling UI
 var setBlacklisted = function () {
+    console.log("setBlacklisted");
     setActiveBasedOnBlacklistedProperty(displayUIBasedOnContext);
 };
 var setInitialStateWithChecks = function () {
+    console.log("setInitialStateWithChecks");
     setActiveBasedOnDisabledProperty(setBlacklisted);
 };
 
@@ -208,13 +231,13 @@ function getTMThenCall(uri, cb) {
 function displayUIBasedOnStoredTimeMap(tmDataIn) {
     if (debug) {
         console.log('displayUIBasedOnStoredTimeMap');
+        console.log('displayUIBasedOnStoredTimeMap tmDataIN',tmDataIn);
     }
     chrome.runtime.sendMessage({
         method: 'setTMData',
         value: tmDataIn
     });
 
-    console.log(tmDataIn);
     if (debug) {
         console.log(tmDataIn);
     }
@@ -329,6 +352,33 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         return;
     }
 
+    if(request.method == 'startTimer'){
+        if(debug){
+            console.log("Got startTimer");
+        }
+        chrome.runtime.sendMessage({
+            method: 'setBadge', text: '', iconPath: {
+                '38': clockIcons_38[clockIcons_38.length - 1],
+                '19': clockIcons_19[clockIcons_19.length - 1]
+            }
+        });
+
+        chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function (response) {
+        });
+
+        animateBrowserActionIcon = true;
+
+        setTimeout(animatePageActionIcon, 500);
+    }
+
+    if(request.method == 'displayUIStoredTM'){
+        if(debug){
+            console.log("got message displayUIStoredTM");
+        }
+        displayUIBasedOnStoredTimeMap(request.data);
+
+    }
+
     if (request.method === 'displayThisMementoData') {
         //Parse the data received from the secure source and display the number of mementos
         if (request.data.timemap_uri) { // e.g., twitter.com
@@ -350,14 +400,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         return;
     }
 
-    if (request.method === 'displayUI') {
+    if (request.method === 'getMementos') {
         if (debug) {
-            console.log(request.timegate);
-            console.log(request.timemap);
-            console.log(request.uri);
-            console.log('-----');
-            console.warn('no special handling, calling fallthrough');
+            console.log("Got displayUI message");
         }
+        //getMementos(request.uri);
+        displayUIBasedOnContext();
     }
 
     if (request.method === 'showViewingMementoInterface') {
@@ -370,8 +418,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (debug) {
         console.log('ppp');
     }
-    displayUIBasedOnContext();
+    //displayUIBasedOnContext();
 });
+
+
+
 
 
 function processResponseFromAggregator(xhr) {
@@ -474,23 +525,7 @@ function getMementos(uri) {
 }
 
 
-var clockIcons_38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_15.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_22.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_30.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_37.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_45.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_52.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')];
-var clockIcons_19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_15.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_22.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_30.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_37.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_45.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_52.5.png'),
-    chrome.extension.getURL('images/mementoLogos/mLogo19_60.png')];
-var iteration = clockIcons_38.length - 1;
+
 
 function animatePageActionIcon() {
     if (!animateBrowserActionIcon) {

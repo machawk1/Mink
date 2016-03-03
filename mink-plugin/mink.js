@@ -6,7 +6,6 @@ var stillProcessingBadgeDisplay = 'WAIT';
 var tabBadgeCount = {}; // Maintain tabId-->count association
 
 
-
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento';
 var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web';
 var browserActionTitle_noMementos = 'Mink - No Mementos Available';
@@ -150,6 +149,12 @@ function displayMinkUI(tabId) {
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+
+        if(debug){
+            console.log("In mink.js got message the request is ",request);
+            console.log("In mink.js got message the sender is ",sender);
+        }
+
         if (request.method == 'store') {
             localStorage.setItem('minkURI',request.value);
             localStorage.setItem('mementos',request.mementos);
@@ -227,6 +232,8 @@ chrome.runtime.onMessage.addListener(
                 }
 
             });
+
+
         }else {
             if(debug){console.log('Message sent using chrome.runtime not caught: ' + request.method);}
         }
@@ -524,45 +531,66 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
 
     //TODO: this place we must check if cached first
         if(linkHeaderAsString) {
-            var linkHeaderHasMementoData = false;
             if(debug) {
                 console.log('A link header exists:');
                 console.log(linkHeaderAsString);
             }
+            chrome.storage.local.get('timemaps',function(tms) {
+                if(!tms.timemaps.hasOwnProperty(url)){
+                    var linkHeaderHasMementoData = false;
 
 
+                    var tm = new Timemap(linkHeaderAsString);
+                    if(debug){console.log('TG?: ' + tm.timegate);}
+                    //mementoguide logic
+                    if(tm.timegate) { //specified own TimeGate, query this
+                        findTMURI(tm.timegate,deets.tabId);
+                        linkHeaderHasMementoData = true;
+                        return;
+                    }
 
-            var tm = new Timemap(linkHeaderAsString);
-            if(debug){console.log('TG?: ' + tm.timegate);}
-            if(tm.timegate) { //specified own TimeGate, query this
-                findTMURI(tm.timegate,deets.tabId);
-                linkHeaderHasMementoData = true;
-                return;
-            }
+                    if(mementoDateTimeHeader){
+                        tm.datetime = mementoDateTimeHeader;
+                        linkHeaderHasMementoData = true;
+                    }
 
-            if(mementoDateTimeHeader){
-                tm.datetime = mementoDateTimeHeader;
-                linkHeaderHasMementoData = true;
-            }
+                    if(!linkHeaderHasMementoData) { // Had a link header sans Memento data
+                        return;
+                    }
 
-            if(!linkHeaderHasMementoData) { // Had a link header sans Memento data
-                return;
-            }
+                    if(tm.timemap && !mementoDateTimeHeader) { // e.g., w3c wiki
+                        fetchTimeMap(tm.timemap, deets.tabId);
+                        return;
+                    }
+                    console.log('#204: bar');
+                    setTimemapInStorage(tm, url);
+                } else {
+                    console.log("We have some ");
 
-            if(tm.timemap && !mementoDateTimeHeader) { // e.g., w3c wiki
-                fetchTimeMap(tm.timemap, deets.tabId);
-                return;
-            }
+                }
+            });
 
-            console.log('#204: bar');
-            setTimemapInStorage(tm, url);
-        } else if(debug) {
+        } else {
             if(debug){console.log('The current page did not send a link header');}
+            chrome.tabs.query({
+                'active': true,
+                'currentWindow': true
+            }, function (tabs) {
+                console.log("getMementos");
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    'method': 'getMementos',
+                    'uri': url
+                });
+            });
+
         }
 
 
     },
-    {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
+    {urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders']);
+
+
+
 
 function createTimemapFromURI(uri, tabId,accumulatedArrayOfTimemaps) {
     console.log('creatTimemapFromURI() - includes write to localstorage');
@@ -607,9 +635,18 @@ function createTimemapFromURI(uri, tabId,accumulatedArrayOfTimemaps) {
                 chrome.tabs.sendMessage(tabId, {
                     'method': 'stopAnimatingBrowserActionIcon'
                 });
+
+                chrome.tabs.sendMessage(tabId, {
+                    'method': 'displayUIStoredTM',
+                    'data' : firstTm
+                });
+
             }
         } else {
             console.log("status === 200 else done decending");
+            //chrome.tabs.sendMessage(tabId, {
+            //    'method': 'stopAnimatingBrowserActionIcon'
+            //});
         }
     });
 }
@@ -630,6 +667,15 @@ function findTMURI(uri,tabid) {
             console.warn(tmX.timemap);
             console.log(tmX);
         }
+
+        chrome.tabs.query({
+            'active': true,
+            'currentWindow': true
+        }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                'method': 'startTimer'
+            });
+        });
 
         Promise.resolve(createTimemapFromURI(tmX.timemap,tabid));
 
