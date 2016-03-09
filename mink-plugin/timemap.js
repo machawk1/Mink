@@ -2,9 +2,9 @@ function Timemap(fromString){
 	if(debug){console.log("In timemap.js");}
 	var timemap, timegate, original, url, self;
 	this.str = fromString;
-	if (!this.str) {
-		if (debug) {
-			console.log('data passed in was null');
+    if (!this.str) {
+	    if (debug) {
+		    console.log('data passed in was null');
 		}
 		return;
 	}
@@ -14,17 +14,17 @@ function Timemap(fromString){
 	// Check if the string passed in is an Object, e.g., https://github.com/
 	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
 	if(debug) {
-		//console.log(this.str);
-		//console.log('type: ' + typeof this.str);
+	  console.log(this.str);
+	  console.log('type: ' + typeof this.str);
 	}
 	if (strIsAnObject) {
 		if (debug) {
-			console.log('Handle fromString as an object, akin to github.com');
+		  console.log('Handle fromString as an object, akin to github.com');
 		}
-		//		this = this.str;
+	//		this = this.str;
 	}
 	if(debug) {
-		//console.log(fromString);
+	  console.log(fromString);
 	}
 	var linkHeaderEntries = this.str.split(",");
 
@@ -94,9 +94,9 @@ function Timemap(fromString){
 		if(debug){
 			console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.");
 			console.log('link header: ');
-			//console.log(this.str);
-			//console.log(linkHeaderEntries);
-			//console.log(linkHeaderEntries);
+			console.log(this.str);
+			console.log(linkHeaderEntries);
+			console.log(linkHeaderEntries);
 		}
 	}
 
@@ -118,8 +118,8 @@ function Memento(fromStr){
 }
 
 /* ***************************
- PUT BELOW IN UTIL.JS
- *************************** */
+   PUT BELOW IN UTIL.JS
+*************************** */
 
 function sanitizeMementoURI(mURI){
 	var ret = mURI.trim();
