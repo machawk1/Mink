@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 //var proxy = 'http://timetravel.mementoweb.org/timemap/link/';
 var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/';
@@ -154,7 +154,7 @@ function displayUIBasedOnContext() {
 			var headers = itemsh.headers[document.URL];
 			var mementoDateTimeHeader;
 			var linkHeaderAsString;
-
+			var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL);
 			/*
 			 special consideration deets.tabId will be -1 if the request is not related to a tab
 			 case 1: no link header, no datetime
@@ -162,6 +162,7 @@ function displayUIBasedOnContext() {
 			 case 3: link header, datetime
 			 */
 			for (var headerI = 0; headerI < headers.length; headerI++) {
+				console.log(headers[headerI]);
 				if (headers[headerI].name == 'Memento-Datetime') {
 					mementoDateTimeHeader = headers[headerI].value;
 				} else if (headers[headerI].name == 'Link') {
@@ -171,69 +172,74 @@ function displayUIBasedOnContext() {
 			var tm;
 			if (!linkHeaderAsString && !mementoDateTimeHeader /*case1*/) {
 				normalDisplayUIBC(items);
-				// console.log("No linkheader and no memento date time header");
+				if(debug){
+					console.log("No linkheader and no memento date time header");
+				}
 
-			} else if (linkHeaderAsString/*case2*/) {
-				var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL);
-				if (!mementoDateTimeHeader/*case2*/) {
-					// console.log(" linkheader and no memento date time header");
-					if (notStoredInCache) {
-						var specifiedTimegate = false;
-						var specifiedTimemap = false;
+			} else if (linkHeaderAsString/*case2*/ && !mementoDateTimeHeader) {
+
+				if(debug){
+					console.log(" linkheader and no memento date time header");
+				}
+				if (notStoredInCache) {
+					var specifiedTimegate = false;
+					var specifiedTimemap = false;
+					if (debug) {
+						console.log("case 2 not in cache putting link header specified into cache");
+					}
+					tm = new Timemap(linkHeaderAsString);
+
+					if (debug) {
+						console.log('TG?: ' + tm.timegate);
+					}
+					if (tm.timegate) { //specified own TimeGate, query this
 						if (debug) {
-							console.log("case 2 not in cache putting link header specified into cache");
+							console.log("Specified Timegate");
 						}
-						tm = new Timemap(linkHeaderAsString);
+						specifiedTimegate = true;
 
+
+						chrome.runtime.sendMessage({
+							method: 'findTMURI', timegate: tm.timegate
+						});
+
+					}
+
+					if (tm.timemap && !specifiedTimegate) { // e.g., w3c wiki
 						if (debug) {
-							console.log('TG?: ' + tm.timegate);
-						}
-						if (tm.timegate) { //specified own TimeGate, query this
-							if (debug) {
-								console.log("Specified Timegate");
-							}
-							specifiedTimegate = true;
-
-
-							chrome.runtime.sendMessage({
-								method: 'findTMURI', timegate: tm.timegate
-							});
-
+							console.log('time map and no timegate');
 						}
 
-						if (tm.timemap && !specifiedTimegate) { // e.g., w3c wiki
-							if (debug) {
-								console.log('time map and no timegate');
-							}
+						chrome.runtime.sendMessage({
+							method: 'fetchTimeMap', value: tm.timemap
+						});
+						specifiedTimemap = true;
+					}
 
-							chrome.runtime.sendMessage({
-								method: 'fetchTimeMap', value:tm.timemap
-							});
-							specifiedTimemap = true;
-						}
-
-						if (!specifiedTimegate && !specifiedTimemap) {
-							//case for when there is a link but nothing about memento is there
-							normalDisplayUIBC(items);
-						}
-					} else {
+					if (!specifiedTimegate && !specifiedTimemap) {
+						//case for when there is a link but nothing about memento is there
 						normalDisplayUIBC(items);
 					}
-				}else {
+				} else {
 					normalDisplayUIBC(items);
 				}
 
 
-			} else /*case 3*/{
-				tm = new Timemap(linkHeaderAsString);
-				tm.datetime = mementoDateTimeHeader;
-				if (debug) {
-					console.log("case 3: link header, datetime");
-					console.log(tm);
+			} else if (mementoDateTimeHeader) /*case 3*/{
+				if(notStoredInCache){
+					tm = new Timemap(linkHeaderAsString);
+					tm.datetime = mementoDateTimeHeader;
+					if (debug) {
+						console.log("case 3: link header, datetime");
+						console.log(tm);
+					}
+					chrome.runtime.sendMessage({
+						method: 'setTimemapInStorageAndCall', tm: tm, url: document.URL
+					});
+				} else {
+					normalDisplayUIBC(items);
 				}
-				chrome.runtime.sendMessage({
-					method: 'setTimemapInStorageAndCall', tm:tm, url:document.URL
-				});
+
 			}
 
 		});
@@ -373,6 +379,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return;
     }
 
+
+	if (request.method === 'displayUIStoredTM') {
+		if (debug) {
+			console.log("got message displayUIStoredTM");
+		}
+		displayUIBasedOnStoredTimeMap(request.data);
+
+	}
+
 	if (request.method === 'startTimer') {
 		if (debug) {
 			console.log("Got startTimer");
@@ -429,6 +444,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.log(request.uri);
 			console.log('-----');
 			console.warn('no special handling, calling fallthrough');
+			displayUIBasedOnContext();
 		}
 	}
 
@@ -440,7 +456,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if(debug) {console.log('ppp');}
-	displayUIBasedOnContext();
+
 });
 
 

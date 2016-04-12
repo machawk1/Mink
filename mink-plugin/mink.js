@@ -1,4 +1,4 @@
-var debug =true;
+var debug = false;
 var iconState = -1;
 var tmData;
 var maxBadgeDisplay = '999+';
@@ -176,6 +176,7 @@ chrome.runtime.onMessage.addListener(
              'method': 'displayUI'
           });
        });
+
     }
     else if (request.method == 'retrieve'){
     	if(debug){console.log('Retrieving items from localStorage');}
@@ -541,9 +542,8 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
                delete data[keyOfIndex];
             }
          }
-         console.log(data);
+
          data[deets.url] = deets.responseHeaders;
-         console.log(data);
          chrome.storage.local.set({'headers':data},function () {
                   if(chrome.runtime.lastError) {
                      if(debug){console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);}
