@@ -162,7 +162,6 @@ function displayUIBasedOnContext() {
 			 case 3: link header, datetime
 			 */
 			for (var headerI = 0; headerI < headers.length; headerI++) {
-				console.log(headers[headerI]);
 				if (headers[headerI].name == 'Memento-Datetime') {
 					mementoDateTimeHeader = headers[headerI].value;
 				} else if (headers[headerI].name == 'Link') {
@@ -172,12 +171,12 @@ function displayUIBasedOnContext() {
 			var tm;
 			if (!linkHeaderAsString && !mementoDateTimeHeader /*case1*/) {
 				normalDisplayUIBC(items);
-				console.log("No linkheader and no memento date time header");
+				// console.log("No linkheader and no memento date time header");
 
 			} else if (linkHeaderAsString/*case2*/) {
 				var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL);
 				if (!mementoDateTimeHeader/*case2*/) {
-					console.log(" linkheader and no memento date time header");
+					// console.log(" linkheader and no memento date time header");
 					if (notStoredInCache) {
 						var specifiedTimegate = false;
 						var specifiedTimemap = false;
