@@ -167,6 +167,7 @@ chrome.runtime.onMessage.addListener(
 
     	sendResponse({value: 'noise'});
     } else if(request.method == 'findTMURI'){
+        console.log("Got findTMURI");
        findTMURI(request.timegate, sender.tab.id);
     } else if(request.method == 'setTimemapInStorageAndCall'){
        console.log("Got setTimemapInStorageAndCall");

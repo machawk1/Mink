@@ -14,7 +14,7 @@ function Timemap(fromString){
 	// Check if the string passed in is an Object, e.g., https://github.com/
 	var strIsAnObject = (typeof this.str === "object") && (this.str !== null);
 	if(debug) {
-	  console.log(this.str);
+	  // console.log(this.str);
 	  console.log('type: ' + typeof this.str);
 	}
 	if (strIsAnObject) {
@@ -24,7 +24,7 @@ function Timemap(fromString){
 	//		this = this.str;
 	}
 	if(debug) {
-	  console.log(fromString);
+	  // console.log(fromString);
 	}
 	var linkHeaderEntries = this.str.split(",");
 

@@ -147,37 +147,41 @@ function displayUIBasedOnContext() {
 		console.log('displayUIBasedOnContext()');
 		console.log(document.URL);
 	}
-	chrome.storage.local.get('headers', function (items) {
-		var headers = items.headers[document.URL];
-		var mementoDateTimeHeader;
-		var linkHeaderAsString;
+	chrome.storage.local.get('headers', function (itemsh) {
 
-		/*
-		 special consideration deets.tabId will be -1 if the request is not related to a tab
-		 case 1: no link header, no datetime
-		 case 2: link header, no datetime
-		 case 3: link header, datetime
-		 */
-		for (var headerI = 0; headerI < headers.length; headerI++) {
-			if (headers[headerI].name == 'Memento-Datetime') {
-				mementoDateTimeHeader = headers[headerI].value;
-			} else if (headers[headerI].name == 'Link') {
-				linkHeaderAsString = headers[headerI].value;
-			}
-		}
 
 		chrome.storage.local.get('timemaps', function (items) {
+			var headers = itemsh.headers[document.URL];
+			var mementoDateTimeHeader;
+			var linkHeaderAsString;
+
+			/*
+			 special consideration deets.tabId will be -1 if the request is not related to a tab
+			 case 1: no link header, no datetime
+			 case 2: link header, no datetime
+			 case 3: link header, datetime
+			 */
+			for (var headerI = 0; headerI < headers.length; headerI++) {
+				console.log(headers[headerI]);
+				if (headers[headerI].name == 'Memento-Datetime') {
+					mementoDateTimeHeader = headers[headerI].value;
+				} else if (headers[headerI].name == 'Link') {
+					linkHeaderAsString = headers[headerI].value;
+				}
+			}
 			var tm;
 			if (!linkHeaderAsString && !mementoDateTimeHeader /*case1*/) {
 				normalDisplayUIBC(items);
+				console.log("No linkheader and no memento date time header");
 
 			} else if (linkHeaderAsString/*case2*/) {
 				var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL);
 				if (!mementoDateTimeHeader/*case2*/) {
+					console.log(" linkheader and no memento date time header");
 					if (notStoredInCache) {
 						var specifiedTimegate = false;
 						var specifiedTimemap = false;
-						if (true) {
+						if (debug) {
 							console.log("case 2 not in cache putting link header specified into cache");
 						}
 						tm = new Timemap(linkHeaderAsString);
@@ -193,7 +197,7 @@ function displayUIBasedOnContext() {
 
 
 							chrome.runtime.sendMessage({
-								method: 'findTMURI', timegate:tm.timegate
+								method: 'findTMURI', timegate: tm.timegate
 							});
 
 						}
@@ -213,6 +217,8 @@ function displayUIBasedOnContext() {
 							//case for when there is a link but nothing about memento is there
 							normalDisplayUIBC(items);
 						}
+					} else {
+						normalDisplayUIBC(items);
 					}
 				}else {
 					normalDisplayUIBC(items);
@@ -226,13 +232,8 @@ function displayUIBasedOnContext() {
 					console.log("case 3: link header, datetime");
 					console.log(tm);
 				}
-				chrome.tabs.query({
-					'active': true,
-					'currentWindow': true
-				}, function (tabs) {
-					chrome.runtime.sendMessage({
-						method: 'setTimemapInStorageAndCall', tm:tm,url:document.URL, tabId:tabs[0].id
-					});
+				chrome.runtime.sendMessage({
+					method: 'setTimemapInStorageAndCall', tm:tm, url:document.URL
 				});
 			}
 
@@ -372,6 +373,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         animateBrowserActionIcon = false;
         return;
     }
+
+	if (request.method === 'startTimer') {
+		if (debug) {
+			console.log("Got startTimer");
+		}
+		chrome.runtime.sendMessage({
+			method: 'setBadge', text: '', iconPath: {
+				'38': clockIcons_38[clockIcons_38.length - 1],
+				'19': clockIcons_19[clockIcons_19.length - 1]
+			}
+		});
+		chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function (response) {
+		});
+		animateBrowserActionIcon = true;
+		setTimeout(animatePageActionIcon, 500);
+	}
+
+	if (request.method === 'stopAnimatingBrowserActionIcon') {
+		clearTimeout(animationTimer);
+		animateBrowserActionIcon = false;
+		return;
+	}
 
 	if(request.method === 'showArchiveNowUI'){
 		if(debug){console.log('Hide logo here');}
