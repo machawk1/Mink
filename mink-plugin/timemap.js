@@ -99,7 +99,7 @@ function Timemap(fromString){
 			console.log(linkHeaderEntries);
 		}
 	}
-	
+
 	if(debug) {console.warn('the tm: ' + this.timemap);}
 }
 
