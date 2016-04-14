@@ -167,10 +167,10 @@ chrome.runtime.onMessage.addListener(
 
     	sendResponse({value: 'noise'});
     } else if(request.method == 'findTMURI'){
-        console.log("Got findTMURI");
+       if(debug){console.log("Got findTMURI");}
        findTMURI(request.timegate, sender.tab.id);
     } else if(request.method == 'setTimemapInStorageAndCall'){
-       console.log("Got setTimemapInStorageAndCall");
+       if(debug){console.log("Got setTimemapInStorageAndCall");}
        setTimemapInStorageAndCall(request.tm,request.url,function(){
           chrome.tabs.sendMessage(sender.tab.id, {
              'method': 'displayUI'
@@ -588,7 +588,7 @@ function createTimemapFromURI(uri, tabId, accumulatedArrayOfTimemaps) {
          tm.mementos = {};
          tm.mementos.list = mementosFromTimeMap;
 
-         if (tm.timemap && tm.self && tm.timemap !== tm.self) { // Paginated TimeMaps likely
+         if (tm.timemap && tm.self && tm.timemap !== tm.self && !tmInList(tm.timemap, accumulatedArrayOfTimemaps)) { // Paginated TimeMaps likely
             //Recursing to find more TMs
             if (debug) {
                console.log(accumulatedArrayOfTimemaps);
@@ -623,6 +623,13 @@ function createTimemapFromURI(uri, tabId, accumulatedArrayOfTimemaps) {
    });
 }
 
+
+function tmInList(tmURI, tms) {
+  for(var tm = tms.length - 1; tm >= 0; tm--) {
+    if(tms[tm].timemap === tmURI) {return true;}
+  }
+  return false;
+}
 
 function findTMURI(uri, tabid) {
    if (debug) {
