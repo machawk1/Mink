@@ -277,8 +277,9 @@ function archiveURI_archiveOrg(cb) {
 				title: 'Mink',
 				body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
 			}, function(response) {});
-			cb();
-
+			if(cb) {
+			  cb();
+      }
 
 			var shadow = document.getElementById('minkWrapper').shadowRoot;
 			shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess');
@@ -313,8 +314,10 @@ function archiveURI_archiveDotIs(cb) {
 				title: 'Mink',
 				body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
 			});
-			cb();
-
+			if(cb) {
+  			cb();
+      } 
+      
 			$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
 
 			var linkHeader = xhr.getResponseHeader('link');
