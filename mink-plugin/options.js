@@ -214,6 +214,12 @@ function clearTimemapCache() {
         populatedCachedTimeMapsUI();
       }
     );
+
+  chrome.storage.local.set({'headers':{}},
+     function() {
+       console.log('Remove headers');
+     }
+  );
 }
 
 function saveAndCloseOptionsPanel() {

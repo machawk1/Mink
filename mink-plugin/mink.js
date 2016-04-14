@@ -146,6 +146,16 @@ function displayMinkUI(tabId) {
   });
 
 }
+/*
+ setTimemapInStorageAndCall(tm,url,function(){
+ displayUIBasedOnTabid(deets.tabId);
+ });
+ setTimemapInStorageAndCall
+ fetchTimeMap
+ method: 'findTMURI', timegate:tm.timegate, tabId:tabs[0].id
+ method: 'fetchTimeMap', timemap:tm.timemap, tabId:tabs[0].id
+ method: 'setTimemapInStorageAndCall', tm:tm,url:document.URL, tabId:tabs[0].id
+ */
 
 
 chrome.runtime.onMessage.addListener(
@@ -156,7 +166,19 @@ chrome.runtime.onMessage.addListener(
 		localStorage.setItem('memento_datetime',request.memento_datetime);
 
     	sendResponse({value: 'noise'});
-    } else if (request.method == 'retrieve'){
+    } else if(request.method == 'findTMURI'){
+       if(debug){console.log("Got findTMURI");}
+       findTMURI(request.timegate, sender.tab.id);
+    } else if(request.method == 'setTimemapInStorageAndCall'){
+       if(debug){console.log("Got setTimemapInStorageAndCall");}
+       setTimemapInStorageAndCall(request.tm,request.url,function(){
+          chrome.tabs.sendMessage(sender.tab.id, {
+             'method': 'displayUI'
+          });
+       });
+
+    }
+    else if (request.method == 'retrieve'){
     	if(debug){console.log('Retrieving items from localStorage');}
 
       sendResponse({
@@ -503,91 +525,222 @@ chrome.webRequest.onCompleted.addListener(function(deets){
 
 
 chrome.webRequest.onHeadersReceived.addListener(function(deets) {
-	var url = deets.url;
-	var timemap, timegate, original;
+      chrome.storage.local.get('headers',function (items) {
+         var data;
+         if(!items.headers){
+            data = {};
+         } else {
+            data = items.headers;
+         }
 
-	var headers = deets.responseHeaders;
-	var mementoDateTimeHeader;
-	var linkHeaderAsString;
+         if(items.headers) {
+            var cachedTMKeys = Object.keys(items.headers);
+            if(cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
+               if(debug){console.warn('******* Number of cached URL Headers:');}
+               var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
+               var keyOfIndex = cachedTMKeys[indexToRemove];
+               delete data[keyOfIndex];
+            }
+         }
 
-	// Enumerate through the HTTP response headers to grab those related to Memento (if applicable)
-	for(var headerI = 0; headerI < headers.length; headerI++){
-		if(headers[headerI].name == 'Memento-Datetime'){
-			mementoDateTimeHeader = headers[headerI].value;
-		}else if(headers[headerI].name == 'Link'){
-			linkHeaderAsString = headers[headerI].value;
-		}
-	}
+         data[deets.url] = deets.responseHeaders;
+         chrome.storage.local.set({'headers':data},function () {
+                  if(chrome.runtime.lastError) {
+                     if(debug){console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);}
+                     if(chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
+                        // Chicken wire and duct tape! Clear the cache, do it again, yeah!
+                        if(debug){console.warn('LOCALSTORAGE full! clearing!');}
+                        chrome.storage.local.clear();
+                        if(debug){
+                           console.log('Re-setting chrome.storage.local with:');
+                           console.log(data);
+                        }
 
-    if(debug) {
-      console.log('Checking ' + url);
-      console.log(headers);
-    }
-
-	if(linkHeaderAsString) {
-	    var linkHeaderHasMementoData = false;
-	    if(debug) {
-	      console.log('A link header exists:');
-	      console.log(linkHeaderAsString);
-	    }
-
-		var tm = new Timemap(linkHeaderAsString);
-		if(debug){console.log('TG?: ' + tm.timegate);}
-		if(tm.timegate) { //specified own TimeGate, query this
-		  findTMURI(tm.timegate);
-		  linkHeaderHasMementoData = true;
-		}
-
-		if(mementoDateTimeHeader){
-			tm.datetime = mementoDateTimeHeader;
-			linkHeaderHasMementoData = true;
-		}
-
-        if(!linkHeaderHasMementoData) { // Had a link header sans Memento data
-          return;
-        }
-                
-        if(tm.timemap && !mementoDateTimeHeader) { // e.g., w3c wiki          
-          fetchTimeMap(tm.timemap, deets.tabId);
-          return;
-        }
-        
-        console.log('#204: bar');        
-		setTimemapInStorage(tm, url);
-	} else if(debug) {
-	  if(debug){console.log('The current page did not send a link header');}
-	}
-
-
+                     }
+                  }
+               });
+       
+      });
 },
-{urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders', 'blocking']);
+{urls: ['<all_urls>'],types: ['main_frame']},['responseHeaders','blocking']);
 
+function createTimemapFromURI(uri, tabId, accumulatedArrayOfTimemaps) {
+   if (debug) {
+      console.log('creatTimemapFromURI() - includes write to localstorage');
+   }
+   //the intial call of this function makes this null
+   if (!accumulatedArrayOfTimemaps) {
+      accumulatedArrayOfTimemaps = [];
+   }
 
-function findTMURI(uri) {
-  if(debug){
-    console.log('finding TM URI');
-    console.log(uri);
-  }
-  
-  $.ajax({
-    url: uri
-    ,dataType: 'jsonp'
-  }).done(function(data, status, xhr){
-    var tmX = new Timemap(xhr.getResponseHeader('link'));
-    if(debug){
-      console.warn(tmX.timemap);
-      console.log(tmX);
-    }
-  }).fail(function(xhr, status, err) {
-    if(debug) {
-      console.error('Querying the tm ' + uri + ' failed');
-      console.error(xhr);
-      console.log(status);
-      console.log(err);
-    }
-  
-  });
+   $.ajax({
+      url: uri,
+      type: 'GET' /* asking for json for mementoweb fails every time */
+   }).done(function (data, textStatus, xhr) {
+      if (xhr.status === 200) {
+         if (debug) {
+            console.log('creating new tm ll');
+         }
+         //make the time map
+         var tm = new Timemap(data);
+         var mementosFromTimeMap = tm.mementos;
+         tm.mementos = null;
+         tm.mementos = {};
+         tm.mementos.list = mementosFromTimeMap;
+
+         if (tm.timemap && tm.self && tm.timemap !== tm.self && !tmInList(tm.timemap, accumulatedArrayOfTimemaps)) { // Paginated TimeMaps likely
+            //Recursing to find more TMs
+            if (debug) {
+               console.log(accumulatedArrayOfTimemaps);
+            }
+            return createTimemapFromURI(tm.timemap, tabId, accumulatedArrayOfTimemaps.concat(tm));
+         } else {
+            //create single timemap from original
+            accumulatedArrayOfTimemaps.push(tm);//add final timemap
+            var firstTm = accumulatedArrayOfTimemaps[0];//get the first one
+            accumulatedArrayOfTimemaps.slice(1, accumulatedArrayOfTimemaps.length)
+               .forEach(function (elem) {//for all other tm, add them to the firsts list
+                  firstTm.mementos.list = firstTm.mementos.list.concat(elem.mementos.list);
+               });
+            if (debug) {
+               console.log("tm.timemap && tm.self.... else ");
+               console.log("First TimeMap", firstTm);
+               console.log("First TimeMap", firstTm.original);
+               console.log(accumulatedArrayOfTimemaps);
+            }
+            //put them in the cache and tell content to display the ui
+            setTimemapInStorage(firstTm, firstTm.original);
+            //send two messages first stop animation then display stored
+            //if use displayUIBasedOnContext the correctly gotten items wont be display
+            //rather we will ask memgator.cs for mementos
+            chrome.tabs.sendMessage(tabId, {'method': 'stopAnimatingBrowserActionIcon'});
+            chrome.tabs.sendMessage(tabId, {
+               'method': 'displayUIStoredTM',
+               'data': firstTm
+            });
+         }
+      }
+   });
 }
+
+
+function tmInList(tmURI, tms) {
+  for(var tm = tms.length - 1; tm >= 0; tm--) {
+    if(tms[tm].timemap === tmURI) {return true;}
+  }
+  return false;
+}
+
+function findTMURI(uri, tabid) {
+   if (debug) {
+      console.log('finding TM URI');
+      console.log(uri);
+   }
+
+   $.ajax({
+      url: uri
+   }).done(function (data, status, xhr) {
+      //get the first timemap
+      var tmX = new Timemap(xhr.getResponseHeader('link'));
+      if (debug) {
+         console.warn(tmX.timemap);
+         console.log(tmX);
+      }
+      //tell content to start the timer
+      chrome.tabs.sendMessage(tabid, {
+         'method': 'startTimer'
+      });
+      //get the paginated list of timemaps
+      Promise.resolve(createTimemapFromURI(tmX.timemap, tabid));
+   }).fail(function (xhr, status, err) {
+      if (debug) {
+         console.error('Querying the tm ' + uri + ' failed');
+         console.error(xhr);
+         console.log(status);
+         console.log(err);
+      }
+
+   });
+}
+
+function setTimemapInStorageAndCall(tm,url,cb) {
+   if (debug) {
+      console.log('setTimemapInStorageAndCall setting tm in storage');
+      console.log(tm);
+      console.log(url);
+   }
+
+   chrome.storage.local.get('timemaps', function (items) {
+      var tms;
+      var originalURI;
+      if (tm.origin_uri) {
+         originalURI = tm.original_uri;
+      } else if (tm.original) {
+         originalURI = tm.original;
+      }
+
+      if (debug) {
+         console.log('setting TM for uri in storage, uri:' + url);
+      }
+
+
+      if (!items.timemaps) {
+         tms = {};
+      } else {
+         tms = items.timemaps;
+      }
+      tms[url] = tm;
+
+      // Trim the cache if overfull
+      if (items.timemaps) {
+         if (debug) {
+            console.warn('******* Number of cached TMs:');
+         }
+         var cachedTMKeys = Object.keys(items.timemaps);
+         if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
+            var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
+            var keyOfIndex = cachedTMKeys[indexToRemove];
+            delete tms[keyOfIndex];
+         }
+      }
+
+      if (debug) {
+         console.log('* * * setting tms');
+         console.log(tms);
+      }
+
+      chrome.storage.local.set({'timemaps': tms}, function () {
+         chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
+            if (debug) {
+               console.log('current bytes used:' + bytesUsed);
+            }
+         });
+         if (chrome.runtime.lastError) {
+            if (debug) {
+               console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message);
+            }
+            if (chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
+               // Chicken wire and duct tape! Clear the cache, do it again, yeah!
+               if (debug) {
+                  console.warn('LOCALSTORAGE full! clearing!');
+               }
+               chrome.storage.local.clear();
+               if (debug) {
+                  console.log('Re-setting chrome.storage.local with:');
+                  console.log(tms);
+               }
+               chrome.storage.local.set({'timemaps': tms}, function () {
+                  cb();
+               });
+            }
+         } else {
+            cb();
+         }
+      });
+   });
+}
+
+
 
 function setTimemapInStorage(tm, url) {
     if(debug) {
@@ -614,7 +767,6 @@ function setTimemapInStorage(tm, url) {
 			tms = items.timemaps;
 		}
 		tms[url] = tm;
-
 		// Trim the cache if overfull
 		if(items.timemaps) {
 			if(debug){console.warn('******* Number of cached TMs:');}
