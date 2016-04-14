@@ -125,7 +125,8 @@ function normalDisplayUIBC(items) {
 				console.log('Live web page revisited with a TM in cache');
 			}
 
-			if (!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate && items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length == 0) {
+			if (!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate && 
+				items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length == 0) {
 				//DBPedia specifies its own TG but lists no mementos/TM
 				getTMThenCall(document.URL, function () {
 					displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
@@ -148,8 +149,6 @@ function displayUIBasedOnContext() {
 		console.log(document.URL);
 	}
 	chrome.storage.local.get('headers', function (itemsh) {
-
-
 		chrome.storage.local.get('timemaps', function (items) {
 			var headers = itemsh.headers[document.URL];
 			var mementoDateTimeHeader;
@@ -162,7 +161,6 @@ function displayUIBasedOnContext() {
 			 case 3: link header, datetime
 			 */
 			for (var headerI = 0; headerI < headers.length; headerI++) {
-				console.log(headers[headerI]);
 				if (headers[headerI].name == 'Memento-Datetime') {
 					mementoDateTimeHeader = headers[headerI].value;
 				} else if (headers[headerI].name == 'Link') {
@@ -237,6 +235,9 @@ function displayUIBasedOnContext() {
 						method: 'setTimemapInStorageAndCall', tm: tm, url: document.URL
 					});
 				} else {
+					if(debug){
+						console.log("case 3: link header, datetime in cache");
+					}
 					normalDisplayUIBC(items);
 				}
 
@@ -430,8 +431,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 			return;
 		}
-		console.log('creating new TM');
-		var tm = new Timemap(request.data);
+		// console.log('creating new TM');
+		// var tm = new Timemap(request.data);
 		//displayUIBasedOnTimemap(tm);
 
 		return;
@@ -446,6 +447,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.warn('no special handling, calling fallthrough');
 			//displayUIBasedOnContext();
 		}
+
+		displayUIBasedOnContext();
 	}
 
     if(request.method === 'showViewingMementoInterface') {

@@ -534,9 +534,9 @@ chrome.webRequest.onHeadersReceived.addListener(function(deets) {
          }
 
          if(items.headers) {
-            if(debug){console.warn('******* Number of cached URL Headers:');}
             var cachedTMKeys = Object.keys(items.headers);
             if(cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
+               if(debug){console.warn('******* Number of cached URL Headers:');}
                var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length);
                var keyOfIndex = cachedTMKeys[indexToRemove];
                delete data[keyOfIndex];
@@ -647,13 +647,8 @@ function findTMURI(uri, tabid) {
          console.log(tmX);
       }
       //tell content to start the timer
-      chrome.tabs.query({
-         'active': true,
-         'currentWindow': true
-      }, function (tabs) {
-         chrome.tabs.sendMessage(tabs[0].id, {
-            'method': 'startTimer'
-         });
+      chrome.tabs.sendMessage(tabid, {
+         'method': 'startTimer'
       });
       //get the paginated list of timemaps
       Promise.resolve(createTimemapFromURI(tmX.timemap, tabid));
