@@ -143,6 +143,37 @@ function buildDropDown(mementos) {
          $('#title_dropdown').addClass('disabled');
     }
    $('#mementosDropdown').append(mementoSelections);
+   /*$('#mementosDropdown').select2({
+      templateResult: formatArchiveDropdown,
+      theme: "classic"
+   });
+   $('#mementosDropdown').replaceWith($('#select2-mementosDropdown-results'));*/
+}
+
+var dropdownIcon_ia = chrome.extension.getURL('images/archives/dropdown_ia.png');
+var dropdownIcon_wc = chrome.extension.getURL('images/archives/dropdown_wc.png');
+var dropdownIcon_ais = chrome.extension.getURL('images/archives/dropdown_ais.png');
+
+
+function formatArchiveDropdown(ddEntry) {
+  if (!ddEntry.id) { return ddEntry.text; }
+  var urim = $(ddEntry.element).data('uri') || '';
+  
+  var imgSrc = '';
+  
+  if(urim.indexOf('web.archive.org') !== -1) {
+    imgSrc = dropdownIcon_ia;
+  }else if(urim.indexOf('webcitation.org') !== -1) {
+    imgSrc = dropdownIcon_wc;
+  }else if(urim.indexOf('archive.is') !== -1) {
+    imgSrc = dropdownIcon_ais;
+  }
+  
+  var $ddEntry = ddEntry.text;
+  if(imgSrc !== '') {
+    $ddEntry = $('<span><img src="'+imgSrc+'" /> ' + ddEntry.text + '</span>');
+  }
+  return $ddEntry;
 }
 
 function switchToArchiveNowInterface() {
