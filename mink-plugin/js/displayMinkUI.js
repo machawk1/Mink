@@ -321,7 +321,7 @@ function archiveURI_archiveDotIs(cb) {
 			$('#archiveNow_archivedotis').addClass('archiveNowSuccess');
 
 			var linkHeader = xhr.getResponseHeader('link');
-			console.log('creating new tm iiui');
+
 			var tmFromLinkHeader = new Timemap(linkHeader);
 
 			var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri;
