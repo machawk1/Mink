@@ -194,7 +194,7 @@ chrome.runtime.onMessage.addListener(
 				  type:'basic',
 				  title:request.title,
 				  message:request.body,
-				  iconUrl: 'images/icon128.png'
+				  iconUrl: 'images/mink_marvel_128.png'
 			  },function() {}
 		   );
     }else if(request.method == 'setBadgeText') {
