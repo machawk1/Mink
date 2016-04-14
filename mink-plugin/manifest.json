@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Mink - Integrate Live & Archived Web +Memento",
   "short_name": "Mink",
-  "version": "2.2.1",
+  "version": "2.3",
   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
   "homepage_url": "http://matkelly.com/mink",
   "author": "Mat Kelly <mink@matkelly.com>",
@@ -39,7 +39,7 @@
   "content_scripts": [
     {
       "js": [
-        "js/jquery-2.1.1.min.js",
+        "js/jquery-2.1.1.min.js","js/select2/select2.min.js",
         "jQuery-Scoped/jquery.scoped.js",
         "moment-with-langs.min.js",
         "jquery.miller.js/js/jquery.miller.js",
@@ -53,8 +53,8 @@
         "ui.js","content.js","timemap.js"],
       "matches": ["<all_urls>"],
       "css": ["style.css",
-        "font-awesome-4.0.3/css/font-awesome-modified.css",
-        "jquery.miller.js/css/jquery.miller.css"
+        "font-awesome-4.0.3/css/font-awesome-modified.css","js/select2/select2.min.css",
+        "jquery.miller.js/css/jquery.miller.css","css/select2.css"
 
       ]
     }
@@ -84,8 +84,12 @@
     "js/jquery-2.1.1.min.js","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
     "js/date.js",
 
+"js/select2/select2.min.js","js/select2/select2.min.css",
+
     "js/displayMinkUI.js", "minkui.html", "css/minkui.css", "images/minkLogo_300.png",
     "images/mink_marvel_80.png",
+    
+    "images/archives/dropdown_ia.png", "images/archives/dropdown_ais.png", "images/archives/dropdown_wc.png", "css/select2.css",   
     "Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
     "jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
     "bootstrap/css/bootstrap.min.css","bootstrap/css/bootstrap-theme.min.css",
