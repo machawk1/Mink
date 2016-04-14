@@ -33,7 +33,8 @@
     "cookies",
     "notifications",
     "contextMenus",
-    "activeTab"
+    "activeTab",
+    "unlimitedStorage"
   ],
   "content_scripts": [
     {

@@ -106,38 +106,144 @@ function ceaseQuery() { //stop everything (AND DANCE!)
 	alert('Halting execution');
 }
 
+
+function normalDisplayUIBC(items) {
+	var hasATimeMapInCache = items.timemaps && items.timemaps[document.URL];
+
+	if (hasATimeMapInCache) {
+		var isAMemento = items.timemaps[document.URL].datetime;
+
+		if (isAMemento) {
+			chrome.runtime.sendMessage({
+				method: 'setBadge', text: '', iconPath: {
+					'38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
+					'19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
+				}
+			});
+		} else { // Live web page revisited w/ a TM in cache
+			if (debug) {
+				console.log('Live web page revisited with a TM in cache');
+			}
+
+			if (!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate && 
+				items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length == 0) {
+				//DBPedia specifies its own TG but lists no mementos/TM
+				getTMThenCall(document.URL, function () {
+					displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
+				});
+			} else {
+				displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
+			}
+		}
+	} else { // Not a Memento, no TM in cache
+		if (debug) {
+			console.log('not a memento, no TM in cache');
+		}
+		getMementos(document.URL);
+	}
+}
+
 function displayUIBasedOnContext() {
-    if(debug) {console.log('displayUIBasedOnContext()'); console.log(document.URL);}
-    chrome.storage.local.get('timemaps', function(items) {
-      var hasATimeMapInCache = items.timemaps && items.timemaps[document.URL];
+	if (debug) {
+		console.log('displayUIBasedOnContext()');
+		console.log(document.URL);
+	}
+	chrome.storage.local.get('headers', function (itemsh) {
+		chrome.storage.local.get('timemaps', function (items) {
+			var headers = itemsh.headers[document.URL];
+			var mementoDateTimeHeader;
+			var linkHeaderAsString;
+			var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL);
+			/*
+			 special consideration deets.tabId will be -1 if the request is not related to a tab
+			 case 1: no link header, no datetime
+			 case 2: link header, no datetime
+			 case 3: link header, datetime
+			 */
+			for (var headerI = 0; headerI < headers.length; headerI++) {
+				if (headers[headerI].name == 'Memento-Datetime') {
+					mementoDateTimeHeader = headers[headerI].value;
+				} else if (headers[headerI].name == 'Link') {
+					linkHeaderAsString = headers[headerI].value;
+				}
+			}
+			var tm;
+			if (!linkHeaderAsString && !mementoDateTimeHeader /*case1*/) {
+				normalDisplayUIBC(items);
+				if(debug){
+					console.log("No linkheader and no memento date time header");
+				}
 
-	  if(hasATimeMapInCache) {
-	    var isAMemento = items.timemaps[document.URL].datetime;
+			} else if (linkHeaderAsString/*case2*/ && !mementoDateTimeHeader) {
 
-        if(isAMemento) {
-	      chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: {
-	          '38' : chrome.extension.getURL('images/mLogo38_isAMemento.png'),
-	          '19' : chrome.extension.getURL('images/mLogo19_isAMemento.png')
-	         }
-	      });
-	    }else { // Live web page revisited w/ a TM in cache
-	      if(debug) {
-	        console.log('Live web page revisited with a TM in cache');
-	      }
+				if(debug){
+					console.log(" linkheader and no memento date time header");
+				}
+				if (notStoredInCache) {
+					var specifiedTimegate = false;
+					var specifiedTimemap = false;
+					if (debug) {
+						console.log("case 2 not in cache putting link header specified into cache");
+					}
+					tm = new Timemap(linkHeaderAsString);
 
-	      if(!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate && items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length == 0) {
-	        //DBPedia specifies its own TG but lists no mementos/TM
-	        getTMThenCall(document.URL, function() {displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);});
-	      }else {
-	           displayUIBasedOnStoredTimeMap(items.timemaps[document.URL]);
-	      }
-	    }
-	  }else { // Not a Memento, no TM in cache
-	    if(debug) {
-	      console.log('not a memento, no TM in cache');
-	    }
-	    getMementos(document.URL);
-	  }
+					if (debug) {
+						console.log('TG?: ' + tm.timegate);
+					}
+					if (tm.timegate) { //specified own TimeGate, query this
+						if (debug) {
+							console.log("Specified Timegate");
+						}
+						specifiedTimegate = true;
+
+
+						chrome.runtime.sendMessage({
+							method: 'findTMURI', timegate: tm.timegate
+						});
+
+					}
+
+					if (tm.timemap && !specifiedTimegate) { // e.g., w3c wiki
+						if (debug) {
+							console.log('time map and no timegate');
+						}
+
+						chrome.runtime.sendMessage({
+							method: 'fetchTimeMap', value: tm.timemap
+						});
+						specifiedTimemap = true;
+					}
+
+					if (!specifiedTimegate && !specifiedTimemap) {
+						//case for when there is a link but nothing about memento is there
+						normalDisplayUIBC(items);
+					}
+				} else {
+					normalDisplayUIBC(items);
+				}
+
+
+			} else if (mementoDateTimeHeader) /*case 3*/{
+				if(notStoredInCache){
+					tm = new Timemap(linkHeaderAsString);
+					tm.datetime = mementoDateTimeHeader;
+					if (debug) {
+						console.log("case 3: link header, datetime");
+						console.log(tm);
+					}
+					chrome.runtime.sendMessage({
+						method: 'setTimemapInStorageAndCall', tm: tm, url: document.URL
+					});
+				} else {
+					if(debug){
+						console.log("case 3: link header, datetime in cache");
+					}
+					normalDisplayUIBC(items);
+				}
+
+			}
+
+		});
 	});
 }
 
@@ -154,13 +260,13 @@ function getTMThenCall(uri, cb) {
 	    },cb);
 	    return;
 	  }
-
-	  if(tm.mementos && tm.mementos.length < 3 && tm.timegate) {
+	  
+	  if(tm.mementos && tm.mementos.length < 3 && tm.timegate) {  
 	    var nextURI = tm.timegate;
 	    tm = null;
 	    tmBody = null;
 	    getTMThenCall(nextURI, cb);
-
+	  
 	  } else {
 	    cb();
 	  }
@@ -175,7 +281,6 @@ function displayUIBasedOnStoredTimeMap(tmDataIn) {
 	  value: tmDataIn
   });
 
-  console.log(tmDataIn);
   if(debug){console.log(tmDataIn);}
   var mementoCountFromCache = tmDataIn.mementos.list.length;
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache});
@@ -275,6 +380,37 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return;
     }
 
+
+	if (request.method === 'displayUIStoredTM') {
+		if (debug) {
+			console.log("got message displayUIStoredTM");
+		}
+		displayUIBasedOnStoredTimeMap(request.data);
+
+	}
+
+	if (request.method === 'startTimer') {
+		if (debug) {
+			console.log("Got startTimer");
+		}
+		chrome.runtime.sendMessage({
+			method: 'setBadge', text: '', iconPath: {
+				'38': clockIcons_38[clockIcons_38.length - 1],
+				'19': clockIcons_19[clockIcons_19.length - 1]
+			}
+		});
+		chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function (response) {
+		});
+		animateBrowserActionIcon = true;
+		setTimeout(animatePageActionIcon, 500);
+	}
+
+	if (request.method === 'stopAnimatingBrowserActionIcon') {
+		clearTimeout(animationTimer);
+		animateBrowserActionIcon = false;
+		return;
+	}
+
 	if(request.method === 'showArchiveNowUI'){
 		if(debug){console.log('Hide logo here');}
 		logoInFocus = true;
@@ -295,8 +431,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 			return;
 		}
-		console.log('creating new TM');
-		var tm = new Timemap(request.data);
+		// console.log('creating new TM');
+		// var tm = new Timemap(request.data);
 		//displayUIBasedOnTimemap(tm);
 
 		return;
@@ -309,7 +445,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			console.log(request.uri);
 			console.log('-----');
 			console.warn('no special handling, calling fallthrough');
+			//displayUIBasedOnContext();
 		}
+
+		displayUIBasedOnContext();
 	}
 
     if(request.method === 'showViewingMementoInterface') {
@@ -320,7 +459,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if(debug) {console.log('ppp');}
-	displayUIBasedOnContext();
+
 });
 
 
