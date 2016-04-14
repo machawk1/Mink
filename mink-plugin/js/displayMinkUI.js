@@ -26,7 +26,7 @@ function appendHTMLToShadowDOM() {
  $.ajax(chrome.extension.getURL('minkui.html'))
  .done(function(data) {
    if(debug){console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');}
-
+   
    $('body').append(data);
    var mementos;
    if(tmData && tmData.mementos) {
@@ -216,7 +216,7 @@ function randomEmail() {
     return text;
 }
 
-function archiveURI_WebCite(cb) {
+function archiveURI_webCite(cb) {
     if (debug) {
         console.log("Archiving for WebCite");
     }
@@ -239,13 +239,13 @@ function archiveURI_WebCite(cb) {
             if(cb){
                 cb();
             }
-            $('#webcite').addClass('archiveNowSuccess');
+            
             var shadow = document.getElementById('minkWrapper').shadowRoot;
-            //shadow.getElementById('webcite').classList.add('archiveNowSuccess');
+            shadow.getElementById('archivelogo_webcite').classList.add('archiveNowSuccess');
             //verbose regex but wanted to ensure exact capture
             var archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0];
-            shadow.getElementById('webcite').setAttribute('title', archiveURI);
-            shadow.getElementById('webcite').onclick = function() {
+            shadow.getElementById('archivelogo_webcite').setAttribute('title', archiveURI);
+            shadow.getElementById('archivelogo_webcite').onclick = function() {
                 window.location = $(this).attr('title');
             };
             if(debug){
@@ -347,7 +347,7 @@ function archiveURI_allServices() {
     $('#archiveNow_all').click(function(){
         $('#archiveNow_archivedotorg').trigger('click');
         $('#archiveNow_archivedotis').trigger('click');
-        $('#webcite').trigger('click');
+        $('#archiveNow_webcite').trigger('click');
         $(this).html('View All');
         $(this).addClass('archiveNowSuccess');
     });
