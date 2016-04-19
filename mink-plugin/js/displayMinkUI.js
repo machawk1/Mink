@@ -28,6 +28,8 @@ function appendHTMLToShadowDOM() {
    if(debug){console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).');}
    
    $('body').append(data);
+   setupUI();
+   
    var mementos;
    if(tmData && tmData.mementos) {
       mementos = tmData.mementos.list; //e.g. mementos[15].uri and mementos[15].datetime
@@ -40,13 +42,6 @@ function appendHTMLToShadowDOM() {
 	      createShadowDOM(setupDrilldownInteractions);
 	  };
       var mCount = mementos.length;
-
-      /*console.log(memgator_json);
-      console.log(items.timemaps);
-      console.log(memgator_json + document.URL);
-      console.log(items.timemaps[memgator_json + document.URL]);
-      console.log(items.timemaps[memgator_json + document.URL].mementos);
-      console.log(items.timemaps[memgator_json + document.URL].datetime);*/
       var uri_t = memgator_json + document.URL;
 
 	  if(items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
@@ -89,9 +84,6 @@ function appendHTMLToShadowDOM() {
         if(debug){console.warn('** About to append CSS2');}
         appendCSSToShadowDOM(cb);
     });
-
-
-
   });
 }
 
@@ -635,6 +627,221 @@ function buildDrilldown_Time(year, month, date){
     }
     drilldownShadow.appendChild(timeUL);
 }
+
+
+
+
+// ******** BEGIN previously inline js **********
+
+
+function setupUI () {
+  replaceContentScriptImagesWithChromeExtensionImages();
+  bindSteps(); // What steps!?!
+  bindOptions();
+  bindViewButton();
+  bindDropdown();
+  bindDrilldown();
+  bindArchiveNowButton();
+  bindGoBackToMainInterfaceButton();
+  bindArchiveLogos();
+  bindGoBackToLiveWebButton();
+
+  $('#viewMementoButton').click(function() {
+    window.location = $(this).attr('alt');
+  });
+}
+
+function replaceContentScriptImagesWithChromeExtensionImages() {
+	document.getElementById('minkLogo').src = chrome.extension.getURL('images/mink_marvel_80.png');
+
+	document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png');
+	document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png');
+	document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png');
+    document.getElementById('archivelogo_webcite').src = chrome.extension.getURL('images/archives/webcitelogo.png');
+}
+
+function bindSteps() {
+	$('#steps li').click(function(){
+	 if($(this).attr('data-status') == 'waiting') {
+	   $(this).attr('data-status','processing');
+	 }else if($(this).attr('data-status') == 'processing') {
+	   $(this).attr('data-status','complete');
+	 }else if($(this).attr('data-status') == 'complete') {
+	   $(this).attr('data-status','waiting');
+	 }
+	});
+}
+
+function bindOptions() {
+	$('#options').click(function(){
+		chrome.runtime.sendMessage({method: "openOptionsPage"}, function(response) {
+		});
+	});
+}
+
+function bindViewButton() {
+	var viewButton = $("#viewMementoButton");
+
+	$('#mementosDropdown').change(function() {
+		if($(this)[0].selectedIndex == 0){
+			$(viewButton).attr('disabled','disabled');
+			$(viewButton).removeAttr('alt');
+		}else {
+			$(viewButton).removeAttr('disabled');
+			$(viewButton).attr('alt',$(this).find('option:selected').data('uri'));
+		}
+	});
+}
+
+function bindDropdown() {
+	document.getElementById('title_dropdown').onclick = function() {
+		var shadow = document.getElementById('minkWrapper').shadowRoot;
+		var mementosDropdown = shadow.getElementById('mementosDropdown');
+		var viewMementoButton = shadow.getElementById('viewMementoButton');
+		var drilldownBox = shadow.getElementById('drilldownBox');
+
+		if(mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
+			alert('Dropdown available for large collections of mementos due to major browser performance degradation.');
+			return;
+		}
+
+		mementosDropdown.className = 'dropdown';
+		viewMementoButton.className = 'dropdown';
+		shadow.getElementById('title_dropdown').className = 'active';
+		drilldownBox.className = 'hidden';
+
+		shadow.getElementById('title_drilldown').className = '';
+	};
+}
+
+function bindDrilldown() {
+	document.getElementById('title_drilldown').onclick = function() {
+		var shadow = document.getElementById('minkWrapper').shadowRoot;
+		var mementosDropdown = shadow.getElementById('mementosDropdown');
+		var viewMementoButton = shadow.getElementById('viewMementoButton');
+		var drilldownBox = shadow.getElementById('drilldownBox');
+		var drilldownTitle = shadow.getElementById('title_drilldown');
+		var dropdownTitle = shadow.getElementById('title_dropdown');
+
+
+		if(!dropdownTitle.classList.contains('disabled')) {
+		  mementosDropdown.className = 'dropdown hidden';
+		  viewMementoButton.className = 'dropdown hidden';
+		  shadow.getElementById('title_dropdown').className = '';
+		  drilldownBox.className = '';
+
+		  drilldownTitle.className = 'active';
+		}
+	};
+}
+
+function changeIconFor(obj, src) {
+  $(obj).attr('src', src);
+}
+
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if(request.method === 'showViewingMementoInterface') {
+      console.log('caught showViewingMementoInterface, tweak UI here');
+    }else {
+      console.log('caught message in minkui.html but did not react');
+    }
+  }
+);
+
+function displayAndHideShadowDOMElements(showElementsIds, hideElementsIds) {
+  var shadow = document.getElementById('minkWrapper').shadowRoot;
+  for(var ee = 0; ee < showElementsIds.length; ee++) {
+    shadow.getElementById(showElementsIds[ee]).classList.remove('hidden','nonArchiveNowInterface');
+  }
+  for(var ee = 0; ee < hideElementsIds.length; ee++) {
+    shadow.getElementById(hideElementsIds[ee]).classList.add('hidden','nonArchiveNowInterface');
+  }
+
+}
+
+function bindArchiveNowButton() {
+  $('#minkuiX #archiveNow').click(function(){
+    var show = ['archiveNowInterface'];
+    var hide = ['archiveNow','steps'];
+
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    var dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active');
+    var drilldownActive = shadow.getElementById('title_drilldown').classList.contains('active');
+
+    if(dropdownActive) {
+      hide.push('mementosDropdown','viewMementoButton');
+    }else if(drilldownActive) {
+      hide.push('drilldownBox');
+    }
+
+    displayAndHideShadowDOMElements(show, hide);
+  });
+
+}
+
+function bindGoBackToMainInterfaceButton() {
+  $('#minkuiX #goBackButton').click(function(){
+    var hide = ['archiveNowInterface'];
+    var show = ['archiveNow', 'steps'];
+
+    var shadow = document.getElementById('minkWrapper').shadowRoot;
+    var dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active');
+    var drilldownActive = shadow.getElementById('title_drilldown').classList.contains('active');
+
+    if(dropdownActive) {
+      show.push('mementosDropdown','viewMementoButton');
+    }else if(drilldownActive) {
+      show.push('drilldownBox');
+    }
+
+    displayAndHideShadowDOMElements(show, hide);
+  });
+}
+
+function bindArchiveLogos() {
+  $('.archiveLogo').click(function() {
+    if($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
+
+      return;
+    }
+
+    var that = this;
+    var newSrc = $(this).attr('src').replace('.png', '_success.png');
+    $(this).attr('src',chrome.extension.getURL('./images/spinner.gif'));
+
+    var id = $(this).attr('id');
+    var cb = function(){changeIconFor(that, newSrc); };
+
+    if($(this).attr('id') === 'archivelogo_ia') {
+        archiveURI_archiveOrg(cb);
+    }else if($(this).attr('id') === 'archivelogo_ais') {
+        archiveURI_archiveDotIs(cb);
+    }else if ($(this).attr('id') === 'archivelogo_webcite'){
+        archiveURI_webCite(cb);
+    } else if ($(this).attr('id') === 'archivelogo_ala') {
+        archiveURI_archiveOrg();
+        archiveURI_archiveDotIs();
+        archiveURI_webCite();
+    }
+  });
+}
+
+function bindGoBackToLiveWebButton() {
+    $('#backToLiveWeb').click(function () {
+        chrome.storage.local.get('timemaps', function (items) {
+            window.location = items.timemaps[document.URL].original;
+        });
+    });
+}
+// ******** END previously inline js **********
+
+
+
+
+
+
 
 if($('#minkWrapper').length === 0) {
   if(debug) {console.log('appending HTML to Shadow DOM');}
