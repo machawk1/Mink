@@ -47,8 +47,7 @@
         "bootstrap-daterangepicker/daterangepicker.js",
 
         "d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
-        "Highcharts-4.0.3/js/highcharts.js","Highcharts-4.0.3/js/modules/data.js","Highcharts-4.0.3/js/modules/drilldown.js",
-        "highchartsdata.js","doThatHighchartsThingYouDo.js",
+        
 
         "ui.js","content.js","timemap.js"],
       "matches": ["<all_urls>"],
@@ -84,13 +83,13 @@
     "js/jquery-2.1.1.min.js","jQuery-Scoped/jquery.scoped.js","bootstrap/js/bootstrap.min.js",
     "js/date.js",
 
-"js/select2/select2.min.js","js/select2/select2.min.css",
+    "js/select2/select2.min.js","js/select2/select2.min.css",
 
     "js/displayMinkUI.js", "minkui.html", "css/minkui.css", "images/minkLogo_300.png",
     "images/mink_marvel_80.png",
     
     "images/archives/dropdown_ia.png", "images/archives/dropdown_ais.png", "images/archives/dropdown_wc.png", "css/select2.css",   
-    "Highcharts-3.0.9/js/highcharts.js","Highcharts-3.0.9/js/modules/drilldown.js","highchartsdata.js","doThatHighchartsThingYouDo.js",
+  
     "jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
     "bootstrap/css/bootstrap.min.css","bootstrap/css/bootstrap-theme.min.css",
     "font-awesome-4.0.3/css/font-awesome-modified.css",
