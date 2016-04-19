@@ -3,22 +3,13 @@
 var debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
-var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/'
-var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
+// var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/'
+// var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
 var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
 // var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/'
-
-var numberOfTimemaps = 0
-
-var embeddedTimemapRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\"timemap\"/g
-var mementosURIsWithinTimemapsRegex = /<https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)>;rel=\".*memento.*\"/g
-var timemapsURIsWithinTimemapsRegex = /<https?:.*>;rel=\".*timemap.*\"/g
-
-var mementosInTimemapBasedOnRelAttributeRegex = /;rel=\".*memento.*\"/g
-var timemapsInTimemapBasedOnRelAttributeRegex = /;rel=\".*timemap.*\"/g
 
 var animateBrowserActionIcon = false
 var animationTimer
@@ -59,51 +50,6 @@ function setActiveBasedOnBlacklistedProperty (cb) {
     }
 
     cb()
-  })
-}
-
-var jsonizedMementos = '['
-var jsonizedMementos
-
-function addToHistory (uri_r, memento_datetime, mementos, callback) {
-  var mementosToStore = mementos
-  if (!mementosToStore) { mementosToStore = jsonizedMementos }
-  chrome.runtime.sendMessage({
-    method: 'store',
-    value: '' + uri_r,
-    memento_datetime: memento_datetime,
-    mementos: mementosToStore
-  }, function (response) {
-    if (callback) {
-      callback()
-    }
-  })
-}
-
-/** When viewing a memento, handles the UI and navigation change of jumping to another memento
- *  @param index A value representative of the location of the new memento on the list, 1 = next, -1 = prev, 0/null = selected in UI
- */
-function viewDifferentMemento (index) {
-  if (debug) { console.log('viewDifferentMemento()') }
-  chrome.runtime.sendMessage({method: 'retrieve'}, function (response) {
-    if (index === null || index === 0) {
-      addToHistory(response.value, $('#mdts option:selected').text(), response.mementos, // Save the Memento-Datetime of option chosen to localStorage
-        function () { window.location = $('#mdts').val() }
-      )
-    } else if (index === 1) { // Next Memento
-      var nextMemento = $('#mdts option:nth-child(' + (parseInt($('#mdts').attr('alt')) + 2) + ')')
-      addToHistory(response.value, nextMemento.text(), response.mementos, // Save the Memento-Datetime of option chosen to localStorage
-        function () { window.location = nextMemento.val() }
-      )
-    } else if (index === -1) { // Prev Memento
-      var prevMemento = $('#mdts option:nth-child(' + (parseInt($('#mdts').attr('alt'))) + ')')
-      addToHistory(response.value, prevMemento.text(), response.mementos, // Save the Memento-Datetime of option chosen to localStorage
-        function () { window.location = prevMemento.val() }
-      )
-    } else {
-      console.log('Bad index value in viewDifferentMemento, ' + index)
-      console.log(index)
-    }
   })
 }
 
@@ -274,15 +220,6 @@ function displayUIBasedOnStoredTimeMap (tmDataIn) {
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache})
 }
 
-function isEmpty (o) { // Returns if empty object is passed in
-  for (var i in o) {
-    if (o.hasOwnProperty(i)) {
-      return false
-    }
-  }
-  return true
-}
-
 function getBlacklist (cb) {
   var callbackArguments = arguments
   chrome.storage.local.get('blacklist', function (items) {
@@ -394,10 +331,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.method === 'showArchiveNowUI') {
-    if (debug) { console.log('Hide logo here') }
-    logoInFocus = true
-    hideLogo = true
-
     return
   }
 
@@ -434,70 +367,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
     return
   }
-
-  if (debug) { console.log('ppp') }
 })
-
-function processResponseFromAggregator (xhr) {
-  if (debug) { console.log('Done querying timegate') }
-  if (xhr.status === 200) {
-    var linkHeaderStr = xhr.getResponseHeader('Link')
-    console.log('creating new TM X')
-    var tm = new Timemap(linkHeaderStr)
-
-    if (debug) {
-      console.log('We have the ultimate timemap')
-      console.log('From the timegate: ' + (tm.timegate ? 'TimeGate, ' : '') + (tm.timemap ? ' TimeMap, ' : '') + 'and ' + tm.mementos.length + ' mementos')
-      console.log(tm)
-    }
-
-    if (tm.timemap) { // Paginated TimeMaps likely (e.g., http://mementoweb.org/guide/)
-      if (debug) { console.log('Recursing to find more TMs, last TM:' + tm.timemap.self) }
-      Promise.resolve(createTimemapFromURI(tm.timemap))
-    }
-  } else if (xhr.status === 302) {
-    console.log('Do something with 302 here')
-  }
-}
-
-function createTimemapFromURI (uri, accumulatedArrayOfTimemaps) {
-  console.log('creatTimemapFromURI() - includes write to localstorage')
-  if (!accumulatedArrayOfTimemaps) { accumulatedArrayOfTimemaps = [] }
-
-  $.ajax({
-    url: uri,
-    type: 'GET' /* The payload is in the response body, not the head */
-  }).done(function (data, textStatus, xhr) {
-    if (xhr.status === 200) {
-      console.log('creating new tm ll')
-      var tm = new Timemap(data)
-      // Move data from tm.mementos as array to tm.mementos as an object and
-      //  tm.mementos.list as array to conform to JSON API from LANL aggregator
-      var mementosFromTimeMap = tm.mementos
-      tm.mementos = null
-      tm.mementos = {}
-      tm.mementos.list = mementosFromTimeMap
-
-      // Delete tm.mementos
-      if (tm.timemap && tm.self && tm.timemap !== tm.self) { // Paginated TimeMaps likely
-        // Recursing to find more TMs
-        return createTimemapFromURI(tm.timemap, accumulatedArrayOfTimemaps.concat(tm))
-      }
-    }
-  })
-}
-
-function countNumberOfMementos (arrayOfTimeMaps) {
-  if (debug) { console.log('Counting mementos for ' + arrayOfTimeMaps.length + ' TimeMaps') }
-
-  var totalNumberOfMementos = 0
-  for (var tm = arrayOfTimeMaps.length - 1; tm >= 0; tm--) {
-    totalNumberOfMementos += arrayOfTimeMaps[tm].mementos.list.length
-  }
-
-  if (debug) { console.log('Found ' + totalNumberOfMementos + ' mementos') }
-  return totalNumberOfMementos
-}
 
 function getMementos (uri) {
   if (debug) { console.log('getMementosWithTimemap()') }
@@ -553,9 +423,4 @@ function animatePageActionIcon () {
   if (iteration < 0) { iteration = clockIcons_38.length - 1 }
   animationTimer = setTimeout(animatePageActionIcon, 250)
   // TODO: know when to stop this
-}
-
-function Memento (uri, datetime) {
-  this.uri = uri
-  this.datetime = datetime
 }
