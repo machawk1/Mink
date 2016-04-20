@@ -29,8 +29,8 @@ For web pages with not many mementos, the dropdown menu is the most accessible w
 If no mementos exist in the archive, the extension will indicate this with a red "no mementos" icon and give the option to submit the URL to various archives for preservation.
 
 ## Examples
-### [A niche site with few mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-1-a-niche-site-with-few-mementos)
-### [A popular site with many mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-2-a-popular-site-with-many-mementos)
+1. [A niche site with few mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-1-a-niche-site-with-few-mementos)
+1. [A popular site with many mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-2-a-popular-site-with-many-mementos)
 
 
 ##License
