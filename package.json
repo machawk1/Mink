@@ -1,4 +1,29 @@
 {
+  "name": "Mink",
+  "description": "Integrate the Live & Archived Web +Memento",
+  "author": {
+    "email": "mkelly@cs.odu.edu",
+    "name": "Mat Kelly",
+    "url": "http://www.cs.odu.edu/~mkelly/"
+  },
+  "keywords": [
+    "archive",
+    "web archive",
+    "web archiving",
+    "memento",
+    "aggregation"
+  ],
+  "license": "GPLv2",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/machawk1/mink.git"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "devDependencies": {
+    "standard" :"^3.0.0"
+  },
   "standard": {
     "ignore": [
       "mink-plugin/js/date.js",
