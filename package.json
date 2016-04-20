@@ -1,0 +1,13 @@
+{
+  "standard": {
+    "ignore": [
+      "mink-plugin/js/date.js",
+      "mink-plugin/jquery.miller.js/*",
+      "mink-plugin/jQuery-Scoped/*",
+      "mink-plugin/d3.v3/*",
+      "mink-plugin/d3.makechart.js",
+      "mink-plugin/bootstrap-daterangepicker/*",
+      "mink-plugin/d3.makechart.js"
+    ]
+  }
+}
