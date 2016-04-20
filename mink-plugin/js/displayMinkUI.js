@@ -455,7 +455,7 @@ function buildDrilldown_Day (year, month) {
 
     li.appendChild(liSpan)
     li.onclick = function (event) {
-      buildDrilldown_Time($(this).data('year'), $(this).data('month'), parseInt($(this).data('date')))
+      buildDrilldown_Time($(this).data('year'), $(this).data('month'), parseInt($(this).data('date'), 10))
       $(this).siblings().removeClass('selectedOption')
       $(this).addClass('selectedOption')
     }

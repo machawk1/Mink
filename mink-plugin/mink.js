@@ -273,7 +273,7 @@ function fetchTimeMap (uri, tabid) {
 function setBadgeText (value, tabid) {
   var badgeValue = value
 
-  if (parseInt(badgeValue) > 999) {
+  if (parseInt(badgeValue, 10) > 999) {
     badgeValue = maxBadgeDisplay
   }
 
