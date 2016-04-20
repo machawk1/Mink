@@ -118,3 +118,5 @@ function sanitizeMementoURI (mURI) {
   }
   return ret
 }
+
+this.timemap = Timemap
