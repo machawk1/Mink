@@ -1,6 +1,5 @@
-<h1 align="center">
- <a href="https://github.com/machawk1/mink"><img src="https://cdn.rawgit.com/machawk1/Mink/master/mink-plugin/images/mink_marvel_300.png" alt="Mink logo" /></a></h1>
- <h2 align="center">Integrate the Live and Archived Web Viewing Experience</h2>
+<h2 align="center">
+ <a href="https://github.com/machawk1/mink"><img src="https://cdn.rawgit.com/machawk1/Mink/master/mink-plugin/images/mink_marvel_300.png" alt="Mink logo" /></a><br />Integrate the Live and Archived Web Viewing Experience</h2>
 
 <p align="center">
   <a href="https://travis-ci.org/machawk1/mink"><img src="https://travis-ci.org/machawk1/Mink.svg" alt="TravisCI build status" /></a>
