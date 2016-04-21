@@ -38,7 +38,7 @@ function Timemap (fromString) {
   var mementoRelOriginalExpression = /rel=.*original.*/gi
   var moriginalregex = new RegExp(mementoRelOriginalExpression) // Regex to get original
 
-  var mementoRelMementoExpression = /rel=.*memento.*/gi
+  var mementoRelMementoExpression = /rel=.*memento[^a-zA-Z].*/gi
   var mementoregex = new RegExp(mementoRelMementoExpression) // Regex to get a memento
 
   var mementoRelSelfExpression = /rel=.*self.*/gi
@@ -84,7 +84,7 @@ function Timemap (fromString) {
 
   if (!timemap && !timegate && !original) {
     if (debug) {
-      console.log("Link header exists, but we didn't time a timemap, timegate or original value in the header.")
+      console.log("Link header exists, but we didn't find a timemap, timegate or original value in the header.")
       console.log('link header: ')
       console.log(this.str)
       console.log(linkHeaderEntries)
