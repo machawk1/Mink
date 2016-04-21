@@ -461,7 +461,8 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
 
 function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   if (debug) {
-    console.log('creatTimemapFromURI() - includes write to localstorage')
+    console.log('createTimemapFromURI() - includes write to localstorage')
+    console.log(accumulatedArrayOfTimemaps)
   }
   // The intial call of this function makes this null
   if (!accumulatedArrayOfTimemaps) {
@@ -516,6 +517,20 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   })
 }
 
+// e.g., http://ws-dl-05.cs.odu.edu/demo-headers/index.php/Seven_Kingdoms
+function displayMementosMissingTM (mementos, urir, tabId) {
+  var tm = new Timemap()
+  tm.mementos = { list: mementos }
+  tm.original = urir
+  setTimemapInStorage(tm, tm.original)
+
+  chrome.tabs.sendMessage(tabId, {'method': 'stopAnimatingBrowserActionIcon'})
+  chrome.tabs.sendMessage(tabId, {
+    'method': 'displayUIStoredTM',
+    'data': tm
+  })
+}
+
 function tmInList (tmURI, tms) {
   for (var tm = tms.length - 1; tm >= 0; tm--) {
     if (tms[tm].timemap === tmURI) { return true }
@@ -542,6 +557,13 @@ function findTMURI (uri, tabid) {
     chrome.tabs.sendMessage(tabid, {
       'method': 'startTimer'
     })
+
+    // No URI-T but we found a couple mementos
+    // See http://ws-dl-05.cs.odu.edu/demo-headers/index.php/Seven_Kingdoms for e.g.
+    if (!tmX.timemap && tmX && tmX.mementos && tmX.mementos.length > 0) {
+      return Promise.resolve(displayMementosMissingTM(tmX.mementos, uri, tabid))
+    }
+
     // Get the paginated list of timemaps
     Promise.resolve(createTimemapFromURI(tmX.timemap, tabid))
   }).fail(function (xhr, status, err) {
