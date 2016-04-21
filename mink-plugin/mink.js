@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-var debug = true
+var debug = false
 var tmData
 var maxBadgeDisplay = '999+'
 var stillProcessingBadgeDisplay = 'WAIT'
