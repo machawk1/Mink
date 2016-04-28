@@ -196,7 +196,7 @@ function randomEmail () {
   return text
 }
 
-function archiveURI_webCite (cb) {
+function archiveURI_webCite (cb, openInNewTab) {
   var remail = randomEmail()
   $.ajax({
     method: 'POST',
@@ -224,7 +224,11 @@ function archiveURI_webCite (cb) {
       var archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0]
       shadow.getElementById('archivelogo_webcite').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_webcite').onclick = function () {
-        window.location = $(this).attr('title')
+        if (!openInNewTab) {
+          window.location = $(this).attr('title')
+        } else {
+          window.open($(this).attr('title'))
+        }
       }
     } else {
       chrome.runtime.sendMessage({
@@ -236,7 +240,7 @@ function archiveURI_webCite (cb) {
   })
 }
 
-function archiveURI_archiveOrg (cb) {
+function archiveURI_archiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
     url: 'https://web.archive.org/save/' + document.URL
@@ -259,13 +263,17 @@ function archiveURI_archiveOrg (cb) {
       var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
       shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_ia').onclick = function () {
-        window.location = $(this).attr('title')
+        if (!openInNewTab) {
+          window.location = $(this).attr('title')
+        } else {
+          window.open($(this).attr('title'))
+        }
       }
     }
   })
 }
 
-function archiveURI_archiveDotIs (cb) {
+function archiveURI_archiveDotIs (cb, openInNewTab) {
   $.ajax({
     method: 'POST',
     url: 'http://archive.is/submit/',
@@ -293,7 +301,11 @@ function archiveURI_archiveDotIs (cb) {
 
       shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_ais').onclick = function () {
-        window.location = $(this).attr('title')
+        if (!openInNewTab) {
+          window.location = $(this).attr('title')
+        } else {
+          window.open($(this).attr('title'))
+        }
       }
     }
   })
@@ -700,6 +712,8 @@ function bindArchiveLogos () {
 
   var alaLogo = $('#archivelogo_ala') // All archives
 
+  var openInNewTab = false
+
   $('.archiveLogo').click(function () {
     if ($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
       return
@@ -713,11 +727,11 @@ function bindArchiveLogos () {
     var cb = function () { changeIconFor(that, newSrc) }
 
     if (archiveLogoID === 'archivelogo_ia') {
-      archiveURI_archiveOrg(cb)
+      archiveURI_archiveOrg(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
-      archiveURI_archiveDotIs(cb)
+      archiveURI_archiveDotIs(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_webcite') {
-      archiveURI_webCite(cb)
+      archiveURI_webCite(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 3 archives
       var ia_newSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
       var ais_newSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
@@ -740,9 +754,10 @@ function bindArchiveLogos () {
       $(aisLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
       $(wcLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
 
-      archiveURI_archiveOrg(ia_cb)
-      archiveURI_archiveDotIs(ais_cb)
-      archiveURI_webCite(wc_cb)
+      openInNewTab = true
+      archiveURI_archiveOrg(ia_cb, openInNewTab)
+      archiveURI_archiveDotIs(ais_cb, openInNewTab)
+      archiveURI_webCite(wc_cb, openInNewTab)
     }
   })
 }
