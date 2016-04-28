@@ -694,6 +694,12 @@ function bindGoBackToMainInterfaceButton () {
 }
 
 function bindArchiveLogos () {
+  var iaLogo = $('#archivelogo_ia')
+  var aisLogo = $('#archivelogo_ais')
+  var wcLogo = $('#archivelogo_webcite')
+  
+  var alaLogo = $('#archivelogo_ala') // All archives
+  
   $('.archiveLogo').click(function () {
     if ($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
       return
@@ -713,11 +719,43 @@ function bindArchiveLogos () {
     } else if (archiveLogoID === 'archivelogo_webcite') {
       archiveURI_webCite(cb)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 3 archives
-      archiveURI_archiveOrg()
-      archiveURI_archiveDotIs()
-      archiveURI_webCite()
+     var ia_newSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
+     var ais_newSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
+     var wc_newSrc = $(wcLogo).attr('src').replace('.png', '_success.png')
+
+
+      var ia_cb = function () {
+        changeIconFor(iaLogo, ia_newSrc)
+        changeArchiveAllIconWhenComplete(alaLogo)
+      }
+      var ais_cb = function () {
+        changeIconFor(aisLogo, ais_newSrc)
+        changeArchiveAllIconWhenComplete(alaLogo)
+      }
+      var wc_cb = function () {
+        changeIconFor(wcLogo, wc_newSrc)
+        changeArchiveAllIconWhenComplete(alaLogo)
+      }
+
+      $(iaLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+      $(aisLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+      $(wcLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+ 
+      archiveURI_archiveOrg(ia_cb)
+      archiveURI_archiveDotIs(ais_cb)
+      archiveURI_webCite(wc_cb)
     }
   })
+}
+
+var archivesFinished = 0
+function changeArchiveAllIconWhenComplete (iconObj) {
+  archivesFinished++
+  if (archivesFinished >= 3) {
+    $(iconObj).attr('src', chrome.extension.getURL('./images/archives/allListedArchives_success.png'))
+    $(iconObj).unbind()
+    $(iconObj).removeClass('archiveLogo')
+  }
 }
 
 function bindGoBackToLiveWebButton () {
