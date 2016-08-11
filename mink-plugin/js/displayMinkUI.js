@@ -607,7 +607,7 @@ function bindDropdown () {
     var drilldownBox = shadow.getElementById('drilldownBox')
 
     if (mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
-      window.alert('Dropdown available for large collections of mementos due to major browser performance degradation.')
+      window.alert('The dropdown interface is unavailable for large collections of mementos due to browser performance degradation.')
       return
     }
 
