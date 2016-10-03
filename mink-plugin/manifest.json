@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Mink - Integrate Live & Archived Web +Memento",
   "short_name": "Mink",
-  "version": "2.3.2.1",
+  "version": "2.3.2.2",
   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
   "homepage_url": "http://matkelly.com/mink",
   "author": "Mat Kelly <mink@matkelly.com>",
@@ -50,7 +50,7 @@
         
 
         "content.js","timemap.js"],
-      "matches": ["<all_urls>"],
+      "matches": ["http://*/*", "https://*/*"],
       "css": ["style.css",
         "font-awesome-4.0.3/css/font-awesome-modified.css","js/select2/select2.min.css",
         "jquery.miller.js/css/jquery.miller.css","css/select2.css"
