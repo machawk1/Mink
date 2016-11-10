@@ -8,6 +8,7 @@ var stillProcessingBadgeDisplay = 'WAIT'
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento'
 var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web'
 var browserActionTitle_noMementos = 'Mink - No Mementos Available'
+var browserActionTitle_blacklisted = 'Mink - Viewing Blacklisted Site'
 
 var badgeImages_disabled = {
   '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
@@ -98,6 +99,10 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
         if (result === browserActionTitle_noMementos) {
           displayMinkUI(tabid)
           return
+        }
+
+        if (result === browserActionTitle_blacklisted) {
+          return // Prevent the below WAIT message from appearing if b-listed
         }
 
         if (result !== browserActionTitle_viewingMemento) {
@@ -369,6 +374,7 @@ function stopWatchingRequests_blacklisted () {
   }, function (tab) {
     setBadge(' ', badgeImages_blacklisted, tab[0].id)
     setBadgeText('', tab[0].id)
+    setBadgeTitle(browserActionTitle_blacklisted, tab[0].id)
   })
 }
 
@@ -399,6 +405,7 @@ function addToBlackList () {
 
     setBadgeIcon(badgeImages_blacklisted, tabs[0].id)
     setBadgeText('', tabs[0].id)
+    setBadgeTitle(browserActionTitle_blacklisted, tabs[0].id)
   })
 }
 

@@ -341,6 +341,9 @@ function buildDrilldown_Year (mementos) {
 function setupDrilldownInteraction_Year () {
   var shadow = document.getElementById('minkWrapper').shadowRoot
 
+  // No stored TM, halt building irrelevant drilldown
+  if (!shadow.getElementById('years')) { return }
+
   var years = shadow.getElementById('years').childNodes
 
   for (var year = 0; year < years.length; year++) {
