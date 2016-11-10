@@ -20,7 +20,7 @@ The extension works by querying the archives when you browse the web. For each p
 
 ###Selecting a Memento
 
-For web pages with not many mementos, the dropdown menu is the most accessible way to view the memento in the web archive. To do this, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button. When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
+For web pages with few mementos, the dropdown menu is the most accessible way to view the memento in the web archive. To do this, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button. When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
 
 ###No mementos? No problem!
 
