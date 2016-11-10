@@ -2,7 +2,7 @@
 
 var debug = false
 var tmData
-var maxBadgeDisplay = '999+'
+var maxBadgeDisplay = '> 1k'
 var stillProcessingBadgeDisplay = 'WAIT'
 
 var browserActionTitle_viewingMemento = 'Mink - Viewing Memento'
