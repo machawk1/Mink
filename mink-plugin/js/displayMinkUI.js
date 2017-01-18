@@ -243,7 +243,7 @@ function archiveURI_webCite (cb, openInNewTab) {
 function archiveURI_archiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
-    url: 'https://web.archive.org/save/' + document.URL
+    url: '//web.archive.org/save/' + document.URL
   })
   .done(function (a, b, c) {
     if (b === 'success') {
@@ -276,7 +276,7 @@ function archiveURI_archiveOrg (cb, openInNewTab) {
 function archiveURI_archiveDotIs (cb, openInNewTab) {
   $.ajax({
     method: 'POST',
-    url: 'http://archive.is/submit/',
+    url: '//archive.is/submit/',
     data: { coo: '', url: document.URL }
   })
   .done(function (data, status, xhr) {
