@@ -10,19 +10,19 @@
 
 Mink is a Google Chrome extension that uses the [Memento protocol](https://tools.ietf.org/html/rfc7089) to indicate that a page a user is viewing on the live web has an archived copy and to give the user access to the copy. If no copies exist, the extension provides one-button access to preserve the page in various web archives and to easily view the page once it has been preserved.
 
-##Install
+## Install
 
 The extension is available for download from the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)!
 
-##Usage
+## Usage
 
 The extension works by querying the archives when you browse the web. For each page you visit, Mink sends an asynchronous request to a Memento aggregator and displays the number of mementos (web pages for the URL in the archives) using a badge over the Mink/Memento icon in the browser's button bar.
 
-###Selecting a Memento
+### Selecting a Memento
 
 For web pages with few mementos, the dropdown menu is the most accessible way to view the memento in the web archive. To do this, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button. When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
 
-###No mementos? No problem!
+### No mementos? No problem!
 
 If no mementos exist in the archive, the extension will indicate this with a red "no mementos" icon and give the option to submit the URL to various archives for preservation.
 
@@ -31,6 +31,6 @@ If no mementos exist in the archive, the extension will indicate this with a red
 1. [A popular site with many mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-2-a-popular-site-with-many-mementos)
 
 
-##License
+## License
 
 GPLv2 
