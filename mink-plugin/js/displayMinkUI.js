@@ -200,7 +200,7 @@ function archiveURI_webCite (cb, openInNewTab) {
   var remail = randomEmail()
   $.ajax({
     method: 'POST',
-    url: 'http://www.webcitation.org/archive',
+    url: 'https://www.webcitation.org/archive',
     data: {
       url: document.URL,
       email: remail
