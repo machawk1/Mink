@@ -3,9 +3,9 @@
 var debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
-// var memgator_proxy = 'http://memgator.cs.odu.edu:1208/timemap/link/'
+// var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-var memgator_json = 'http://memgator.cs.odu.edu:1208/timemap/json/'
+var memgator_json = 'http://memgator.cs.odu.edu/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
