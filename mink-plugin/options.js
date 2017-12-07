@@ -163,7 +163,12 @@ function updateMementoCount () {
   chrome.storage.local.get('timemaps', function (items) {
     console.log(items.timemaps)
     console.log(items.timemaps[$('#cachedTimemaps').val()])
-    $('#mementoCount').html(items.timemaps[$('#cachedTimemaps').val()].mementos.list.length + ' mementos available')
+    var count = items.timemaps[$('#cachedTimemaps').val()].mementos.list.length
+    var plurality = 's'
+    if (count === 1) {
+      plurality = ''
+    }
+    $('#mementoCount').html(count + ' memento' + plurality + ' available')
   })
 }
 
