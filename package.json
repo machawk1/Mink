@@ -13,7 +13,7 @@
     "memento",
     "aggregation"
   ],
-  "license": "MIT License",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/machawk1/mink.git"
