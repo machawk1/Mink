@@ -1,25 +1,25 @@
 /* global chrome, $, Timemap */
 
-var debug = false
+const debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-var memgator_json = 'http://memgator.cs.odu.edu/timemap/json/'
+const memgator_json = 'http://memgator.cs.odu.edu/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
 // var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/'
 
-var animateBrowserActionIcon = false
-var animationTimer
+let animateBrowserActionIcon = false
+let animationTimer
 
 // TODO: check if in blacklist
 // getBlacklist()
 
 // Faux promises for enabling/disabling UI
-var setBlacklisted = function () { setActiveBasedOnBlacklistedProperty(displayUIBasedOnContext) }
-var setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setBlacklisted) }
+const setBlacklisted = function () { setActiveBasedOnBlacklistedProperty(displayUIBasedOnContext) }
+const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setBlacklisted) }
 
 setInitialStateWithChecks()
 
@@ -40,9 +40,9 @@ function setActiveBasedOnBlacklistedProperty (cb) {
       return
     }
 
-    for (var ii = items.blacklist.length - 1; ii >= 0; ii--) {
-      var documentHostname = (new window.URL(document.URL)).hostname
-      var blacklistEntryHostname = (new window.URL(items.blacklist[ii])).hostname
+    for (let ii = items.blacklist.length - 1; ii >= 0; ii--) {
+      const documentHostname = (new window.URL(document.URL)).hostname
+      const blacklistEntryHostname = (new window.URL(items.blacklist[ii])).hostname
       if (documentHostname === blacklistEntryHostname) {
         chrome.runtime.sendMessage({method: 'stopWatchingRequests_blacklisted'})
         return
@@ -54,14 +54,16 @@ function setActiveBasedOnBlacklistedProperty (cb) {
 }
 
 function normalDisplayUIBC (items) {
-  var hasATimeMapInCache = items.timemaps && items.timemaps[document.URL]
+  const hasATimeMapInCache = items.timemaps && items.timemaps[document.URL]
 
   if (hasATimeMapInCache) {
-    var isAMemento = items.timemaps[document.URL].datetime
+    const isAMemento = items.timemaps[document.URL].datetime
 
     if (isAMemento) {
       chrome.runtime.sendMessage({
-        method: 'setBadge', text: '', iconPath: {
+        method: 'setBadge',
+        text: '',
+        iconPath: {
           '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
           '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
         }
@@ -96,24 +98,24 @@ function displayUIBasedOnContext () {
   }
   chrome.storage.local.get('headers', function (itemsh) {
     chrome.storage.local.get('timemaps', function (items) {
-      var headers = itemsh.headers[document.URL]
-      var mementoDateTimeHeader
-      var linkHeaderAsString
-      var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL)
+      const headers = itemsh.headers[document.URL]
+      let mementoDateTimeHeader
+      let linkHeaderAsString
+      const notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL)
       /*
        special consideration deets.tabId will be -1 if the request is not related to a tab
        case 1: no link header, no datetime
        case 2: link header, no datetime
        case 3: link header, datetime
        */
-      for (var headerI = 0; headerI < headers.length; headerI++) {
+      for (let headerI = 0; headerI < headers.length; headerI++) {
         if (headers[headerI].name === 'Memento-Datetime') {
           mementoDateTimeHeader = headers[headerI].value
         } else if (headers[headerI].name === 'Link') {
           linkHeaderAsString = headers[headerI].value
         }
       }
-      var tm
+      let tm
       if (!linkHeaderAsString && !mementoDateTimeHeader) { // Case 1
         normalDisplayUIBC(items)
         if (debug) {
@@ -124,8 +126,8 @@ function displayUIBasedOnContext () {
           console.log(' linkheader and no memento date time header')
         }
         if (notStoredInCache) {
-          var specifiedTimegate = false
-          var specifiedTimemap = false
+          let specifiedTimegate = false
+          let specifiedTimemap = false
           if (debug) {
             console.log('case 2 not in cache putting link header specified into cache')
           }
@@ -189,7 +191,7 @@ function getTMThenCall (uri, cb) {
   $.ajax({
     url: uri
   }).done(function (data, textStatus, xhr) {
-    var tm = new Timemap(xhr.getResponseHeader('Link'))
+    let tm = new Timemap(xhr.getResponseHeader('Link'))
     if (tm.timemap) {
       chrome.runtime.sendMessage({
         method: 'fetchTimeMap',
@@ -199,7 +201,7 @@ function getTMThenCall (uri, cb) {
     }
 
     if (tm.mementos && tm.mementos.length < 3 && tm.timegate) {
-      var nextURI = tm.timegate
+      const nextURI = tm.timegate
       tm = null
       getTMThenCall(nextURI, cb)
     } else {
@@ -216,12 +218,12 @@ function displayUIBasedOnStoredTimeMap (tmDataIn) {
   })
 
   if (debug) { console.log(tmDataIn) }
-  var mementoCountFromCache = tmDataIn.mementos.list.length
+  const mementoCountFromCache = tmDataIn.mementos.list.length
   chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache})
 }
 
 function getBlacklist (cb) {
-  var callbackArguments = arguments
+  const callbackArguments = arguments
   chrome.storage.local.get('blacklist', function (items) {
     if (debug) {
       console.log('Current blacklist: ')
@@ -238,8 +240,8 @@ function getBlacklist (cb) {
 }
 
 function addToBlacklist (currentBlacklist, uriIn) {
-  var uri = uriIn
-  var save = {
+  const uri = uriIn
+  let save = {
     'blacklist': null
   }
 
@@ -313,7 +315,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       console.log('Got startTimer')
     }
     chrome.runtime.sendMessage({
-      method: 'setBadge', text: '', iconPath: {
+      method: 'setBadge',
+      text: '',
+      iconPath: {
         '38': clockIcons_38[clockIcons_38.length - 1],
         '19': clockIcons_19[clockIcons_19.length - 1]
       }
@@ -365,17 +369,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (debug) {
       console.log('We will show the "return to live web" interface but it is not implemented yet')
     }
-    return
   }
 })
 
 function getMementos (uri) {
   if (debug) { console.log('getMementosWithTimemap()') }
-  var timemapLocation = memgator_json + uri
+  let timemapLocation = memgator_json + uri
 
-  chrome.runtime.sendMessage({method: 'setBadge', text: '', iconPath: {
-    '38': clockIcons_38[clockIcons_38.length - 1],
-    '19': clockIcons_19[clockIcons_19.length - 1]
+  chrome.runtime.sendMessage({
+    method: 'setBadge',
+    text: '',
+    iconPath: {
+      '38': clockIcons_38[clockIcons_38.length - 1],
+      '19': clockIcons_19[clockIcons_19.length - 1]
   }})
 
   chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function (response) {})
@@ -391,7 +397,7 @@ function getMementos (uri) {
   })
 }
 
-var clockIcons_38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
+const clockIcons_38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo38_15.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo38_22.5.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo38_30.png'),
@@ -399,7 +405,7 @@ var clockIcons_38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.pn
   chrome.extension.getURL('images/mementoLogos/mLogo38_45.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo38_52.5.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')]
-var clockIcons_19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.png'),
+const clockIcons_19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo19_15.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo19_22.5.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo19_30.png'),
@@ -407,7 +413,7 @@ var clockIcons_19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.pn
   chrome.extension.getURL('images/mementoLogos/mLogo19_45.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo19_52.5.png'),
   chrome.extension.getURL('images/mementoLogos/mLogo19_60.png')]
-var iteration = clockIcons_38.length - 1
+let iteration = clockIcons_38.length - 1
 
 function animatePageActionIcon () {
   if (!animateBrowserActionIcon) {
