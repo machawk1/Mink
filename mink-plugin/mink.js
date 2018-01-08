@@ -1,36 +1,36 @@
 /* global chrome, $, Timemap */
 
-var debug = false
-var tmData
-var maxBadgeDisplay = '> 1k'
-var stillProcessingBadgeDisplay = 'WAIT'
+const debug = false
+let tmData
+let maxBadgeDisplay = '> 1k'
+const stillProcessingBadgeDisplay = 'WAIT'
 
-var browserActionTitle_viewingMemento = 'Mink - Viewing Memento'
-var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web'
-var browserActionTitle_noMementos = 'Mink - No Mementos Available'
-var browserActionTitle_blacklisted = 'Mink - Viewing Blacklisted Site'
+const browserActionTitle_viewingMemento = 'Mink - Viewing Memento'
+const browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web'
+const browserActionTitle_noMementos = 'Mink - No Mementos Available'
+const browserActionTitle_blacklisted = 'Mink - Viewing Blacklisted Site'
 
-var badgeImages_disabled = {
+const badgeImages_disabled = {
   '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
   '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
 }
 
-var badgeImages_blacklisted = {
+const badgeImages_blacklisted = {
   '38': chrome.extension.getURL('images/minkLogo38_blacklisted.png'),
   '19': chrome.extension.getURL('images/minkLogo19_blacklisted.png')
 }
 
-var badgeImages_noMementos = {
+const badgeImages_noMementos = {
   '38': chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
   '19': chrome.extension.getURL('images/minkLogo19_noMementos2.png')
 }
 
-var badgeImages_mink = {
+const badgeImages_mink = {
   '38': chrome.extension.getURL('images/minkLogo38.png'),
   '19': chrome.extension.getURL('images/minkLogo19.png')
 }
 
-var badgeImages_isAMemento = {
+const badgeImages_isAMemento = {
   '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
   '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
 }
@@ -43,7 +43,7 @@ chrome.webNavigation.onCommitted.addListener(function (e) {
 })
 
 chrome.browserAction.onClicked.addListener(function (tab) {
-  var scheme = (new window.URL(tab.url)).origin.substr(0, 4)
+  const scheme = (new window.URL(tab.url)).origin.substr(0, 4)
   if (scheme !== 'http') {
     if (debug) { console.log('Invalid scheme for Mink: ' + scheme) }
     return
@@ -81,7 +81,7 @@ function showMinkBadgeInfoBasedOnProcessingState (tabid) {
       return
     }
 
-    var cb = function () { setBadgeTextBasedOnBrowserActionState(tabid) }
+    const cb = function () { setBadgeTextBasedOnBrowserActionState(tabid) }
 
     // TODO: check if URI is in blacklist
     if (debug) { console.warn('about to call setEnabledBasedOnURIBlacklist') }
@@ -123,7 +123,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
 
 function displayMinkUI (tabId) {
   if (debug) { console.log('Injecting displayMinkUI.js') }
-  chrome.tabs.executeScript(tabId, {code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';'},
+  chrome.tabs.executeScript(tabId, {code: 'let tmData = ' + JSON.stringify(tmData) + '; let tabId = ' + tabId + ';'},
   function () {
     chrome.tabs.executeScript(tabId, {
     // TODO: Account for data: URIs like the "connection unavailable" page.
@@ -193,7 +193,7 @@ chrome.runtime.onMessage.addListener(
     } else if (request.method === 'getMementosForHTTPSSource') {
       // Ideally, we would talk to an HTTPS version of the aggregator,
       // Instead, we will communicate with Mink's bg script to get around scheme issue
-      var uri = 'http' + request.value.substr(4)
+      const uri = 'http' + request.value.substr(4)
       $.ajax({
         url: uri,
         type: 'GET'
@@ -228,14 +228,13 @@ function fetchTimeMap (uri, tabid) {
     url: uri,
     type: 'GET'
   }).done(function (data, textStatus, xhr, a, b) {
-    // var numberOfMementos = xhr.getResponseHeader('X-Memento-Count')
     tmData = data
     if (debug) { console.log(tmData) }
 
     if (!data.mementos) {
       data = new Timemap(data)
       // TODO: data.normalize()
-      var mems = data.mementos
+      const mems = data.mementos
       delete data.mementos
       data.mementos = {list: mems}
       if (debug) { console.log(data) }
@@ -276,13 +275,13 @@ function fetchTimeMap (uri, tabid) {
 }
 
 function setBadgeText (value, tabid) {
-  var badgeValue = value
+  let badgeValue = value
 
   if (parseInt(badgeValue, 10) > 999) {
     badgeValue = maxBadgeDisplay
   }
 
-  var badgeColor = '#090'
+  let badgeColor = '#090'
   if (value === stillProcessingBadgeDisplay) {
     badgeColor = '#900'
   }
@@ -435,7 +434,7 @@ chrome.webRequest.onCompleted.addListener(function (deets) {
 
 chrome.webRequest.onHeadersReceived.addListener(function (deets) {
   chrome.storage.local.get('headers', function (items) {
-    var data
+    let data
     if (!items.headers) {
       data = {}
     } else {
@@ -443,11 +442,11 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     }
 
     if (items.headers) {
-      var cachedTMKeys = Object.keys(items.headers)
+      const cachedTMKeys = Object.keys(items.headers)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
         if (debug) { console.warn('******* Number of cached URL Headers:') }
-        var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        var keyOfIndex = cachedTMKeys[indexToRemove]
+        const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        const keyOfIndex = cachedTMKeys[indexToRemove]
         delete data[keyOfIndex]
       }
     }
@@ -482,8 +481,8 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   }).done(function (data, textStatus, xhr) {
     if (xhr.status === 200) {
       // Make the TimeMap
-      var tm = new Timemap(data)
-      var mementosFromTimeMap = tm.mementos
+      let tm = new Timemap(data)
+      const mementosFromTimeMap = tm.mementos
       tm.mementos = null
       tm.mementos = {}
       tm.mementos.list = mementosFromTimeMap
@@ -497,7 +496,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
       } else {
         // Create single timemap from original
         accumulatedArrayOfTimemaps.push(tm) // Add final timemap
-        var firstTm = accumulatedArrayOfTimemaps[0] // Get the first one
+        let firstTm = accumulatedArrayOfTimemaps[0] // Get the first one
 
         // For all other tm, add them to the firsts list
         accumulatedArrayOfTimemaps.slice(1, accumulatedArrayOfTimemaps.length).forEach(function (elem) {
@@ -526,7 +525,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
 
 // e.g., http://ws-dl-05.cs.odu.edu/demo-headers/index.php/Seven_Kingdoms
 function displayMementosMissingTM (mementos, urir, tabId) {
-  var tm = new Timemap()
+  let tm = new Timemap()
   tm.mementos = { list: mementos }
   tm.original = urir
   setTimemapInStorage(tm, tm.original)
@@ -539,7 +538,7 @@ function displayMementosMissingTM (mementos, urir, tabId) {
 }
 
 function tmInList (tmURI, tms) {
-  for (var tm = tms.length - 1; tm >= 0; tm--) {
+  for (let tm = tms.length - 1; tm >= 0; tm--) {
     if (tms[tm].timemap === tmURI) { return true }
   }
   return false
@@ -555,7 +554,7 @@ function findTMURI (uri, tabid) {
     url: uri
   }).done(function (data, status, xhr) {
     // Get the first timemap
-    var tmX = new Timemap(xhr.getResponseHeader('link'))
+    let tmX = new Timemap(xhr.getResponseHeader('link'))
     if (debug) {
       console.warn(tmX.timemap)
       console.log(tmX)
@@ -591,7 +590,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
   }
 
   chrome.storage.local.get('timemaps', function (items) {
-    var tms
+    let tms
     /* var originalURI
     if (tm.origin_uri) {
       originalURI = tm.original_uri
@@ -615,10 +614,10 @@ function setTimemapInStorageAndCall (tm, url, cb) {
       if (debug) {
         console.warn('******* Number of cached TMs:')
       }
-      var cachedTMKeys = Object.keys(items.timemaps)
+      let cachedTMKeys = Object.keys(items.timemaps)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
-        var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        var keyOfIndex = cachedTMKeys[indexToRemove]
+        const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        const keyOfIndex = cachedTMKeys[indexToRemove]
         delete tms[keyOfIndex]
       }
     }
@@ -667,7 +666,7 @@ function setTimemapInStorage (tm, url) {
   }
 
   chrome.storage.local.get('timemaps', function (items) {
-    var tms
+    let tms
     /* var originalURI
     if (tm.origin_uri) {
       originalURI = tm.original_uri
@@ -686,10 +685,10 @@ function setTimemapInStorage (tm, url) {
     // Trim the cache if overfull
     if (items.timemaps) {
       if (debug) { console.warn('******* Number of cached TMs:') }
-      var cachedTMKeys = Object.keys(items.timemaps)
+      const cachedTMKeys = Object.keys(items.timemaps)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
-        var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        var keyOfIndex = cachedTMKeys[indexToRemove]
+        const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        const keyOfIndex = cachedTMKeys[indexToRemove]
         delete tms[keyOfIndex]
       }
     }
