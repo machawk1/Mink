@@ -13,7 +13,7 @@
     "memento",
     "aggregation"
   ],
-  "license": "GPLv2",
+  "license": "MIT License",
   "repository": {
     "type": "git",
     "url": "git://github.com/machawk1/mink.git"
@@ -22,7 +22,7 @@
     "test": "standard"
   },
   "devDependencies": {
-    "standard": "^3.13.2"
+    "standard": "^10.0.3"
   },
   "standard": {
     "ignore": [
