@@ -22,7 +22,7 @@
     "test": "standard"
   },
   "devDependencies": {
-    "standard" :"^3.0.0"
+    "standard": "^3.13.2"
   },
   "standard": {
     "ignore": [

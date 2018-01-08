@@ -1,12 +1,12 @@
 /* global chrome, $, Timemap, moment, tmData */
 
-var MAX_MEMENTOS_IN_DROPDOWN = 500
-var debug = false
+const MAX_MEMENTOS_IN_DROPDOWN = 500
+const debug = false
 function createShadowDOM (cb) {
-  var selector = '#minkuiX'
+  const selector = '#minkuiX'
 
-  var shadow = document.querySelector('#minkWrapper').createShadowRoot()
-  var template = document.querySelector(selector)
+  let shadow = document.querySelector('#minkWrapper').createShadowRoot()
+  const template = document.querySelector(selector)
   // var clone = document.importNode(template, true)
   shadow.appendChild(template)
 
@@ -31,7 +31,7 @@ function appendHTMLToShadowDOM () {
     $('body').append(data)
     setupUI()
 
-    var mementos
+    let mementos
     if (tmData && tmData.mementos) {
       mementos = tmData.mementos.list // e.g. mementos[15].uri and mementos[15].datetime
     } else {
@@ -39,10 +39,10 @@ function appendHTMLToShadowDOM () {
     }
 
     chrome.storage.local.get('timemaps', function (items) {
-      var cb = function () {
+      let cb = function () {
         createShadowDOM(setupDrilldownInteractions)
       }
-      var mCount = mementos.length
+      let mCount = mementos.length
 
       if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
         if (debug) { console.log('qq') }
@@ -88,8 +88,8 @@ function addZ (n) {
 }
 
 function buildDropDown (mementos) {
-  var mementoSelections = ''
-  for (var mm = 0; mm < mementos.length; mm++) {
+  let mementoSelections = ''
+  for (let mm = 0; mm < mementos.length; mm++) {
     mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
   }
 
@@ -146,7 +146,7 @@ function switchToArchiveNowInterface () {
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
   .done(function (data) {
-    var styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+    const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
     $('#minkuiX').prepend(styleElement)
     cb()
   })
@@ -159,26 +159,26 @@ function randomEmail () {
   }
 
   // Choices for the email character pool
-  var alpha = 'abcdefghijklmnopqrstuvwxyz'
-  var choices = 'abcdefghijklmnopqrstuvwxyz' + '0123456789'
-  var domain = ['.com', '.org', '.edu', '.co.uk', '.net'][randy(0, 4)]
+  const alpha = 'abcdefghijklmnopqrstuvwxyz'
+  const choices = 'abcdefghijklmnopqrstuvwxyz' + '0123456789'
+  const domain = ['.com', '.org', '.edu', '.co.uk', '.net'][randy(0, 4)]
 
-  var text = ''
+  let text = ''
 
   // Have a function that will make a unique part of an
   // Email 1 to 3 characters long
-  var getPart = function (pool) {
-    var len = randy(1, 3)
-    var it = ''
-    for (var i = 0; i < len; ++i) {
+  const getPart = function (pool) {
+    const len = randy(1, 3)
+    let it = ''
+    for (let i = 0; i < len; ++i) {
       it += pool.charAt(randy(0, pool.length - 1))
     }
     return it
   }
 
-  var len = randy(2, 4)
+  let len = randy(2, 4)
   // Get user portion of email
-  for (var i = 0; i < len; ++i) {
+  for (let i = 0; i < len; ++i) {
     text += getPart(choices)
   }
 
@@ -197,7 +197,7 @@ function randomEmail () {
 }
 
 function archiveURI_webCite (cb, openInNewTab) {
-  var remail = randomEmail()
+  const remail = randomEmail()
   $.ajax({
     method: 'POST',
     url: 'https://www.webcitation.org/archive',
@@ -217,11 +217,11 @@ function archiveURI_webCite (cb, openInNewTab) {
         cb()
       }
 
-      var shadow = document.getElementById('minkWrapper').shadowRoot
+      const shadow = document.getElementById('minkWrapper').shadowRoot
       shadow.getElementById('archivelogo_webcite').classList.add('archiveNowSuccess')
 
       // Verbose regex but wanted to ensure exact capture
-      var archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0]
+      const archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0]
       shadow.getElementById('archivelogo_webcite').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_webcite').onclick = function () {
         if (!openInNewTab) {
@@ -256,11 +256,11 @@ function archiveURI_archiveOrg (cb, openInNewTab) {
         cb()
       }
 
-      var shadow = document.getElementById('minkWrapper').shadowRoot
+      const shadow = document.getElementById('minkWrapper').shadowRoot
       shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
-      var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g)
-      var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
+      const parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g)
+      const archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
       shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_ia').onclick = function () {
         if (!openInNewTab) {
@@ -292,11 +292,11 @@ function archiveURI_archiveDotIs (cb, openInNewTab) {
 
       $('#archiveNow_archivedotis').addClass('archiveNowSuccess')
 
-      var linkHeader = xhr.getResponseHeader('link')
-      var tmFromLinkHeader = new Timemap(linkHeader)
-      var archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri
+      const linkHeader = xhr.getResponseHeader('link')
+      const tmFromLinkHeader = new Timemap(linkHeader)
+      const archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri
 
-      var shadow = document.getElementById('minkWrapper').shadowRoot
+      const shadow = document.getElementById('minkWrapper').shadowRoot
       shadow.getElementById('archivelogo_ais').classList.add('archiveNowSuccess')
 
       shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI)
@@ -311,7 +311,7 @@ function archiveURI_archiveDotIs (cb, openInNewTab) {
   })
 }
 
-var years = {}
+let years = {}
 var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 var dayNames = ['NA', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th',
           '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th',
@@ -438,7 +438,7 @@ function buildDrilldown_Month (year) {
 function buildDrilldown_Day (year, month) {
   var mementos = tmData.mementos.list
 
-  var dayUL = document.createElement('ul')
+  let dayUL = document.createElement('ul')
   dayUL.id = 'days'
 
   var days = {}
