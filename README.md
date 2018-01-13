@@ -33,4 +33,4 @@ If no mementos exist in the archive, the extension will indicate this with a red
 
 ## License
 
-GPLv2 
+MIT
