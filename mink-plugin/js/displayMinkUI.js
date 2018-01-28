@@ -260,7 +260,7 @@ function archiveURI_archiveOrg (cb, openInNewTab) {
       shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
       var parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g)
-      var archiveURI = 'http://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
+      var archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
       shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_ia').onclick = function () {
         if (!openInNewTab) {
