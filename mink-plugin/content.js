@@ -5,7 +5,7 @@ var debug = false
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-var memgator_json = 'http://memgator.cs.odu.edu/timemap/json/'
+var memgator_json = 'https://memgator.cs.odu.edu/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
@@ -107,9 +107,9 @@ function displayUIBasedOnContext () {
        case 3: link header, datetime
        */
       for (var headerI = 0; headerI < headers.length; headerI++) {
-        if (headers[headerI].name === 'Memento-Datetime') {
+        if (headers[headerI].name.toLowerCase() === 'memento-datetime') {
           mementoDateTimeHeader = headers[headerI].value
-        } else if (headers[headerI].name === 'Link') {
+        } else if (headers[headerI].name.toLowerCase() === 'link') {
           linkHeaderAsString = headers[headerI].value
         }
       }
