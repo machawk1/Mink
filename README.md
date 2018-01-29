@@ -12,8 +12,6 @@ Mink is a Google Chrome extension that uses the [Memento protocol](https://tools
 
 ## Install
 
-**NOTE:** _On January 25, 2018 Mink was removed from the Chrome Web store due to an apparent violation of their policies. We are in the process of resolving this issue. See [#250](https://github.com/machawk1/Mink/issues/250) for progress on this issue._
-
 The extension is available for download from the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)!
 
 ## Usage
