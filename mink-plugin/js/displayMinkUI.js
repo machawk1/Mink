@@ -1,7 +1,7 @@
 /* global chrome, $, Timemap, moment, tmData */
 
 var MAX_MEMENTOS_IN_DROPDOWN = 500
-var debug = false
+//var debug = false
 function createShadowDOM (cb) {
   const selector = '#minkuiX'
 
@@ -309,10 +309,10 @@ function setupDrilldownInteractionYear () {
   // No stored TM, halt building irrelevant drilldown
   if (!shadow.getElementById('years')) { return }
 
-  let years = shadow.getElementById('years').childNodes
+  let yearsDOM = shadow.getElementById('years').childNodes
 
-  for (let year = 0; year < years.length; year++) {
-    years[year].onclick = function (event) {
+  for (let year = 0; year < yearsDOM.length; year++) {
+    yearsDOM[year].onclick = function (event) {
       const existingMonthsUL = shadow.getElementById('months')
       const existingDaysUL = shadow.getElementById('days')
       const existingTimesUL = shadow.getElementById('times')
