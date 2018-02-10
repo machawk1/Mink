@@ -1,7 +1,7 @@
 /* global chrome, $, Timemap, moment, tmData */
 
 var MAX_MEMENTOS_IN_DROPDOWN = 500
-//var debug = false
+
 function createShadowDOM (cb) {
   const selector = '#minkuiX'
 
@@ -10,10 +10,6 @@ function createShadowDOM (cb) {
   // var clone = document.importNode(template, true)
   shadow.appendChild(template)
 
-  if (debug) {
-    console.log('in createShadowDOM()')
-    console.log(cb)
-  }
   if (cb) {
     cb()
   }
@@ -26,7 +22,7 @@ function setupDrilldownInteractions () {
 function appendHTMLToShadowDOM () {
   $.ajax(chrome.extension.getURL('minkui.html'))
   .done(function (data) {
-    if (debug) { console.log('TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).') }
+    // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
 
     $('body').append(data)
     setupUI()
@@ -45,7 +41,6 @@ function appendHTMLToShadowDOM () {
       let mCount = mementos.length
 
       if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
-        if (debug) { console.log('qq') }
         mCount = items.timemaps[document.URL].mementos.length
 
         $('.dropdown').addClass('hidden')
@@ -749,7 +744,6 @@ function bindGoBackToLiveWebButton () {
 }
 
 if ($('#minkWrapper').length === 0) {
-  if (debug) { console.log('appending HTML to Shadow DOM') }
   appendHTMLToShadowDOM()
 } else {
   $('#minkWrapper').toggle()
