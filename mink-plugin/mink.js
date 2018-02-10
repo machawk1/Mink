@@ -5,32 +5,32 @@ var tmData
 var maxBadgeDisplay = '> 1k'
 var stillProcessingBadgeDisplay = 'WAIT'
 
-var browserActionTitle_viewingMemento = 'Mink - Viewing Memento'
-var browserActionTitle_normal = 'Mink - Integrating the Live and Archived Web'
-var browserActionTitle_noMementos = 'Mink - No Mementos Available'
-var browserActionTitle_blacklisted = 'Mink - Viewing Blacklisted Site'
+var browserActionTitleViewingMemento = 'Mink - Viewing Memento'
+var browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
+var browserActionTitleNoMementos = 'Mink - No Mementos Available'
+var browserActionTitleBlacklisted = 'Mink - Viewing Blacklisted Site'
 
-var badgeImages_disabled = {
+var badgeImagesDisabled = {
   '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
   '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
 }
 
-var badgeImages_blacklisted = {
+var badgeImagesBlacklisted = {
   '38': chrome.extension.getURL('images/minkLogo38_blacklisted.png'),
   '19': chrome.extension.getURL('images/minkLogo19_blacklisted.png')
 }
 
-var badgeImages_noMementos = {
+var badgeImagesNoMementos = {
   '38': chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
   '19': chrome.extension.getURL('images/minkLogo19_noMementos2.png')
 }
 
-var badgeImages_mink = {
+var badgeImagesMink = {
   '38': chrome.extension.getURL('images/minkLogo38.png'),
   '19': chrome.extension.getURL('images/minkLogo19.png')
 }
 
-var badgeImages_isAMemento = {
+var badgeImagesIsAMemento = {
   '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
   '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
 }
@@ -54,7 +54,6 @@ chrome.browserAction.onClicked.addListener(function (tab) {
     if (items.timemaps && items.timemaps[tab.url]) {
       if (debug) { console.log('Clicked button and we are viewing a memento') }
       displayMinkUI(tab.id)
-      return
     } else {
       if (debug) { console.log('No timemap stored in cache for ' + tab.url) }
       showMinkBadgeInfoBasedOnProcessingState(tab.id)
@@ -96,16 +95,16 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
     if (!result.length && !Number.isInteger(result) && result !== maxBadgeDisplay) {
       chrome.browserAction.getTitle({tabId: tabid}, function (result) {
         // Only set badge text if not viewing a memento
-        if (result === browserActionTitle_noMementos) {
+        if (result === browserActionTitleNoMementos) {
           displayMinkUI(tabid)
           return
         }
 
-        if (result === browserActionTitle_blacklisted) {
+        if (result === browserActionTitleBlacklisted) {
           return // Prevent the below WAIT message from appearing if b-listed
         }
 
-        if (result !== browserActionTitle_viewingMemento) {
+        if (result !== browserActionTitleViewingMemento) {
           setBadgeText(stillProcessingBadgeDisplay, tabid)
         } else {
           console.log('Show "Viewing Memento" Mink UI in page content.')
@@ -188,8 +187,8 @@ chrome.runtime.onMessage.addListener(
       chrome.runtime.openOptionsPage()
     } else if (request.method === 'stopWatchingRequests') {
       stopWatchingRequests()
-    } else if (request.method === 'stopWatchingRequests_blacklisted') {
-      stopWatchingRequests_blacklisted()
+    } else if (request.method === 'stopWatchingRequestsBlacklisted') {
+      stopWatchingRequestsBlacklisted()
     } else if (request.method === 'getMementosForHTTPSSource') {
       // Ideally, we would talk to an HTTPS version of the aggregator,
       // Instead, we will communicate with Mink's bg script to get around scheme issue
@@ -315,10 +314,10 @@ function setBadge (value, icon, tabid) {
 
   setBadgeIcon(icon, tabid)
 
-  if (JSON.stringify(icon) === JSON.stringify(badgeImages_isAMemento)) {
-    chrome.browserAction.setTitle({title: browserActionTitle_viewingMemento})
+  if (JSON.stringify(icon) === JSON.stringify(badgeImagesIsAMemento)) {
+    chrome.browserAction.setTitle({title: browserActionTitleViewingMemento})
   } else {
-    chrome.browserAction.setTitle({title: browserActionTitle_normal})
+    chrome.browserAction.setTitle({title: browserActionTitleNormal})
   }
 }
 
@@ -341,7 +340,7 @@ function startWatchingRequests () {
       active: true,
       'currentWindow': true
     }, function (tab) {
-      setBadge('', badgeImages_mink, tab[0].id)
+      setBadge('', badgeImagesMink, tab[0].id)
       setBadgeText('', tab[0].id)
     })
   })
@@ -359,22 +358,22 @@ function stopWatchingRequests () {
       active: true,
       'currentWindow': true
     }, function (tab) {
-      setBadge(' ', badgeImages_disabled, tab[0].id)
+      setBadge(' ', badgeImagesDisabled, tab[0].id)
       setBadgeText('', tab[0].id)
     })
   })
 }
 
-function stopWatchingRequests_blacklisted () {
-  if (debug) { console.log('stopWatchingRequests_blacklisted() executing') }
+function stopWatchingRequestsBlacklisted () {
+  if (debug) { console.log('stopWatchingRequestsBlacklisted() executing') }
 
   chrome.tabs.query({
     active: true,
     'currentWindow': true
   }, function (tab) {
-    setBadge(' ', badgeImages_blacklisted, tab[0].id)
+    setBadge(' ', badgeImagesBlacklisted, tab[0].id)
     setBadgeText('', tab[0].id)
-    setBadgeTitle(browserActionTitle_blacklisted, tab[0].id)
+    setBadgeTitle(browserActionTitleBlacklisted, tab[0].id)
   })
 }
 
@@ -403,9 +402,9 @@ function addToBlackList () {
       'uri': tabs[0].url
     })
 
-    setBadgeIcon(badgeImages_blacklisted, tabs[0].id)
+    setBadgeIcon(badgeImagesBlacklisted, tabs[0].id)
     setBadgeText('', tabs[0].id)
-    setBadgeTitle(browserActionTitle_blacklisted, tabs[0].id)
+    setBadgeTitle(browserActionTitleBlacklisted, tabs[0].id)
   })
 }
 
@@ -721,7 +720,7 @@ function setTimemapInStorage (tm, url) {
 }
 
 function displaySecureSiteMementos (mementos, tabid) {
-  setBadge(mementos.length, badgeImages_mink, tabid)
+  setBadge(mementos.length, badgeImagesMink, tabid)
 }
 
 function showInterfaceForZeroMementos (tabid) {
@@ -733,6 +732,6 @@ function showInterfaceForZeroMementos (tabid) {
 
   // TODO: Also set the badge icon to the red memento icon (or something else indicative)
   setBadgeText('', tabid)
-  setBadgeIcon(badgeImages_noMementos, tabid)
-  setBadgeTitle(browserActionTitle_noMementos, tabid)
+  setBadgeIcon(badgeImagesNoMementos, tabid)
+  setBadgeTitle(browserActionTitleNoMementos, tabid)
 }
