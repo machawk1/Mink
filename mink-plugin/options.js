@@ -5,7 +5,7 @@ var debug = true
 var tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
 var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
 
-function restore_options () {
+function restoreOptions () {
   chrome.storage.local.get('blacklist', function (items) {
     $(items.blacklist).each(function (i, v) {
       $('#options').append(getListItemHTML(v, 'glyphicon-remove'))
@@ -246,7 +246,7 @@ function addSelectedURIToBlacklist () {
   $('#options').append('<li class="strike"><span>' + oURI + '</li>')
 }
 
-document.addEventListener('DOMContentLoaded', restore_options)
+document.addEventListener('DOMContentLoaded', restoreOptions)
 document.addEventListener('DOMContentLoaded', createAddURIBinder)
 document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI)
 

@@ -2,7 +2,7 @@
 
 function Timemap (fromString) {
   if (debug) { console.log('In timemap.js') }
-  var timemap, timegate, original, url, self
+  let timemap, timegate, original, url, self
   this.str = fromString
   if (!this.str) {
     if (debug) {
@@ -12,7 +12,7 @@ function Timemap (fromString) {
   }
 
   // Check if the string passed in is an Object, e.g., https://github.com/
-  var strIsAnObject = (typeof this.str === 'object') && (this.str !== null)
+  const strIsAnObject = (typeof this.str === 'object') && (this.str !== null)
   if (debug) {
     // console.log(this.str)
     console.log('type: ' + typeof this.str)
@@ -24,32 +24,32 @@ function Timemap (fromString) {
   //    this = this.str
   }
 
-  var linkHeaderEntries = this.str.split(',')
+  const linkHeaderEntries = this.str.split(',')
 
-  var mementoUrlExpression = /<[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?>/gi
-  var murlregex = new RegExp(mementoUrlExpression) // Regex to get a memento URI
+  const mementoUrlExpression = /<[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?>/gi
+  const murlregex = new RegExp(mementoUrlExpression) // Regex to get a memento URI
 
-  var mementoRelTimegateExpression = /rel=.*timegate.*/gi
-  var mtimegateregex = new RegExp(mementoRelTimegateExpression) // Regex to get timegate
+  const mementoRelTimegateExpression = /rel=.*timegate.*/gi
+  const mtimegateregex = new RegExp(mementoRelTimegateExpression) // Regex to get timegate
 
-  var mementoRelTimemapExpression = /rel=.*timemap.*/gi
-  var mtimemapregex = new RegExp(mementoRelTimemapExpression) // Regex to get timemap
+  const mementoRelTimemapExpression = /rel=.*timemap.*/gi
+  const mtimemapregex = new RegExp(mementoRelTimemapExpression) // Regex to get timemap
 
-  var mementoRelOriginalExpression = /rel=.*original.*/gi
-  var moriginalregex = new RegExp(mementoRelOriginalExpression) // Regex to get original
+  const mementoRelOriginalExpression = /rel=.*original.*/gi
+  const moriginalregex = new RegExp(mementoRelOriginalExpression) // Regex to get original
 
-  var mementoRelMementoExpression = /rel=.*memento[^a-zA-Z].*/gi
-  var mementoregex = new RegExp(mementoRelMementoExpression) // Regex to get a memento
+  const mementoRelMementoExpression = /rel=.*memento[^a-zA-Z].*/gi
+  const mementoregex = new RegExp(mementoRelMementoExpression) // Regex to get a memento
 
-  var mementoRelSelfExpression = /rel=.*self.*/gi
-  var mselfregex = new RegExp(mementoRelSelfExpression) // Regex to get a memento
+  const mementoRelSelfExpression = /rel=.*self.*/gi
+  const mselfregex = new RegExp(mementoRelSelfExpression) // Regex to get a memento
 
   this.mementos = []
 
-  for (var lhe = 0; lhe < linkHeaderEntries.length; lhe++) {
-    var partsOfEntry = linkHeaderEntries[lhe].split(';')
+  for (let lhe = 0; lhe < linkHeaderEntries.length; lhe++) {
+    const partsOfEntry = linkHeaderEntries[lhe].split(';')
 
-    for (var partOfEntry = 0; partOfEntry < partsOfEntry.length; partOfEntry++) {
+    for (let partOfEntry = 0; partOfEntry < partsOfEntry.length; partOfEntry++) {
       if (partsOfEntry[partOfEntry].match(murlregex)) {
         url = partsOfEntry[partOfEntry]
       }
@@ -104,7 +104,7 @@ function Memento (fromStr) {
 
   this.uri = this.str.substring(this.str.indexOf('<') + 1, this.str.indexOf('>'))
   this.datetime = this.str.substr(this.str.indexOf('datetime')) // Abbreviation to just include datetime string and on
-  this.datetime = this.datetime.substr(this.datetime.indexOf('\"')).replace(/"/g, '').trim()
+  this.datetime = this.datetime.substr(this.datetime.indexOf('"')).replace(/"/g, '').trim()
 }
 
 /* ***************************
@@ -112,7 +112,7 @@ function Memento (fromStr) {
 *************************** */
 
 function sanitizeMementoURI (mURI) {
-  var ret = mURI.trim()
+  let ret = mURI.trim()
   if (ret.substr(0, 1) === '<' && ret.substr(ret.length - 1, 1) === '>') {
     ret = ret.substr(1, ret.length - 2) // Remove first and last characters
   }

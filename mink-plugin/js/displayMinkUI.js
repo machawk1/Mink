@@ -20,7 +20,7 @@ function createShadowDOM (cb) {
 }
 
 function setupDrilldownInteractions () {
-  setupDrilldownInteraction_Year()
+  setupDrilldownInteractionYear()
 }
 
 function appendHTMLToShadowDOM () {
@@ -61,12 +61,12 @@ function appendHTMLToShadowDOM () {
         $('#steps .action').removeClass('active')
         $('#title_drilldown').addClass('active')
         buildDropDown([])
-        buildDrilldown_Year(items.timemaps[document.URL].mementos.list)
+        buildDrilldownYear(items.timemaps[document.URL].mementos.list)
       } else if (mCount === 0) {
         switchToArchiveNowInterface()
       } else {
         buildDropDown(mementos)
-        buildDrilldown_Year(mementos)
+        buildDrilldownYear(mementos)
         $('#drilldownBox').addClass('hidden')
         $('#steps .action').removeClass('active')
         $('#title_dropdown').addClass('active')
@@ -161,7 +161,7 @@ function randomEmail () {
   return text
 }
 
-function archiveURI_webCite (cb, openInNewTab) {
+function archiveURIWebCite (cb, openInNewTab) {
   const remail = randomEmail()
   $.ajax({
     method: 'POST',
@@ -205,7 +205,7 @@ function archiveURI_webCite (cb, openInNewTab) {
   })
 }
 
-function archiveURI_archiveOrg (cb, openInNewTab) {
+function archiveURIArchiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
     url: '//web.archive.org/save/' + document.URL
@@ -224,7 +224,7 @@ function archiveURI_archiveOrg (cb, openInNewTab) {
       const shadow = document.getElementById('minkWrapper').shadowRoot
       shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
-      const parsedRawArchivedURI = a.match(/\"\/web\/.*\"/g)
+      const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
       const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
       shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
       shadow.getElementById('archivelogo_ia').onclick = function () {
@@ -238,7 +238,7 @@ function archiveURI_archiveOrg (cb, openInNewTab) {
   })
 }
 
-function archiveURI_archiveDotIs (cb, openInNewTab) {
+function archiveURIArchiveDotIs (cb, openInNewTab) {
   $.ajax({
     method: 'POST',
     url: '//archive.is/submit/',
@@ -282,7 +282,7 @@ let dayNames = ['NA', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9
   '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th',
   '21st', '22nd', '23rd', '24th', '25th', '26th', '27th', '28th', '29th', '30th', '31st']
 
-function buildDrilldown_Year (mementos) {
+function buildDrilldownYear (mementos) {
   // NOTE: Shadow DOM not yet built. Do so after this function
   years = null
   years = {}
@@ -303,7 +303,7 @@ function buildDrilldown_Year (mementos) {
   $('body #drilldownBox').append(memCountList)
 }
 
-function setupDrilldownInteraction_Year () {
+function setupDrilldownInteractionYear () {
   const shadow = document.getElementById('minkWrapper').shadowRoot
 
   // No stored TM, halt building irrelevant drilldown
@@ -330,14 +330,14 @@ function setupDrilldownInteraction_Year () {
         drilldownShadow.removeChild(existingTimesUL)
       }
 
-      buildDrilldown_Month($(this).data('year'))
+      buildDrilldownMonth($(this).data('year'))
       $(this).siblings().removeClass('selectedOption')
       $(this).addClass('selectedOption')
     }
   }
 }
 
-function buildDrilldown_Month (year) {
+function buildDrilldownMonth (year) {
   let mementos = tmData.mementos.list
 
   let monthUL = document.createElement('ul')
@@ -370,7 +370,7 @@ function buildDrilldown_Month (year) {
 
     li.appendChild(liSpan)
     li.onclick = function (event) {
-      buildDrilldown_Day($(this).data('year'), $(this).data('month'))
+      buildDrilldownDay($(this).data('year'), $(this).data('month'))
       $(this).siblings().removeClass('selectedOption')
       $(this).addClass('selectedOption')
     }
@@ -400,7 +400,7 @@ function buildDrilldown_Month (year) {
   drilldownShadow.appendChild(monthUL)
 }
 
-function buildDrilldown_Day (year, month) {
+function buildDrilldownDay (year, month) {
   const mementos = tmData.mementos.list
 
   let dayUL = document.createElement('ul')
@@ -435,7 +435,7 @@ function buildDrilldown_Day (year, month) {
 
     li.appendChild(liSpan)
     li.onclick = function (event) {
-      buildDrilldown_Time($(this).data('year'), $(this).data('month'), parseInt($(this).data('date'), 10))
+      buildDrilldownTime($(this).data('year'), $(this).data('month'), parseInt($(this).data('date'), 10))
       $(this).siblings().removeClass('selectedOption')
       $(this).addClass('selectedOption')
     }
@@ -460,7 +460,7 @@ function buildDrilldown_Day (year, month) {
   drilldownShadow.appendChild(dayUL)
 }
 
-function buildDrilldown_Time (year, month, date) {
+function buildDrilldownTime (year, month, date) {
   const mementos = tmData.mementos.list
 
   let timeUL = document.createElement('ul')
@@ -695,26 +695,26 @@ function bindArchiveLogos () {
     const cb = function () { changeIconFor(that, newSrc) }
 
     if (archiveLogoID === 'archivelogo_ia') {
-      archiveURI_archiveOrg(cb, openInNewTab)
+      archiveURIArchiveOrg(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
-      archiveURI_archiveDotIs(cb, openInNewTab)
+      archiveURIArchiveDotIs(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_webcite') {
-      archiveURI_webCite(cb, openInNewTab)
+      archiveURIWebCite(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 3 archives
-      const ia_newSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
-      const ais_newSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
-      const wc_newSrc = $(wcLogo).attr('src').replace('.png', '_success.png')
+      const iaNewSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
+      const aisNewSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
+      const wcNewSrc = $(wcLogo).attr('src').replace('.png', '_success.png')
 
-      const ia_cb = function () {
-        changeIconFor(iaLogo, ia_newSrc)
+      const iaCb = function () {
+        changeIconFor(iaLogo, iaNewSrc)
         changeArchiveAllIconWhenComplete(alaLogo)
       }
-      const ais_cb = function () {
-        changeIconFor(aisLogo, ais_newSrc)
+      const aisCb = function () {
+        changeIconFor(aisLogo, aisNewSrc)
         changeArchiveAllIconWhenComplete(alaLogo)
       }
-      const wc_cb = function () {
-        changeIconFor(wcLogo, wc_newSrc)
+      const wcCb = function () {
+        changeIconFor(wcLogo, wcNewSrc)
         changeArchiveAllIconWhenComplete(alaLogo)
       }
 
@@ -723,9 +723,9 @@ function bindArchiveLogos () {
       $(wcLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
 
       openInNewTab = true
-      archiveURI_archiveOrg(ia_cb, openInNewTab)
-      archiveURI_archiveDotIs(ais_cb, openInNewTab)
-      archiveURI_webCite(wc_cb, openInNewTab)
+      archiveURIArchiveOrg(iaCb, openInNewTab)
+      archiveURIArchiveDotIs(aisCb, openInNewTab)
+      archiveURIWebCite(wcCb, openInNewTab)
     }
   })
 }
