@@ -725,7 +725,7 @@ function bindArchiveLogos () {
   })
 }
 
-let archivesFinished = 0
+var archivesFinished = 0 /* TOFIX This is doubly declared if 'let' */
 function changeArchiveAllIconWhenComplete (iconObj) {
   archivesFinished++
   if (archivesFinished >= 3) {
