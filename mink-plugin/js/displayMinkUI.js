@@ -7,7 +7,6 @@ function createShadowDOM (cb) {
 
   let shadow = document.querySelector('#minkWrapper').createShadowRoot()
   const template = document.querySelector(selector)
-  // var clone = document.importNode(template, true)
   shadow.appendChild(template)
 
   if (cb) {
@@ -81,7 +80,7 @@ function addZ (n) {
 
 function buildDropDown (mementos) {
   let mementoSelections = ''
-  for (var mm = 0; mm < mementos.length; mm++) {
+  for (let mm = 0; mm < mementos.length; mm++) {
     mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
   }
 
@@ -106,7 +105,7 @@ function switchToArchiveNowInterface () {
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
   .done(function (data) {
-    var styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+    const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
     $('#minkuiX').prepend(styleElement)
     cb()
   })
@@ -130,7 +129,7 @@ function randomEmail () {
   const getPart = function (pool) {
     const len = randy(1, 3)
     let it = ''
-    for (var i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
       it += pool.charAt(randy(0, pool.length - 1))
     }
     return it
@@ -138,7 +137,7 @@ function randomEmail () {
 
   let len = randy(2, 4)
   // Get user portion of email
-  for (var i = 0; i < len; ++i) {
+  for (let i = 0; i < len; ++i) {
     text += getPart(choices)
   }
 

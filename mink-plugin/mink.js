@@ -442,11 +442,11 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     }
 
     if (items.headers) {
-      var cachedTMKeys = Object.keys(items.headers)
+      const cachedTMKeys = Object.keys(items.headers)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
         if (debug) { console.warn('******* Number of cached URL Headers:') }
-        var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        var keyOfIndex = cachedTMKeys[indexToRemove]
+        const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        const keyOfIndex = cachedTMKeys[indexToRemove]
         delete data[keyOfIndex]
       }
     }
@@ -481,8 +481,8 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   }).done(function (data, textStatus, xhr) {
     if (xhr.status === 200) {
       // Make the TimeMap
-      var tm = new Timemap(data)
-      var mementosFromTimeMap = tm.mementos
+      let tm = new Timemap(data)
+      const mementosFromTimeMap = tm.mementos
       tm.mementos = null
       tm.mementos = {}
       tm.mementos.list = mementosFromTimeMap
@@ -496,7 +496,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
       } else {
         // Create single timemap from original
         accumulatedArrayOfTimemaps.push(tm) // Add final timemap
-        var firstTm = accumulatedArrayOfTimemaps[0] // Get the first one
+        let firstTm = accumulatedArrayOfTimemaps[0] // Get the first one
 
         // For all other tm, add them to the firsts list
         accumulatedArrayOfTimemaps.slice(1, accumulatedArrayOfTimemaps.length).forEach(function (elem) {
@@ -525,7 +525,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
 
 // e.g., http://ws-dl-05.cs.odu.edu/demo-headers/index.php/Seven_Kingdoms
 function displayMementosMissingTM (mementos, urir, tabId) {
-  var tm = new Timemap()
+  let tm = new Timemap()
   tm.mementos = { list: mementos }
   tm.original = urir
   setTimemapInStorage(tm, tm.original)
@@ -538,7 +538,7 @@ function displayMementosMissingTM (mementos, urir, tabId) {
 }
 
 function tmInList (tmURI, tms) {
-  for (var tm = tms.length - 1; tm >= 0; tm--) {
+  for (let tm = tms.length - 1; tm >= 0; tm--) {
     if (tms[tm].timemap === tmURI) { return true }
   }
   return false
@@ -554,7 +554,7 @@ function findTMURI (uri, tabid) {
     url: uri
   }).done(function (data, status, xhr) {
     // Get the first timemap
-    var tmX = new Timemap(xhr.getResponseHeader('link'))
+    const tmX = new Timemap(xhr.getResponseHeader('link'))
     if (debug) {
       console.warn(tmX.timemap)
       console.log(tmX)
@@ -590,7 +590,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
   }
 
   chrome.storage.local.get('timemaps', function (items) {
-    var tms
+    let tms
     /* var originalURI
     if (tm.origin_uri) {
       originalURI = tm.original_uri
@@ -614,10 +614,10 @@ function setTimemapInStorageAndCall (tm, url, cb) {
       if (debug) {
         console.warn('******* Number of cached TMs:')
       }
-      var cachedTMKeys = Object.keys(items.timemaps)
+      const cachedTMKeys = Object.keys(items.timemaps)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
-        var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        var keyOfIndex = cachedTMKeys[indexToRemove]
+        const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        const keyOfIndex = cachedTMKeys[indexToRemove]
         delete tms[keyOfIndex]
       }
     }
@@ -666,14 +666,7 @@ function setTimemapInStorage (tm, url) {
   }
 
   chrome.storage.local.get('timemaps', function (items) {
-    var tms
-    /* var originalURI
-    if (tm.origin_uri) {
-      originalURI = tm.original_uri
-    } else if (tm.original) {
-      originalURI = tm.original
-    } */
-
+    let tms
     if (debug) { console.log('setting TM for uri in storage, uri:' + url) }
 
     if (!items.timemaps) {
@@ -685,10 +678,10 @@ function setTimemapInStorage (tm, url) {
     // Trim the cache if overfull
     if (items.timemaps) {
       if (debug) { console.warn('******* Number of cached TMs:') }
-      var cachedTMKeys = Object.keys(items.timemaps)
+      const cachedTMKeys = Object.keys(items.timemaps)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
-        var indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        var keyOfIndex = cachedTMKeys[indexToRemove]
+        const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        const keyOfIndex = cachedTMKeys[indexToRemove]
         delete tms[keyOfIndex]
       }
     }

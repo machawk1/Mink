@@ -2,8 +2,8 @@
 
 var debug = true
 
-var tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
-var tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
+const tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
+const tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
 
 function restoreOptions () {
   chrome.storage.local.get('blacklist', function (items) {
@@ -15,7 +15,6 @@ function restoreOptions () {
 
     $('.remove').click(function () {
       if ($(this).hasClass('glyphicon-remove')) {
-        // var uriToStrike = $(this).parent().text()
         $(this).parent().addClass('strike')
         $(this).toggleClass('glyphicon-remove glyphicon-ok')
       } else {
@@ -41,8 +40,8 @@ function clearBlacklist () {
 }
 
 function saveBlacklist (dontReload) {
-  var blacklistJSON = {}
-  var uris = []
+  let blacklistJSON = {}
+  let uris = []
   $('#options li:not(.strike) span').each(function () {
     uris.push($(this).text())
   })
@@ -58,7 +57,7 @@ function saveBlacklist (dontReload) {
 }
 
 function updateSaveButtonStatus () {
-  var saveBlacklistButton = $('#saveBlacklist')
+  let saveBlacklistButton = $('#saveBlacklist')
   if ($('.glyphicon-ok').length > 0 || $('.newEntry').length > 0) {
     saveBlacklistButton.removeAttr('disabled').removeClass('disabled')
   } else {
@@ -67,7 +66,7 @@ function updateSaveButtonStatus () {
 }
 
 function updateRemoveAllBlacklistButtonStatus () {
-  var clearBlacklistButton = $('#clearBlacklist')
+  let clearBlacklistButton = $('#clearBlacklist')
   if (debug) {
     console.log($('#options li').length)
     console.log($('#options li'))
@@ -88,7 +87,7 @@ function createAddURIBinder () {
 
 function bindAddBlacklistEntryUI () {
   $('.uriTextField').keyup(function () {
-    var uriFieldValue = $(this).val()
+    const uriFieldValue = $(this).val()
     if (uriFieldValue.length === 0) {
       $(this).parent().find('button.addToBlacklist').attr('disabled', true)
     } else {
@@ -107,7 +106,7 @@ function addMinkBlacklistToBeSavedLI (valIn) {
 }
 
 function addToBlacklistToBeSaved () {
-  var uri = $(this).parent().find('.uriTextField').val()
+  let uri = $(this).parent().find('.uriTextField').val()
   if (uri.substr(0, 4) !== 'http') {
     uri = 'http://' + uri
   }
@@ -135,15 +134,15 @@ function populatedCachedTimeMapsUI () {
       console.log(items)
     }
 
-    var tms = items.timemaps
+    const tms = items.timemaps
 
-    var keys = tms ? Object.keys(tms) : 0
-    // var uriPluralityString = keys.length === 1 ? 'URI' : 'URIs'
+    const keys = tms ? Object.keys(tms) : 0
+    // let uriPluralityString = keys.length === 1 ? 'URI' : 'URIs'
 
     if (keys.length) {
       $('#cachedTimemaps').append(tmDropdownString)
-      for (var tm = 0; tm < keys.length; tm++) {
-        var originalURI = tms[keys[tm]].original_uri
+      for (let tm = 0; tm < keys.length; tm++) {
+        let originalURI = tms[keys[tm]].original_uri
         if (!tms[keys[tm]].original_uri) {
           originalURI = keys[tm]
         }
@@ -163,8 +162,8 @@ function updateMementoCount () {
   chrome.storage.local.get('timemaps', function (items) {
     console.log(items.timemaps)
     console.log(items.timemaps[$('#cachedTimemaps').val()])
-    var count = items.timemaps[$('#cachedTimemaps').val()].mementos.list.length
-    var plurality = 's'
+    const count = items.timemaps[$('#cachedTimemaps').val()].mementos.list.length
+    const plurality = 's'
     if (count === 1) {
       plurality = ''
     }
@@ -177,16 +176,16 @@ function resetMementoCount () {
 }
 
 function enableRemoveButtons (disable, additionalIdsIn) {
-  var additionalIds = ''
+  let additionalIds = ''
   if (additionalIdsIn) {
     additionalIds = ',' + additionalIdsIn
   }
-  var buttonIds = '#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndBlacklist' + additionalIds
+  const buttonIds = '#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndBlacklist' + additionalIds
   $(buttonIds).prop('disabled', disable)
 }
 
 function enableRemoveButtonsBasedOnDropdown () {
-  var selectedIndex = $(this).find('option:selected').index()
+  let selectedIndex = $(this).find('option:selected').index()
   if (selectedIndex > 0) { // -1 would be valid with the verbose conditional
     enableRemoveButtons(false)
     updateMementoCount()
@@ -198,7 +197,7 @@ function enableRemoveButtonsBasedOnDropdown () {
 
 function removeTMFromCache (originalURI) {
   chrome.storage.local.get('timemaps', function (items) {
-    var tms = items.timemaps
+    let tms = items.timemaps
     delete tms[originalURI]
     chrome.storage.local.set({'timemaps': tms},
       function () {
@@ -237,12 +236,12 @@ function restoreDefaults () {
 }
 
 function removeSelectedURIFromTimeMapCache () {
-  var oURI = $('#cachedTimemaps option:selected').text()
+  const oURI = $('#cachedTimemaps option:selected').text()
   removeTMFromCache(oURI)
 }
 
 function addSelectedURIToBlacklist () {
-  var oURI = $('#cachedTimemaps option:selected').text()
+  const oURI = $('#cachedTimemaps option:selected').text()
   $('#options').append('<li class="strike"><span>' + oURI + '</li>')
 }
 
@@ -253,7 +252,7 @@ document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI)
 $('#removeSelectedTMFromCache').click(removeSelectedURIFromTimeMapCache)
 $('#removeSelectedTMFromCacheAndBlacklist').click(function () {
   addSelectedURIToBlacklist()
-  var dontReloadAfterSavingBlacklist = true
+  const dontReloadAfterSavingBlacklist = true
   saveBlacklist(dontReloadAfterSavingBlacklist)
   removeSelectedURIFromTimeMapCache()
 })
