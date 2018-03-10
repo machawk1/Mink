@@ -6,24 +6,23 @@
 #minkContainer {position: fixed; bottom: 5px; right: 5px;text-align: center; width: 100px; z-index: 9999; font-size: 12px; border: 0; height: 50px;}
 * #minkContainer, #minkContainer * {top: auto; left: auto;} /* Fix #62 */
 
-#archiveOptions {position: absolute; top: 0px; left: 0px; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
+#archiveOptions {position: absolute; top: 0; left: 0; margin-left: 0; margin-top: 10px;  width: 725px; background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px; background: linear-gradient(to right, #bbbbbb, rgba(187,187,187,0.75)); opacity: 0.0; font-weight: bold; border-radius: 4px; height: 1.75em;
 }
 #mdts, #dateUIButton, #helpButton {margin-left: 1.0em;}
 #prevMementoButton,#fetchLabel {margin-left: 1.5em;}
 
 #datepickerContainer {position: absolute; top: 5px; left: 40%; text-align: center; width: 100px; z-index: 10000; background-color: white;}
-#datepickerOptions {position: absolute; top: 0px; left: 0px; margin-top: 0px; width: 725px; min-height: 50%;  background-color: #ccc; z-index: 98; text-align: left;
+#datepickerOptions {position: absolute; top: 0; left: 0; margin-top: 0; width: 725px; min-height: 50%;  background-color: #ccc; z-index: 98; text-align: left;
 	padding: 5px;
 	background: linear-gradient(to bottom, #999999, rgba(187,187,187,0.75));
 
 	font-weight: bold; border-radius: 4px;
 }
 #datepickerOptions ul {list-style-type: none;}
-#countOverLogo {position: absolute; right: 20px; bottom: 0; display: block; text-align: right; padding: 0 7px 0 7px; color: blue; z-index: 999999; margin: 0; font-weight: bold;
-	font-family: Arial; font-size: 18px; border-radius: 25px; letter-spacing: normal;
-   /*text-shadow: 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black, 0 0 4px black;*/
-   opacity: 0.9; display: none; background: #ddd;box-shadow: 0px 2px 5px #888888;
+#countOverLogo {position: absolute; right: 20px; bottom: 0; text-align: right; padding: 0 7px 0 7px; color: blue; z-index: 999999; margin: 0; font-weight: bold;
+	font-family: Arial, sans-serif; font-size: 18px; border-radius: 25px; letter-spacing: normal;
+    opacity: 0.9; display: none; background: #ddd; box-shadow: 0 2px 5px #888888;
 	}
 #countOverLogo:hover {cursor: pointer; background-color: #999;}
 
@@ -56,7 +55,7 @@
 #largerNumberButtons>p {float: left;  padding: 0 5px 0 5px; font-size: 12px; padding-top: 3px;}
 #largerNumberButtons p, #largerNumberButtons button, #largerNumberButtons input[type=submit], #largerNumberButtons input[type=button] {margin-bottom: 0; color: black;}
 #largerNumberButtons button.disabled {opacity: 0.5; border: 1px dashed black;}
-.largeNumberOfMementoOption { padding: 3px 5px; font-weight: bold; display: block; border: 1px solid black; border-radius: 10px; background-color: white; line-height: 1.2em; box-shadow: 0px 2px 5px #888888; outline: 0; float: left;}
+.largeNumberOfMementoOption { padding: 3px 5px; font-weight: bold; display: block; border: 1px solid black; border-radius: 10px; background-color: white; line-height: 1.2em; box-shadow: 0 2px 5px #888888; outline: 0; float: left;}
 .largeNumberOfMementoOption span {color: #999;}
 .activeButton span {color: black;}
 
@@ -70,21 +69,13 @@
 
 
 
-#drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; position: absolute; z-index: 1; left: 125px; font-family: Arial, sans-serif; background-color: white;}
+#drilldownBox {border: 1px solid #999; padding: 2px; position: absolute; z-index: 1; left: 125px; font-family: Arial, sans-serif; background-color: white;}
 #drilldownBox ul {list-style-type: none; width: 100px; float: left;  padding: 0; background-color: white; max-height: 500px; overflow-x: hidden; overflow-y: auto;}
 #drilldownBox ul li {list-style-type: none; padding: 0; margin: 0; width: 90px;}
 #drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
 #drilldownBox ul li.selectedOption {background-color: #ddddff;}
-#drilldownBox ul li span.memCount {float: right;  font-family: Monaco, Courier, sans-serif; padding: 0px 3px; margin-right: 5px; border-radius: 2px; font-size: 10px; margin-top: 3px; line-height: 10px;}
+#drilldownBox ul li span.memCount {float: right;  font-family: Monaco, Courier, sans-serif; padding: 0 3px; margin-right: 5px; border-radius: 2px; font-size: 10px; margin-top: 3px; line-height: 10px;}
 
-/*
-#drilldownBox ul li span.memCount {
-    font-size: 9px;
-    line-height: 9px;
-    margin-top: 5px;
-    margin-right: 2px;
-}
-*/
 
 /* Do not display UI elements for non-selected view of list of mementos */
 .hiddenUI {display: none;}
@@ -93,4 +84,4 @@
 /* This isn't working, the image ought to be pulled from the extension, not the current page */
 /* option.ia {background-image: url('images/archives/ia.png');}*/
 
-} /* End @media screen */
+/* }  End @media screen */
