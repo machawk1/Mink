@@ -68,8 +68,9 @@ function updateSaveButtonStatus () {
 function updateRemoveAllBlacklistButtonStatus () {
   let clearBlacklistButton = $('#clearBlacklist')
   if (debug) {
-    console.log($('#options li').length)
-    console.log($('#options li'))
+    let lis = $('#options li')
+    console.log(lis.length)
+    console.log(lis)
   }
   if ($('#options li').length > 0) {
     clearBlacklistButton.removeAttr('disabled').removeClass('disabled')
@@ -163,7 +164,7 @@ function updateMementoCount () {
     console.log(items.timemaps)
     console.log(items.timemaps[$('#cachedTimemaps').val()])
     const count = items.timemaps[$('#cachedTimemaps').val()].mementos.list.length
-    const plurality = 's'
+    let plurality = 's'
     if (count === 1) {
       plurality = ''
     }
