@@ -123,19 +123,19 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
 function displayMinkUI (tabId) {
   if (debug) { console.log('Injecting displayMinkUI.js') }
   chrome.tabs.executeScript(tabId, {code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';'},
-  function () {
-    chrome.tabs.executeScript(tabId, {
-    // TODO: Account for data: URIs like the "connection unavailable" page.
-    //   Currently, because this scheme format is not in the manifest, an exception is
-    //     thrown. Handle this more gracefully.
-      file: 'js/displayMinkUI.js'
-    }, function (res) {
-      if (debug) {
-        console.log('mink ui injected. res = ')
-        console.log(res)
-      }
+    function () {
+      chrome.tabs.executeScript(tabId, {
+        // TODO: Account for data: URIs like the "connection unavailable" page.
+        //   Currently, because this scheme format is not in the manifest, an exception is
+        //     thrown. Handle this more gracefully.
+        file: 'js/displayMinkUI.js'
+      }, function (res) {
+        if (debug) {
+          console.log('mink ui injected. res = ')
+          console.log(res)
+        }
+      })
     })
-  })
 }
 
 chrome.runtime.onMessage.addListener(

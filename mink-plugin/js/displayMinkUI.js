@@ -20,58 +20,58 @@ function setupDrilldownInteractions () {
 
 function appendHTMLToShadowDOM () {
   $.ajax(chrome.extension.getURL('minkui.html'))
-  .done(function (data) {
+    .done(function (data) {
     // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
 
-    $('body').append(data)
-    setupUI()
+      $('body').append(data)
+      setupUI()
 
-    let mementos
-    if (tmData && tmData.mementos) {
-      mementos = tmData.mementos.list // e.g. mementos[15].uri and mementos[15].datetime
-    } else {
-      mementos = []
-    }
-
-    chrome.storage.local.get('timemaps', function (items) {
-      let cb = function () {
-        createShadowDOM(setupDrilldownInteractions)
-      }
-      let mCount = mementos.length
-
-      if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
-        mCount = items.timemaps[document.URL].mementos.length
-
-        $('.dropdown').addClass('hidden')
-        $('#drilldownBox').addClass('hidden')
-        $('#steps').addClass('hidden')
-        $('#title_dropdown').addClass('hidden')
-        $('#archiveNow').addClass('hidden')
-        $('#viewingMementoInterface').removeClass('hidden')
-        $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)))
-        cb = createShadowDOM
-      } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
-        $('.dropdown').addClass('hidden')
-        $('#steps .action').removeClass('active')
-        $('#title_drilldown').addClass('active')
-        buildDropDown([])
-        buildDrilldownYear(items.timemaps[document.URL].mementos.list)
-      } else if (mCount === 0) {
-        switchToArchiveNowInterface()
+      let mementos
+      if (tmData && tmData.mementos) {
+        mementos = tmData.mementos.list // e.g. mementos[15].uri and mementos[15].datetime
       } else {
-        buildDropDown(mementos)
-        buildDrilldownYear(mementos)
-        $('#drilldownBox').addClass('hidden')
-        $('#steps .action').removeClass('active')
-        $('#title_dropdown').addClass('active')
+        mementos = []
       }
 
-      // Append CSS1
-      $('#mementosAvailable span').html(mCount)
-      // Append CSS2
-      appendCSSToShadowDOM(cb)
+      chrome.storage.local.get('timemaps', function (items) {
+        let cb = function () {
+          createShadowDOM(setupDrilldownInteractions)
+        }
+        let mCount = mementos.length
+
+        if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
+          mCount = items.timemaps[document.URL].mementos.length
+
+          $('.dropdown').addClass('hidden')
+          $('#drilldownBox').addClass('hidden')
+          $('#steps').addClass('hidden')
+          $('#title_dropdown').addClass('hidden')
+          $('#archiveNow').addClass('hidden')
+          $('#viewingMementoInterface').removeClass('hidden')
+          $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)))
+          cb = createShadowDOM
+        } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
+          $('.dropdown').addClass('hidden')
+          $('#steps .action').removeClass('active')
+          $('#title_drilldown').addClass('active')
+          buildDropDown([])
+          buildDrilldownYear(items.timemaps[document.URL].mementos.list)
+        } else if (mCount === 0) {
+          switchToArchiveNowInterface()
+        } else {
+          buildDropDown(mementos)
+          buildDrilldownYear(mementos)
+          $('#drilldownBox').addClass('hidden')
+          $('#steps .action').removeClass('active')
+          $('#title_dropdown').addClass('active')
+        }
+
+        // Append CSS1
+        $('#mementosAvailable span').html(mCount)
+        // Append CSS2
+        appendCSSToShadowDOM(cb)
+      })
     })
-  })
 }
 
 function addZ (n) {
@@ -104,11 +104,11 @@ function switchToArchiveNowInterface () {
 
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
-  .done(function (data) {
-    const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
-    $('#minkuiX').prepend(styleElement)
-    cb()
-  })
+    .done(function (data) {
+      const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+      $('#minkuiX').prepend(styleElement)
+      cb()
+    })
 }
 
 function randomEmail () {
@@ -204,32 +204,32 @@ function archiveURIArchiveOrg (cb, openInNewTab) {
     method: 'GET',
     url: '//web.archive.org/save/' + document.URL
   })
-  .done(function (a, b, c) {
-    if (b === 'success') {
-      chrome.runtime.sendMessage({
-        method: 'notify',
-        title: 'Mink',
-        body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
-      }, function (response) {})
-      if (cb) {
-        cb()
-      }
+    .done(function (a, b, c) {
+      if (b === 'success') {
+        chrome.runtime.sendMessage({
+          method: 'notify',
+          title: 'Mink',
+          body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
+        }, function (response) {})
+        if (cb) {
+          cb()
+        }
 
-      const shadow = document.getElementById('minkWrapper').shadowRoot
-      shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
+        const shadow = document.getElementById('minkWrapper').shadowRoot
+        shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
-      const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
-      const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
-      shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
-      shadow.getElementById('archivelogo_ia').onclick = function () {
-        if (!openInNewTab) {
-          window.location = $(this).attr('title')
-        } else {
-          window.open($(this).attr('title'))
+        const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
+        const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
+        shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
+        shadow.getElementById('archivelogo_ia').onclick = function () {
+          if (!openInNewTab) {
+            window.location = $(this).attr('title')
+          } else {
+            window.open($(this).attr('title'))
+          }
         }
       }
-    }
-  })
+    })
 }
 
 function archiveURIArchiveDotIs (cb, openInNewTab) {
@@ -238,36 +238,36 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
     url: '//archive.is/submit/',
     data: { coo: '', url: document.URL }
   })
-  .done(function (data, status, xhr) {
-    if (status === 'success') {
-      chrome.runtime.sendMessage({
-        method: 'notify',
-        title: 'Mink',
-        body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
-      })
-      if (cb) {
-        cb()
-      }
+    .done(function (data, status, xhr) {
+      if (status === 'success') {
+        chrome.runtime.sendMessage({
+          method: 'notify',
+          title: 'Mink',
+          body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
+        })
+        if (cb) {
+          cb()
+        }
 
-      $('#archiveNow_archivedotis').addClass('archiveNowSuccess')
+        $('#archiveNow_archivedotis').addClass('archiveNowSuccess')
 
-      const linkHeader = xhr.getResponseHeader('link')
-      const tmFromLinkHeader = new Timemap(linkHeader)
-      const archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri
+        const linkHeader = xhr.getResponseHeader('link')
+        const tmFromLinkHeader = new Timemap(linkHeader)
+        const archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri
 
-      const shadow = document.getElementById('minkWrapper').shadowRoot
-      shadow.getElementById('archivelogo_ais').classList.add('archiveNowSuccess')
+        const shadow = document.getElementById('minkWrapper').shadowRoot
+        shadow.getElementById('archivelogo_ais').classList.add('archiveNowSuccess')
 
-      shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI)
-      shadow.getElementById('archivelogo_ais').onclick = function () {
-        if (!openInNewTab) {
-          window.location = $(this).attr('title')
-        } else {
-          window.open($(this).attr('title'))
+        shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI)
+        shadow.getElementById('archivelogo_ais').onclick = function () {
+          if (!openInNewTab) {
+            window.location = $(this).attr('title')
+          } else {
+            window.open($(this).attr('title'))
+          }
         }
       }
-    }
-  })
+    })
 }
 
 let years = {}

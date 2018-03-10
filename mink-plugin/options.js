@@ -212,17 +212,17 @@ function removeTMFromCache (originalURI) {
 
 function clearTimemapCache () {
   chrome.storage.local.set({'timemaps': {}},
-      function () {
-        console.log('Remove all cached TMs')
-        $('#cachedTimemaps').empty()
-        populatedCachedTimeMapsUI()
-      }
-    )
+    function () {
+      console.log('Remove all cached TMs')
+      $('#cachedTimemaps').empty()
+      populatedCachedTimeMapsUI()
+    }
+  )
 
   chrome.storage.local.set({'headers': {}},
-     function () {
-       console.log('Remove headers')
-     }
+    function () {
+      console.log('Remove headers')
+    }
   )
 }
 
