@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap, moment, tmData */
 
-var MAX_MEMENTOS_IN_DROPDOWN = 500
+const MAX_MEMENTOS_IN_DROPDOWN = 500
 
 function createShadowDOM (cb) {
   const selector = '#minkuiX'

@@ -15,22 +15,22 @@ var badgeImagesDisabled = {
   '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
 }
 
-var badgeImagesBlacklisted = {
+const badgeImagesBlacklisted = {
   '38': chrome.extension.getURL('images/minkLogo38_blacklisted.png'),
   '19': chrome.extension.getURL('images/minkLogo19_blacklisted.png')
 }
 
-var badgeImagesNoMementos = {
+const badgeImagesNoMementos = {
   '38': chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
   '19': chrome.extension.getURL('images/minkLogo19_noMementos2.png')
 }
 
-var badgeImagesMink = {
+const badgeImagesMink = {
   '38': chrome.extension.getURL('images/minkLogo38.png'),
   '19': chrome.extension.getURL('images/minkLogo19.png')
 }
 
-var badgeImagesIsAMemento = {
+const badgeImagesIsAMemento = {
   '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
   '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
 }
@@ -80,7 +80,7 @@ function showMinkBadgeInfoBasedOnProcessingState (tabid) {
       return
     }
 
-    var cb = function () { setBadgeTextBasedOnBrowserActionState(tabid) }
+    const cb = function () { setBadgeTextBasedOnBrowserActionState(tabid) }
 
     // TODO: check if URI is in blacklist
     if (debug) { console.warn('about to call setEnabledBasedOnURIBlacklist') }
@@ -192,7 +192,7 @@ chrome.runtime.onMessage.addListener(
     } else if (request.method === 'getMementosForHTTPSSource') {
       // Ideally, we would talk to an HTTPS version of the aggregator,
       // Instead, we will communicate with Mink's bg script to get around scheme issue
-      var uri = 'http' + request.value.substr(4)
+      const uri = 'http' + request.value.substr(4)
       $.ajax({
         url: uri,
         type: 'GET'
@@ -234,7 +234,7 @@ function fetchTimeMap (uri, tabid) {
     if (!data.mementos) {
       data = new Timemap(data)
       // TODO: data.normalize()
-      var mems = data.mementos
+      const mems = data.mementos
       delete data.mementos
       data.mementos = {list: mems}
       if (debug) { console.log(data) }
@@ -275,13 +275,13 @@ function fetchTimeMap (uri, tabid) {
 }
 
 function setBadgeText (value, tabid) {
-  var badgeValue = value
+  let badgeValue = value
 
   if (parseInt(badgeValue, 10) > 999) {
     badgeValue = maxBadgeDisplay
   }
 
-  var badgeColor = '#090'
+  let badgeColor = '#090'
   if (value === stillProcessingBadgeDisplay) {
     badgeColor = '#900'
   }
