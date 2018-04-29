@@ -1,5 +1,10 @@
 # Ignore all dotfiles...
 .*
+
+# Node meta
+node_modules/
+package-lock.json
+
 # except for .gitignore
 !.gitignore
 !.codeclimate.yml
