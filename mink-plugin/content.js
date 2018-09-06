@@ -98,10 +98,10 @@ function displayUIBasedOnContext () {
   }
   chrome.storage.local.get('headers', function (itemsh) {
     chrome.storage.local.get('timemaps', function (items) {
-      var headers = itemsh.headers[document.URL]
-      var mementoDateTimeHeader
-      var linkHeaderAsString
-      var notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL)
+      const headers = itemsh.headers[document.URL]
+      let mementoDateTimeHeader
+      let linkHeaderAsString
+      const notStoredInCache = Object.keys(items).length === 0 || !items.timemaps.hasOwnProperty(document.URL)
       /*
        special consideration deets.tabId will be -1 if the request is not related to a tab
        case 1: no link header, no datetime

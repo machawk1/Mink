@@ -1,16 +1,16 @@
 /* global chrome, $, Timemap */
 
-var debug = false
-var tmData
-var maxBadgeDisplay = '> 1k'
-var stillProcessingBadgeDisplay = 'WAIT'
+const debug = false
+let tmData
+const maxBadgeDisplay = '> 1k'
+const stillProcessingBadgeDisplay = 'WAIT'
 
-var browserActionTitleViewingMemento = 'Mink - Viewing Memento'
-var browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
-var browserActionTitleNoMementos = 'Mink - No Mementos Available'
-var browserActionTitleBlacklisted = 'Mink - Viewing Blacklisted Site'
+const browserActionTitleViewingMemento = 'Mink - Viewing Memento'
+const browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
+const browserActionTitleNoMementos = 'Mink - No Mementos Available'
+const browserActionTitleBlacklisted = 'Mink - Viewing Blacklisted Site'
 
-var badgeImagesDisabled = {
+const badgeImagesDisabled = {
   '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
   '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
 }
@@ -43,7 +43,7 @@ chrome.webNavigation.onCommitted.addListener(function (e) {
 })
 
 chrome.browserAction.onClicked.addListener(function (tab) {
-  var scheme = (new window.URL(tab.url)).origin.substr(0, 4)
+  const scheme = (new window.URL(tab.url)).origin.substr(0, 4)
   if (scheme !== 'http') {
     if (debug) { console.log('Invalid scheme for Mink: ' + scheme) }
     return
@@ -227,7 +227,6 @@ function fetchTimeMap (uri, tabid) {
     url: uri,
     type: 'GET'
   }).done(function (data, textStatus, xhr, a, b) {
-    // var numberOfMementos = xhr.getResponseHeader('X-Memento-Count')
     tmData = data
     if (debug) { console.log(tmData) }
 
@@ -434,7 +433,7 @@ chrome.webRequest.onCompleted.addListener(function (deets) {
 
 chrome.webRequest.onHeadersReceived.addListener(function (deets) {
   chrome.storage.local.get('headers', function (items) {
-    var data
+    let data
     if (!items.headers) {
       data = {}
     } else {
@@ -591,13 +590,6 @@ function setTimemapInStorageAndCall (tm, url, cb) {
 
   chrome.storage.local.get('timemaps', function (items) {
     let tms
-    /* var originalURI
-    if (tm.origin_uri) {
-      originalURI = tm.original_uri
-    } else if (tm.original) {
-      originalURI = tm.original
-    } */
-
     if (debug) {
       console.log('setting TM for uri in storage, uri:' + url)
     }
