@@ -62,7 +62,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 })
 
 function setEnabledBasedOnURIInBlacklist (cb) {
-  chrome.tabs.query({active: true}, function (tab) {
+  chrome.tabs.query({ active: true }, function (tab) {
     if (debug) {
       console.log('is URI in blacklist?')
       console.log(tab)
@@ -91,9 +91,9 @@ function showMinkBadgeInfoBasedOnProcessingState (tabid) {
 function setBadgeTextBasedOnBrowserActionState (tabid) {
   // TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
   // - maybe rely on the title, since the icon's src path cannot be had.
-  chrome.browserAction.getBadgeText({tabId: tabid}, function (result) {
+  chrome.browserAction.getBadgeText({ tabId: tabid }, function (result) {
     if (!result.length && !Number.isInteger(result) && result !== maxBadgeDisplay) {
-      chrome.browserAction.getTitle({tabId: tabid}, function (result) {
+      chrome.browserAction.getTitle({ tabId: tabid }, function (result) {
         // Only set badge text if not viewing a memento
         if (result === browserActionTitleNoMementos) {
           displayMinkUI(tabid)
@@ -117,7 +117,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
     }
     if (debug) { console.log('u') }
 
-    chrome.browserAction.getBadgeText({tabId: tabid}, function (currentBadgeText) {
+    chrome.browserAction.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
       if (currentBadgeText !== stillProcessingBadgeDisplay) {
         displayMinkUI(tabid)
       }
@@ -127,7 +127,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
 
 function displayMinkUI (tabId) {
   if (debug) { console.log('Injecting displayMinkUI.js') }
-  chrome.tabs.executeScript(tabId, {code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';'},
+  chrome.tabs.executeScript(tabId, { code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';' },
     function () {
       chrome.tabs.executeScript(tabId, {
         // TODO: Account for data: URIs like the "connection unavailable" page.
@@ -150,7 +150,7 @@ chrome.runtime.onMessage.addListener(
       window.localStorage.setItem('mementos', request.mementos)
       window.localStorage.setItem('memento_datetime', request.memento_datetime)
 
-      sendResponse({value: 'noise'})
+      sendResponse({ value: 'noise' })
     } else if (request.method === 'findTMURI') {
       if (debug) { console.log('Got findTMURI') }
       findTMURI(request.timegate, sender.tab.id)
@@ -240,7 +240,7 @@ function fetchTimeMap (uri, tabid) {
       // TODO: data.normalize()
       const mems = data.mementos
       delete data.mementos
-      data.mementos = {list: mems}
+      data.mementos = { list: mems }
       if (debug) { console.log(data) }
     }
 
@@ -294,22 +294,22 @@ function setBadgeText (value, tabid) {
     badgeValue = ''
   }
 
-  chrome.browserAction.setBadgeText({text: badgeValue + '', tabId: tabid})
-  chrome.browserAction.setBadgeBackgroundColor({color: badgeColor, tabId: tabid})
+  chrome.browserAction.setBadgeText({ text: badgeValue + '', tabId: tabid })
+  chrome.browserAction.setBadgeBackgroundColor({ color: badgeColor, tabId: tabid })
 }
 
 function setBadgeTitle (newTitle, tabid) {
   if (debug) { console.warn('setting badge title') }
-  chrome.browserAction.setTitle({title: newTitle, tabId: tabid})
+  chrome.browserAction.setTitle({ title: newTitle, tabId: tabid })
 }
 
 function setBadgeIcon (icons, tabid) {
-  chrome.browserAction.setIcon({tabId: tabid, path: icons})
+  chrome.browserAction.setIcon({ tabId: tabid, path: icons })
 }
 
 function setBadge (value, icon, tabid) {
   if (value === '') {
-    chrome.browserAction.getBadgeText({tabId: tabid}, function (currentBadgeText) {
+    chrome.browserAction.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
       setBadgeText(currentBadgeText + '', tabid)
     })
   } else {
@@ -319,9 +319,9 @@ function setBadge (value, icon, tabid) {
   setBadgeIcon(icon, tabid)
 
   if (JSON.stringify(icon) === JSON.stringify(badgeImagesIsAMemento)) {
-    chrome.browserAction.setTitle({title: browserActionTitleViewingMemento})
+    chrome.browserAction.setTitle({ title: browserActionTitleViewingMemento })
   } else {
-    chrome.browserAction.setTitle({title: browserActionTitleNormal})
+    chrome.browserAction.setTitle({ title: browserActionTitleNormal })
   }
 }
 
@@ -352,7 +352,7 @@ function startWatchingRequests () {
 
 function stopWatchingRequests () {
   if (debug) { console.log('stopWatchingRequests() executing') }
-  chrome.storage.local.set({'disabled': true}, function () {
+  chrome.storage.local.set({ 'disabled': true }, function () {
     chrome.contextMenus.update('mink_stopStartWatching', {
       'title': 'Restart Live-Archived Web Integration',
       'onclick': startWatchingRequests
@@ -434,7 +434,7 @@ chrome.webRequest.onCompleted.addListener(function (deets) {
     })
   })
 },
-{urls: ['*://twitter.com/*/status/*'], types: ['xmlhttprequest']}, ['responseHeaders'])
+{ urls: ['*://twitter.com/*/status/*'], types: ['xmlhttprequest'] }, ['responseHeaders'])
 
 chrome.webRequest.onHeadersReceived.addListener(function (deets) {
   chrome.storage.local.get('headers', function (items) {
@@ -456,7 +456,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     }
 
     data[deets.url] = deets.responseHeaders
-    chrome.storage.local.set({'headers': data}, function () {
+    chrome.storage.local.set({ 'headers': data }, function () {
       if (chrome.runtime.lastError) {
         if (debug) { console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message) }
         if (chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
@@ -467,7 +467,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     })
   })
 },
-{urls: ['<all_urls>'], types: ['main_frame']}, ['responseHeaders', 'blocking'])
+{ urls: ['<all_urls>'], types: ['main_frame'] }, ['responseHeaders', 'blocking'])
 
 function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   if (debug) {
@@ -517,7 +517,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
         // Send two messages first stop animation then display stored
         // If use displayUIBasedOnContext the correctly gotten items wont be display
         // Rather we will ask memgator.cs for mementos
-        chrome.tabs.sendMessage(tabId, {'method': 'stopAnimatingBrowserActionIcon'})
+        chrome.tabs.sendMessage(tabId, { 'method': 'stopAnimatingBrowserActionIcon' })
         chrome.tabs.sendMessage(tabId, {
           'method': 'displayUIStoredTM',
           'data': firstTm
@@ -534,7 +534,7 @@ function displayMementosMissingTM (mementos, urir, tabId) {
   tm.original = urir
   setTimemapInStorage(tm, tm.original)
 
-  chrome.tabs.sendMessage(tabId, {'method': 'stopAnimatingBrowserActionIcon'})
+  chrome.tabs.sendMessage(tabId, { 'method': 'stopAnimatingBrowserActionIcon' })
   chrome.tabs.sendMessage(tabId, {
     'method': 'displayUIStoredTM',
     'data': tm
@@ -624,7 +624,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
       console.log(tms)
     }
 
-    chrome.storage.local.set({'timemaps': tms}, function () {
+    chrome.storage.local.set({ 'timemaps': tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
         if (debug) {
           console.log('current bytes used:' + bytesUsed)
@@ -644,7 +644,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
             console.log('Re-setting chrome.storage.local with:')
             console.log(tms)
           }
-          chrome.storage.local.set({'timemaps': tms}, function () {
+          chrome.storage.local.set({ 'timemaps': tms }, function () {
             cb()
           })
         }
@@ -688,7 +688,7 @@ function setTimemapInStorage (tm, url) {
       console.log(tms)
     }
 
-    chrome.storage.local.set({'timemaps': tms}, function () {
+    chrome.storage.local.set({ 'timemaps': tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
         if (debug) { console.log('current bytes used:' + bytesUsed) }
       })
@@ -702,7 +702,7 @@ function setTimemapInStorage (tm, url) {
             console.log('Re-setting chrome.storage.local with:')
             console.log(tms)
           }
-          chrome.storage.local.set({'timemaps': tms}, function () {})
+          chrome.storage.local.set({ 'timemaps': tms }, function () {})
         }
       }
     })

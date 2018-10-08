@@ -35,7 +35,7 @@ function getListItemHTML (uri, classIn, buttonText) {
 }
 
 function clearBlacklist () {
-  chrome.storage.local.set({'blacklist': []})
+  chrome.storage.local.set({ 'blacklist': [] })
   document.location.reload()
 }
 
@@ -200,7 +200,7 @@ function removeTMFromCache (originalURI) {
   chrome.storage.local.get('timemaps', function (items) {
     let tms = items.timemaps
     delete tms[originalURI]
-    chrome.storage.local.set({'timemaps': tms},
+    chrome.storage.local.set({ 'timemaps': tms },
       function () {
         console.log('Cache updated, updating UI')
         $('#cachedTimemaps').empty()
@@ -211,7 +211,7 @@ function removeTMFromCache (originalURI) {
 }
 
 function clearTimemapCache () {
-  chrome.storage.local.set({'timemaps': {}},
+  chrome.storage.local.set({ 'timemaps': {} },
     function () {
       console.log('Remove all cached TMs')
       $('#cachedTimemaps').empty()
@@ -219,7 +219,7 @@ function clearTimemapCache () {
     }
   )
 
-  chrome.storage.local.set({'headers': {}},
+  chrome.storage.local.set({ 'headers': {} },
     function () {
       console.log('Remove headers')
     }

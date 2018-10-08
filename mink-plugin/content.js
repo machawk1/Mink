@@ -26,7 +26,7 @@ setInitialStateWithChecks()
 function setActiveBasedOnDisabledProperty (cb) {
   chrome.storage.local.get('disabled', function (items) {
     if (items.disabled) {
-      chrome.runtime.sendMessage({method: 'stopWatchingRequests'}, function (response) {})
+      chrome.runtime.sendMessage({ method: 'stopWatchingRequests' }, function (response) {})
     } else {
       cb()
     }
@@ -44,7 +44,7 @@ function setActiveBasedOnBlacklistedProperty (cb) {
       const documentHostname = (new window.URL(document.URL)).hostname
       const blacklistEntryHostname = (new window.URL(items.blacklist[ii])).hostname
       if (documentHostname === blacklistEntryHostname) {
-        chrome.runtime.sendMessage({method: 'stopWatchingRequestsBlacklisted'})
+        chrome.runtime.sendMessage({ method: 'stopWatchingRequestsBlacklisted' })
         return
       }
     }
@@ -219,7 +219,7 @@ function displayUIBasedOnStoredTimeMap (tmDataIn) {
 
   if (debug) { console.log(tmDataIn) }
   const mementoCountFromCache = tmDataIn.mementos.list.length
-  chrome.runtime.sendMessage({method: 'setBadgeText', value: '' + mementoCountFromCache})
+  chrome.runtime.sendMessage({ method: 'setBadgeText', value: '' + mementoCountFromCache })
 }
 
 function getBlacklist (cb) {
@@ -322,7 +322,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         '19': clockIcons19[clockIcons19.length - 1]
       }
     })
-    chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function (response) {
+    chrome.runtime.sendMessage({ method: 'setBadgeText', text: '' }, function (response) {
     })
     animateBrowserActionIcon = true
     setTimeout(animatePageActionIcon, 500)
@@ -376,7 +376,7 @@ function getMementos (uri) {
   if (debug) { console.log('getMementosWithTimemap()') }
   const timemapLocation = memgatorJson + uri
 
-  chrome.runtime.sendMessage({method: 'setBadge',
+  chrome.runtime.sendMessage({ method: 'setBadge',
     text: '',
     iconPath: {
       '38': clockIcons38[clockIcons38.length - 1],
@@ -384,7 +384,7 @@ function getMementos (uri) {
     }
   })
 
-  chrome.runtime.sendMessage({method: 'setBadgeText', text: ''}, function (response) {})
+  chrome.runtime.sendMessage({ method: 'setBadgeText', text: '' }, function (response) {})
 
   animateBrowserActionIcon = true
 
@@ -423,7 +423,7 @@ function animatePageActionIcon () {
   chrome.runtime.sendMessage({
     method: 'setBadge',
     text: '',
-    iconPath: {'38': clockIcons38[iteration], '19': clockIcons19[iteration]}})
+    iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] } })
   iteration--
 
   if (iteration < 0) { iteration = clockIcons38.length - 1 }
