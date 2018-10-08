@@ -116,7 +116,12 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
       return // Badge has not yet been set
     }
     if (debug) { console.log('u') }
-    displayMinkUI(tabid)
+
+    chrome.browserAction.getBadgeText({tabId: tabid}, function (currentBadgeText) {
+      if (currentBadgeText !== stillProcessingBadgeDisplay) {
+        displayMinkUI(tabid)
+      }
+    })
   })
 }
 
