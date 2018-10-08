@@ -544,7 +544,7 @@ function bindSteps () {
 
 function bindOptions () {
   $('#options').click(function () {
-    chrome.runtime.sendMessage({method: 'openOptionsPage'})
+    chrome.runtime.sendMessage({ method: 'openOptionsPage' })
   })
 }
 
