@@ -5,7 +5,7 @@ var MAX_MEMENTOS_IN_DROPDOWN = 500
 function createShadowDOM (cb) {
   const selector = '#minkuiX'
 
-  let shadow = document.querySelector('#minkWrapper').createShadowRoot()
+  let shadow = document.querySelector('#minkWrapper').attachShadow({ mode: 'open' })
   const template = document.querySelector(selector)
   shadow.appendChild(template)
 
