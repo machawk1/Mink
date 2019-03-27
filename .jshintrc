@@ -5,6 +5,7 @@
   "latedef" : false,
   "curly" : true,
   "nonstandard" : true,
+  "asi": true,
   "jquery" : true,
   "devel" : true,
   "browser" : true,
