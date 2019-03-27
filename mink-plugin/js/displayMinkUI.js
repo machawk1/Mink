@@ -290,7 +290,7 @@ function buildDrilldownYear (mementos) {
 
   let memCountList = '<ul id="years">'
   for (let year in years) {
-    memCountList += '<li data-year="' + year + '">' + year + '<span class="memCount">' + years[year].length + '</span></li>\r\n'
+    memCountList += `<li data-year="${year}">${year}<span class="memCount">${years[year].length}</span></li>\r\n`
   }
 
   memCountList += '</ul>'
@@ -471,8 +471,7 @@ function buildDrilldownTime (year, month, date) {
       continue
     }
 
-    const time = addZ(datetime.hour()) + ':' + addZ(datetime.minute()) + ':' + addZ(datetime.second())
-    mementos[memento].time = time
+    mementos[memento].time = addZ(datetime.hour()) + ':' + addZ(datetime.minute()) + ':' + addZ(datetime.second())
     times.push(mementos[memento])
   }
 
