@@ -9,4 +9,5 @@ package-lock.json
 !.gitignore
 !.codeclimate.yml
 !.jshintrc
+!.jshintignore
 !.travis.yml
