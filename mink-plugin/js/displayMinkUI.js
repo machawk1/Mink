@@ -67,7 +67,13 @@ function appendHTMLToShadowDOM () {
         }
 
         // Append CSS1
-        $('#mementosAvailable span').html(mCount)
+        mementoPlurality = 'mementos'
+        $('#mementosAvailable span#mementoCount').html(mCount)
+        if (mCount === 1) {
+          mementoPlurality = 'memento'
+        }
+        $('#mementosAvailable span#mementoPlurality').html(mementoPlurality)
+
         // Append CSS2
         appendCSSToShadowDOM(cb)
       })
