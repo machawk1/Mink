@@ -68,7 +68,7 @@ function appendHTMLToShadowDOM () {
 
         // Append CSS1
         let mementoPlurality = 'mementos'
-        $('#mementosAvailable span#mementoCount').html(mCount)
+        $('#mementosAvailable span#mementoCount').html(mCount.toLocaleString())
         if (mCount === 1) {
           mementoPlurality = 'memento'
         }
