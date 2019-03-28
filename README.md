@@ -30,6 +30,11 @@ If no mementos exist in the archive, the extension will indicate this with a red
 1. [A niche site with few mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-1-a-niche-site-with-few-mementos)
 1. [A popular site with many mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-2-a-popular-site-with-many-mementos)
 
+## Development
+
+Chrome supports debugging extensions by loading them from the local file system. To do this, go to `More Tools > Extensions`, enabled the `Developer Mode` switch, click the `Load unpacked` button, and select the `mink-plugin` directory in the working directory clone of this repository.
+
+For packaging the extension and releasing a new version, enter the `mink-plugin` directory, type `zip -r /where/to/store/resulting/mink.zip *`, access the [Chrome Developer Dashbaord](https://chrome.google.com/webstore/developer/dashboard/) and upload the `.zip` to the Mink entry.
 
 ## License
 
