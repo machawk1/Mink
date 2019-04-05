@@ -48,7 +48,39 @@ function appendHTMLToShadowDOM () {
           $('#title_dropdown').addClass('hidden')
           $('#archiveNow').addClass('hidden')
           $('#viewingMementoInterface').removeClass('hidden')
+
           $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)))
+
+          const firstButton = $('#memento_first')
+          const lastButton = $('#memento_last')
+          const prevButton = $('#memento_prev')
+          const nextButton = $('#memento_next')
+
+          items.timemaps[document.URL].mementos.forEach(function (mem) {
+            let targetButton
+            if (mem.first === true) {
+              targetButton = firstButton
+            }
+            if (mem.last === true) {
+              targetButton = lastButton
+            }
+            if (mem.next === true) {
+              targetButton = nextButton
+            }
+            if (mem.prev === true) {
+              targetButton = prevButton
+            }
+
+            if (typeof targetButton !== 'undefined') {
+              if (mem.uri === window.document.URL) {
+                targetButton.addClass('viewingMemento')
+              }
+
+              targetButton.removeAttr('disabled')
+              targetButton.attr('data-uri', mem.uri)
+            }
+          })
+
           cb = createShadowDOM
         } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
           $('.dropdown').addClass('hidden')
@@ -520,6 +552,7 @@ function setupUI () {
   bindGoBackToMainInterfaceButton()
   bindArchiveLogos()
   bindGoBackToLiveWebButton()
+  bindNavigationButtons()
 
   $('#viewMementoButton').click(function () {
     window.location = $(this).attr('alt')
@@ -744,6 +777,14 @@ function bindGoBackToLiveWebButton () {
   $('#backToLiveWeb').click(function () {
     chrome.storage.local.get('timemaps', function (items) {
       window.location = items.timemaps[document.URL].original
+    })
+  })
+}
+
+function bindNavigationButtons () {
+  ['first', 'last', 'next', 'prev'].forEach(function attachURI(rel) {
+    document.getElementById('memento_' + rel).addEventListener('click', event => {
+      window.location = event.target.getAttribute('data-uri')
     })
   })
 }

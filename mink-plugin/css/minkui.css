@@ -33,3 +33,5 @@ h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-
 #drilldownBox ul li span.memCount {float: right;  font-family: Monaco, Courier, sans-serif; padding: 0px 3px; margin-right: 5px; border-radius: 2px; line-height: 10px;}
 
 .disabled {color: #999;}
+button.viewingMemento {text-decoration: underline;}
+button#memento_first {margin-left: 2.0em;}

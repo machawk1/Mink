@@ -80,7 +80,6 @@
 /* Do not display UI elements for non-selected view of list of mementos */
 .hiddenUI {display: none;}
 
-
 /* This isn't working, the image ought to be pulled from the extension, not the current page */
 /* option.ia {background-image: url('images/archives/ia.png');}*/
 
