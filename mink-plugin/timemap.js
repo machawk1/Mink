@@ -42,7 +42,7 @@ function Timemap (fromString) {
   const mementoregex = new RegExp(mementoRelMementoExpression) // Regex to get a memento
 
   const mementoRelSelfExpression = /rel=.*self.*/gi
-  const mselfregex = new RegExp(mementoRelSelfExpression) // Regex to get a memento
+  const mselfregex = new RegExp(mementoRelSelfExpression) // Regex to get self
 
   this.mementos = []
 
@@ -105,6 +105,32 @@ function Memento (fromStr) {
   this.uri = this.str.substring(this.str.indexOf('<') + 1, this.str.indexOf('>'))
   this.datetime = this.str.substr(this.str.indexOf('datetime')) // Abbreviation to just include datetime string and on
   this.datetime = this.datetime.substr(this.datetime.indexOf('"')).replace(/"/g, '').trim()
+
+  const mementoRelFirstExpression = /rel=.*first.*/gi
+  const mfirstregex = new RegExp(mementoRelFirstExpression) // Regex to get first
+
+  const mementoRelLastExpression = /rel=.*last.*/gi
+  const mlastregex = new RegExp(mementoRelLastExpression) // Regex to get last
+
+  const mementoRelNextExpression = /rel=.*next.*/gi
+  const mnextregex = new RegExp(mementoRelNextExpression) // Regex to get next
+
+  const mementoRelPrevExpression = /rel=.*prev.*/gi
+  const mprevregex = new RegExp(mementoRelPrevExpression) // Regex to get next
+
+
+  if (fromStr.match(mfirstregex)) {
+    this.first = true
+  }
+  if (fromStr.match(mlastregex)) {
+    this.last = true
+  }
+  if (fromStr.match(mnextregex)) {
+    this.next = true
+  }
+  if (fromStr.match(mprevregex)) {
+    this.prev = true
+  }
 }
 
 /* ***************************
