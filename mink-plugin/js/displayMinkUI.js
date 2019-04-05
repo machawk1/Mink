@@ -782,7 +782,7 @@ function bindGoBackToLiveWebButton () {
 }
 
 function bindNavigationButtons () {
-  ['first', 'last', 'next', 'prev'].forEach(function attachURI(rel) {
+  ['first', 'last', 'next', 'prev'].forEach(function attachURI (rel) {
     document.getElementById('memento_' + rel).addEventListener('click', event => {
       window.location = event.target.getAttribute('data-uri')
     })

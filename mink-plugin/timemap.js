@@ -118,7 +118,6 @@ function Memento (fromStr) {
   const mementoRelPrevExpression = /rel=.*prev.*/gi
   const mprevregex = new RegExp(mementoRelPrevExpression) // Regex to get next
 
-
   if (fromStr.match(mfirstregex)) {
     this.first = true
   }
