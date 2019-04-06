@@ -161,19 +161,18 @@ function populatedCachedTimeMapsUI () {
 
 function updateMementoCount () {
   chrome.storage.local.get('timemaps', function (items) {
-    console.log(items.timemaps)
-    console.log(items.timemaps[$('#cachedTimemaps').val()])
-    const count = items.timemaps[$('#cachedTimemaps').val()].mementos.list.length
+    const selectedURI = document.querySelector('#cachedTimemaps').value
+    const count = items.timemaps[selectedURI].mementos.list.length
     let plurality = 's'
     if (count === 1) {
       plurality = ''
     }
-    $('#mementoCount').html(count + ' memento' + plurality + ' available')
+    document.querySelector('#mementoCount').innerHTML = `${count} memento${plurality} available`
   })
 }
 
 function resetMementoCount () {
-  $('#mementoCount').html('')
+  document.querySelector('#mementoCount').innerHTML = ''
 }
 
 function enableRemoveButtons (disable, additionalIdsIn) {
