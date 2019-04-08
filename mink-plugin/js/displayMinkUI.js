@@ -603,6 +603,9 @@ function bindArchivesLink () {
     }
     $(this).html(triangle + ' archives')
   })
+
+  var sortable = Sortable.create(document.getElementById('archivesList'))
+
 }
 
 function bindLoadArchives () {
@@ -613,7 +616,7 @@ function bindLoadArchives () {
 function bindArchivesToggle () {
   const srcList = document.querySelector('#archivesList').children
   for (let archive of srcList) {
-    archive.addEventListener('click', function () {
+    archive.addEventListener('dblclick', function () {
       this.classList.toggle('disabled')
     })
   }
