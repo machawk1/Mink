@@ -591,7 +591,16 @@ function bindOptions () {
 
 function bindArchivesLink () {
   const panel = $('#archivesPanel')
-  $('#openArchivesLink').click(function(){panel.toggleClass('hidden')})
+  $('#openArchivesLink').click(function () {
+    let triangle = '▸'
+    if (panel.hasClass('hidden')) {
+      panel.removeClass('hidden')
+      triangle = '▾'
+    } else {
+      panel.addClass('hidden')
+    }
+    $(this).html(triangle + ' archives')
+  })
 }
 
 function bindLoadArchives () {
