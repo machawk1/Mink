@@ -590,16 +590,13 @@ function bindOptions () {
 }
 
 function bindArchivesLink () {
-  // This won't work, as we can't get in the Shadow DOM from within querySelector
-  const panel = $('#archivesPanel').hide
-  console.log(panel)
-  $('#openArchivesLink').click(panel)
+  const panel = $('#archivesPanel')
+  $('#openArchivesLink').click(function(){panel.toggleClass('hidden')})
 }
 
 function bindLoadArchives () {
-  // This won't work, as we can't get in the Shadow DOM from within querySelector
-  const loadFileButton = document.getElementById('loadFile')
-  document.querySelector('#loadArchives').addEventListener('click', loadFileButton.click)
+  const loadFileButton = $('#loadFile')
+  $('#loadArchives').click(function(){loadFileButton.click()})
 }
 
 function bindArchivesToggle () {
