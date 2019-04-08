@@ -1,6 +1,6 @@
 /* global chrome, $ */
 
-var debug = true
+var debug = false
 
 const tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
 const tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'

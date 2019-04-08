@@ -4,8 +4,9 @@
 #minkuiX #minkStatus {width: 100%; position: absolute; bottom: 0; left: 0; margin: 0; padding: 0; background-color: #ccf; z-index: 1; height: 1.2em; border-bottom: 2px solid #aaf; border-top: 1px solid #bbf;}
 #minkuiX #minkStatus ul {list-style-type: none; margin: 0; padding: 0; width: 700px;}
 #minkuiX #minkStatus li {width: 100px; float: left; text-align: center; vertical-align: middle; padding: 0; margin: 0;}
-#minkuiX #minkStatus li#options {position: absolute; right: 0;}
+#minkuiX #minkStatus li#options {position: absolute; right: 0; width: 75px;}
 #minkuiX #minkStatus li#options:hover {cursor: pointer;}
+#minkuiX #minkStatus li#archivesListButton {position: absolute; right: 75px;}
 #minkuiX #minkStatus li span {border-radius: 10px; padding: 2px 8px 2px 8px; margin: 2px 0px 0px 0px;}
 #minkuiX #minkStatus li.active {background-color: white; font-weight: bold; border-radius: 10px;}
 #minkuiX #minkStatus li span:hover {cursor: pointer; text-decoration: underline;}
@@ -19,6 +20,7 @@ h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-
 .archiveNowInterface {width: 50px; height: 50px; vertical-align: top; position: relative; z-index: 5;}
 #goBackButton {width: 75px; height: 1.75em; margin-left: 3.0em;}
 .hidden {display: none;}
+.hiddenX {}
 .archiveLogo {opacity: 0.75;}
 .archiveLogo:hover {cursor: pointer; opacity: 1.0;}
 
@@ -35,3 +37,11 @@ h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-
 .disabled {color: #999;}
 button.viewingMemento {text-decoration: underline;}
 button#backToLiveWeb {margin-right: 1.5em;}
+
+#archivesPanel {background-color: #eef; position: absolute; right: 0px; top: 90px; bottom: 0px; text-align: right; height: 1000px; background: white; border-left: 1px solid #ccc;}
+#archivesPanel #addSrc {display: block; width: 200px; margin: 2px 0 2px 0;}
+#archivesPanel #addSrc label {text-align: center; line-height: 25px;}
+#archivesPanel #addSrc input {margin-right: 10px;}
+#archivesPanel select { width: 200px; clear: both; position: absolute; top: 25px; right: 0; border: 0;}
+#archivesPanel select option.webArchive {border-left: 5px solid orange;}
+#archivesPanel select option.aggregator {border-left: 5px solid blue;}

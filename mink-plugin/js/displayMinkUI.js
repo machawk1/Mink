@@ -545,6 +545,7 @@ function setupUI () {
   replaceContentScriptImagesWithChromeExtensionImages()
   bindSteps() // What steps!?!
   bindOptions()
+  bindArchivesLink()
   bindViewButton()
   bindDropdown()
   bindDrilldown()
@@ -583,6 +584,17 @@ function bindSteps () {
 function bindOptions () {
   $('#options').click(function () {
     chrome.runtime.sendMessage({ method: 'openOptionsPage' })
+  })
+}
+
+function bindArchivesLink () {
+  console.log('binding')
+  $('#archivesListButton').click(function () {
+    console.log('clicking')
+    console.log(document.querySelector('#minkX'))
+    $('#archivesList').addClass('hidden')
+    console.log($('#archivesList'))
+    console.log($('#archivesList').html())
   })
 }
 

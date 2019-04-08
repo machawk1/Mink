@@ -31,5 +31,8 @@
       "mink-plugin/d3.v3/*",
       "mink-plugin/d3.makechart.js"
     ]
+  },
+  "dependencies": {
+    "jshint": "^2.10.2"
   }
 }
