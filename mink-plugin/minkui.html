@@ -4,16 +4,17 @@
 <h1 id="mementosAvailable"><span id="mementoCount"></span> <span id="mementoPlurality">mementos</span> available.</h1>
 <aside id="archivesPanel">
   <ul id="archivesList" class="hiddenX">
-    <li class="webArchive">Internet Archive</li>
-    <li class="webArchive">UK Web Archive</li>
     <li class="aggregator">MemGator @ ODUCS</li>
-    <li class="aggregator">Aggregator @ LANL</li>
+    <li class="webArchive disabled">Internet Archive</li>
+    <li class="webArchive disabled">UK Web Archive</li>
+    <li class="aggregator disabled">Aggregator @ LANL</li>
   </ul>
-  <span id="addSrc">
-    <!--<label for="addSrcTextbox">Add:</label>-->
+  <button id="loadArchives">Load</button><input type="file" id="loadFile" class="hidden" />
+  <button id="saveArchives">Save</button>
+  <!--<span id="addSrc">
     <input type="text" id="addSrcTextbox" placehold="Source" />
     <input type="button" value="Add" />
-  </span>
+  </span>-->
 </aside>
 
 <div id="drilldownBox"></div>
@@ -49,7 +50,7 @@
     <li data-status="waiting" id="title_dropdown"><span>Dropdown</span></li>
     <li data-status="waiting" id="title_drilldown"><span>Drilldown</span></li>
     <!--<li data-status="waiting"><span>Datepicker</span></li>-->
-    <li id="archivesListButton"><span><a>&blacktriangleright; archives</a></span></li>
+    <li id="archivesListButton"><span><a id="openArchivesLink">&blacktriangleright; archives</a></span></li>
     <li id="options"><span>options</span></li>
   </ul>
 </div>

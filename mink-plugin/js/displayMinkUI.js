@@ -546,6 +546,8 @@ function setupUI () {
   bindSteps() // What steps!?!
   bindOptions()
   bindArchivesLink()
+  bindArchivesToggle()
+  bindLoadArchives()
   bindViewButton()
   bindDropdown()
   bindDrilldown()
@@ -588,14 +590,25 @@ function bindOptions () {
 }
 
 function bindArchivesLink () {
-  console.log('binding')
-  $('#archivesListButton').click(function () {
-    console.log('clicking')
-    console.log(document.querySelector('#minkX'))
-    $('#archivesList').addClass('hidden')
-    console.log($('#archivesList'))
-    console.log($('#archivesList').html())
-  })
+  // This won't work, as we can't get in the Shadow DOM from within querySelector
+  const panel = $('#archivesPanel').hide
+  console.log(panel)
+  $('#openArchivesLink').click(panel)
+}
+
+function bindLoadArchives () {
+  // This won't work, as we can't get in the Shadow DOM from within querySelector
+  const loadFileButton = document.getElementById('loadFile')
+  document.querySelector('#loadArchives').addEventListener('click', loadFileButton.click)
+}
+
+function bindArchivesToggle () {
+  const srcList = document.querySelector('#archivesList').children
+  for (let archive of srcList) {
+    archive.addEventListener('click', function () {
+      this.classList.toggle('disabled')
+    })
+  }
 }
 
 function bindViewButton () {
