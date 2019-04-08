@@ -64,8 +64,8 @@ function normalDisplayUIBC (items) {
         method: 'setBadge',
         text: '',
         iconPath: {
-          '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
-          '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
+          '38': chrome.runtime.getURL('images/mLogo38_isAMemento.png'),
+          '19': chrome.runtime.getURL('images/mLogo19_isAMemento.png')
         }
       })
     } else { // Live web page revisited w/ a TM in cache
@@ -397,22 +397,22 @@ function getMementos (uri) {
   })
 }
 
-const clockIcons38 = [chrome.extension.getURL('images/mementoLogos/mLogo38_7.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_15.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_22.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_30.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_37.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_45.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_52.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo38_60.png')]
-const clockIcons19 = [chrome.extension.getURL('images/mementoLogos/mLogo19_7.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_15.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_22.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_30.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_37.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_45.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_52.5.png'),
-  chrome.extension.getURL('images/mementoLogos/mLogo19_60.png')]
+const clockIcons38 = [chrome.runtime.getURL('images/mementoLogos/mLogo38_7.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_15.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_22.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_30.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_37.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_45.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_52.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo38_60.png')]
+const clockIcons19 = [chrome.runtime.getURL('images/mementoLogos/mLogo19_7.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_15.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_22.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_30.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_37.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_45.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_52.5.png'),
+  chrome.runtime.getURL('images/mementoLogos/mLogo19_60.png')]
 let iteration = clockIcons38.length - 1
 
 function animatePageActionIcon () {

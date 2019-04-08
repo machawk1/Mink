@@ -19,7 +19,7 @@ function setupDrilldownInteractions () {
 }
 
 function appendHTMLToShadowDOM () {
-  $.ajax(chrome.extension.getURL('minkui.html'))
+  $.ajax(chrome.runtime.getURL('minkui.html'))
     .done(function (data) {
     // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
 
@@ -141,7 +141,7 @@ function switchToArchiveNowInterface () {
 }
 
 function appendCSSToShadowDOM (cb) {
-  $.ajax(chrome.extension.getURL('css/minkui.css'))
+  $.ajax(chrome.runtime.getURL('css/minkui.css'))
     .done(function (data) {
       const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
       $('#minkuiX').prepend(styleElement)
@@ -563,12 +563,12 @@ function setupUI () {
 }
 
 function replaceContentScriptImagesWithChromeExtensionImages () {
-  document.getElementById('minkLogo').src = chrome.extension.getURL('images/mink_marvel_80.png')
+  document.getElementById('minkLogo').src = chrome.runtime.getURL('images/mink_marvel_80.png')
 
-  document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png')
-  document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png')
-  document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png')
-  document.getElementById('archivelogo_webcite').src = chrome.extension.getURL('images/archives/webcitelogo.png')
+  document.getElementById('archivelogo_ia').src = chrome.runtime.getURL('images/archives/iaLogo.png')
+  document.getElementById('archivelogo_ais').src = chrome.runtime.getURL('images/archives/archiveisLogo.png')
+  document.getElementById('archivelogo_ala').src = chrome.runtime.getURL('images/archives/allListedArchives.png')
+  document.getElementById('archivelogo_webcite').src = chrome.runtime.getURL('images/archives/webcitelogo.png')
 }
 
 function bindSteps () {
@@ -590,6 +590,8 @@ function bindOptions () {
 }
 
 function bindArchivesLink () {
+  //let chrome.runtime.getURL('./archives.json')
+
   const panel = $('#archivesPanel')
   $('#openArchivesLink').click(function () {
     let triangle = '▸'
@@ -753,7 +755,7 @@ function bindArchiveLogos () {
 
     let that = this
     const newSrc = $(this).attr('src').replace('.png', '_success.png')
-    $(this).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+    $(this).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
 
     const archiveLogoID = $(this).attr('id')
     const cb = function () { changeIconFor(that, newSrc) }
@@ -782,9 +784,9 @@ function bindArchiveLogos () {
         changeArchiveAllIconWhenComplete(alaLogo)
       }
 
-      $(iaLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
-      $(aisLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
-      $(wcLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+      $(iaLogo).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
+      $(aisLogo).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
+      $(wcLogo).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
 
       openInNewTab = true
       archiveURIArchiveOrg(iaCb, openInNewTab)
@@ -798,7 +800,7 @@ var archivesFinished = 0 /* TOFIX This is doubly declared if 'let' */
 function changeArchiveAllIconWhenComplete (iconObj) {
   archivesFinished++
   if (archivesFinished >= 3) {
-    $(iconObj).attr('src', chrome.extension.getURL('./images/archives/allListedArchives_success.png'))
+    $(iconObj).attr('src', chrome.runtime.getURL('./images/archives/allListedArchives_success.png'))
     $(iconObj).unbind()
     $(iconObj).removeClass('archiveLogo')
   }
