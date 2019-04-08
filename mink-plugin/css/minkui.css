@@ -42,9 +42,9 @@ button#backToLiveWeb {margin-right: 1.5em;}
 
 #archivesPanel ul {margin: 0; list-style-type: none; padding: 0; text-align: left;}
 #archivesPanel li {padding-left: 10px;}
-#archivesPanel li:hover {cursor: pointer;}
-#archivesPanel ul li.webArchive {border-left: 5px solid orange;}
-#archivesPanel ul li.aggregator {border-left: 5px solid blue;}
+#archivesPanel li:hover {cursor: pointer; background-color: #dedede;}
+#archivesPanel ul li.webArchive {border-left: 10px solid orange;}
+#archivesPanel ul li.aggregator {border-left: 10px solid blue;}
 #archivesPanel ul li.disabled {opacity: 0.5;}
 
 #archivesPanel #addSrc {display: block; width: 400px; margin: 2px 0 2px 0;}

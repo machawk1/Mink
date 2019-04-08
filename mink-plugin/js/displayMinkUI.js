@@ -610,7 +610,24 @@ function bindArchivesLink () {
 
 function bindLoadArchives () {
   const loadFileButton = $('#loadFile')
+  const loadFromConfig = $('#loadArchivesConfig')
+
   $('#loadArchives').click(function(){loadFileButton.click()})
+  loadFromConfig.click(function () {
+    window.fetch(chrome.runtime.getURL('./archives.json'))
+      .then((response) => response.json())
+      .then((json) => processConfig(json))
+  })
+}
+
+function processConfig (json) {
+  console.log(`Loading ${json.length} archives into Mink configuration`)
+  let htmlOfJSON = ''
+  for (let a of json) {
+    htmlOfJSON += `<li class="webArchive" data-id="${a.id}" data-timemap="${a.timemap}" data-timegate="${a.timegate}">${a.name}</li>`
+  }
+  //console.log(document.getElementById('archivesList'))
+  // TODO: Change the archives list in the Mink shadow DOM here, not straightforward
 }
 
 function bindArchivesToggle () {

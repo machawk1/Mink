@@ -93,6 +93,8 @@
     "font-awesome-4.0.3/fonts/fontawesome-webfont.svg",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.ttf",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.woff",
-    "font-awesome-4.0.3/fonts/fontAwesome.otf"
+    "font-awesome-4.0.3/fonts/fontAwesome.otf",
+
+    "archives.json"
   ]
 }
