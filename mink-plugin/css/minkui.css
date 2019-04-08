@@ -38,10 +38,14 @@ h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-
 button.viewingMemento {text-decoration: underline;}
 button#backToLiveWeb {margin-right: 1.5em;}
 
-#archivesPanel {background-color: #eef; position: absolute; right: 0px; top: 90px; bottom: 0px; text-align: right; height: 1000px; background: white; border-left: 1px solid #ccc;}
+#archivesPanel {background-color: #eef; position: absolute; right: 0px; top: 0px; bottom: 0px; text-align: right; height: 100%; background: white; border-left: 1px solid #ccc; width: 200px; margin-top: 90px;}
+
+#archivesPanel ul {margin: 0; list-style-type: none; padding: 0; text-align: left;}
+#archivesPanel li {padding-left: 10px;}
+#archivesPanel ul li.webArchive {border-left: 5px solid orange;}
+#archivesPanel ul li.aggregator {border-left: 5px solid blue;}
+
 #archivesPanel #addSrc {display: block; width: 200px; margin: 2px 0 2px 0;}
+#archivesPanel #addSrc:focus-within {background-color: #ddd;}
 #archivesPanel #addSrc label {text-align: center; line-height: 25px;}
 #archivesPanel #addSrc input {margin-right: 10px;}
-#archivesPanel select { width: 200px; clear: both; position: absolute; top: 25px; right: 0; border: 0;}
-#archivesPanel select option.webArchive {border-left: 5px solid orange;}
-#archivesPanel select option.aggregator {border-left: 5px solid blue;}
