@@ -57,3 +57,15 @@ button#saveArchives {margin-right: 5px;}
 
 #archivesList li ul, #archivesList li ul li {list-style-type: none; margin: 0; padding: 0;}
 #archivesList li ul li span {display: inline-block; width: 30px; text-align: right; float: left;}
+.colorBrewer0 {background: linear-gradient(to right, rgba(255,237,111,0.4) 0%, #fff 100%);}
+.colorBrewer1 {background: linear-gradient(to right, rgba(141,211,199,0.4) 0%, #fff 100%);}
+.colorBrewer2 {background: linear-gradient(to right, rgba(255,255,179,0.4) 0%, #fff 100%);}
+.colorBrewer3 {background: linear-gradient(to right, rgba(190,186,218,0.4) 0%, #fff 100%);}
+.colorBrewer4 {background: linear-gradient(to right, rgba(251,128,114,0.4) 0%, #fff 100%);}
+.colorBrewer5 {background: linear-gradient(to right, rgba(128,177,211,0.4) 0%, #fff 100%);}
+.colorBrewer6 {background: linear-gradient(to right, rgba(253,180,98,0.4) 0%, #fff 100%);}
+.colorBrewer7 {background: linear-gradient(to right, rgba(179,222,105,0.4) 0%, #fff 100%);}
+.colorBrewer8 {background: linear-gradient(to right, rgba(252,205,229,0.4) 0%, #fff 100%);}
+.colorBrewer9 {background: linear-gradient(to right, rgba(217,217,217,0.4) 0%, #fff 100%);}
+.colorBrewer10 {background: linear-gradient(to right, rgba(188,128,189,0.4) 0%, #fff 100%);}
+.colorBrewer11 {background: linear-gradient(to right, rgba(204,235,197,0.4) 0%, #fff 100%);}

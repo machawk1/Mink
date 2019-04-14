@@ -379,9 +379,11 @@ function buildDrilldownYear (mementos) {
     if (!years[dt.year()]) { years[dt.year()] = [] }
     years[dt.year()].push(m)
   })
+
+  let colors = [...Array(12).keys()].sort(() => Math.random() - 0.5)
   $('#mg_oducs').append('<ul id="mg_oducs_archives"></ul>')
   for (const archive in archives) {
-    $('#mg_oducs_archives').append(`<li title="${archive}"><span>${archives[archive].count}</span> : ${archives[archive].archiveName}</li>`)
+    $('#mg_oducs_archives').append(`<li title="${archive}" class="colorBrewer${colors.pop()}"><span>${archives[archive].count}</span> : ${archives[archive].archiveName}</li>`)
   }
 
   let memCountList = '<ul id="years">'
