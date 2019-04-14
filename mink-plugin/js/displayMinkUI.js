@@ -1,4 +1,4 @@
-/* global chrome, $, Timemap, moment, tmData */
+/* global chrome, $, Timemap, moment, tmData, Sortable */
 
 var MAX_MEMENTOS_IN_DROPDOWN = 500
 
@@ -132,7 +132,6 @@ function buildDropDown (mementos) {
     dropdown.appendChild(option)
   }
 
-
   dropdown.setAttribute('data-memento-count', mementos.length)
   if (mementos.length === 0) {
     document.querySelector('#title_dropdown').classList.add('disabled')
@@ -144,7 +143,7 @@ function countArchives (mementos) {
   for (let memento of mementos) {
     const host = (new URL(memento.uri)).host
     if (!(host in archives)) {
-      archives[host] = {'count': 1, 'archiveName': getArchiveName(host)}
+      archives[host] = { 'count': 1, 'archiveName': getArchiveName(host) }
       console.log(getArchiveName(host))
     } else {
       archives[host].count += 1
@@ -155,7 +154,7 @@ function countArchives (mementos) {
 }
 
 function getArchiveName (host) {
-   // Ideally we should read the archives.json file internal to Mink here
+  // Ideally we should read the archives.json file internal to Mink here
   //  for now, manually define the mapping
   const archives = {
     'web.archive.org': 'Internet Archive',
@@ -174,7 +173,7 @@ function getArchiveName (host) {
     'swap.stanford.edu': 'Stanford Web Archive',
     'arquivo.pt': 'Portuguese Web Archive',
     'perma-archives.org': 'Perma Archive',
-    'webarchive.nrscotland.gov.uk': 'National Records of Scotland'}
+    'webarchive.nrscotland.gov.uk': 'National Records of Scotland' }
 
   if (host in archives) {
     return archives[host]
@@ -381,7 +380,7 @@ function buildDrilldownYear (mementos) {
     years[dt.year()].push(m)
   })
   $('#mg_oducs').append('<ul id="mg_oducs_archives"></ul>')
-  for (archive in archives) {
+  for (const archive in archives) {
     $('#mg_oducs_archives').append(`<li title="${archive}"><span>${archives[archive].count}</span> : ${archives[archive].archiveName}</li>`)
   }
 
@@ -649,7 +648,7 @@ function bindOptions () {
 }
 
 function bindArchivesLink () {
-  //let chrome.runtime.getURL('./archives.json')
+  // let chrome.runtime.getURL('./archives.json')
 
   const panel = $('#archivesPanel')
   $('#openArchivesLink').click(function () {
@@ -663,17 +662,16 @@ function bindArchivesLink () {
     $(this).html(triangle + ' archives')
   })
 
-  //console.log(document.querySelectorAll('#mementosDropdown option[data-uri*="archive.org/"]'))
+  // console.log(document.querySelectorAll('#mementosDropdown option[data-uri*="archive.org/"]'))
 
-  var sortable = Sortable.create(document.getElementById('archivesList'))
-
+  Sortable.create(document.getElementById('archivesList'))
 }
 
 function bindLoadArchives () {
   const loadFileButton = $('#loadFile')
   const loadFromConfig = $('#loadArchivesConfig')
 
-  $('#loadArchives').click(function(){loadFileButton.click()})
+  $('#loadArchives').click(function () { loadFileButton.click() })
   loadFromConfig.click(function () {
     window.fetch(chrome.runtime.getURL('./archives.json'))
       .then((response) => response.json())
@@ -687,7 +685,8 @@ function processConfig (json) {
   for (let a of json) {
     htmlOfJSON += `<li class="webArchive" data-id="${a.id}" data-timemap="${a.timemap}" data-timegate="${a.timegate}">${a.name}</li>`
   }
-  //console.log(document.getElementById('archivesList'))
+  console.log(htmlOfJSON)
+  // console.log(document.getElementById('archivesList'))
   // TODO: Change the archives list in the Mink shadow DOM here, not straightforward
 }
 
