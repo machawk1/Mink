@@ -118,6 +118,7 @@ function addZ (n) {
 
 function buildDropDown (mementos) {
   const dropdown = document.querySelector('#mementosDropdown')
+
   for (let mm = 0; mm < mementos.length; mm++) {
     let option = document.createElement('option')
     const memento = mementos[mm]
@@ -126,6 +127,7 @@ function buildDropDown (mementos) {
     option.appendChild(document.createTextNode(new Date(memento.datetime)))
     dropdown.appendChild(option)
   }
+
 
   dropdown.setAttribute('data-memento-count', mementos.length)
   if (mementos.length === 0) {
@@ -323,12 +325,24 @@ function buildDrilldownYear (mementos) {
   // NOTE: Shadow DOM not yet built. Do so after this function
   years = null
   years = {}
+  let archives = {}
 
   $(mementos).each(function (mI, m) {
     const dt = moment(m.datetime)
     if (!years[dt.year()]) { years[dt.year()] = [] }
     years[dt.year()].push(m)
+
+    const host = (new URL(m.uri)).host
+    if (!(host in archives)) {
+      archives[host] = 1
+    } else {
+      archives[host] += 1
+    }
   })
+  $('#mg_oducs').append('<ul id="mg_oducs_archives"></ul>')
+  for (archive in archives) {
+    $('#mg_oducs_archives').append(`<li>${archives[archive]} : ${archive}</li>`)
+  }
 
   let memCountList = '<ul id="years">'
   for (let year in years) {
@@ -513,7 +527,7 @@ function buildDrilldownTime (year, month, date) {
       continue
     }
 
-    mementos[memento].time = addZ(datetime.hour()) + ':' + addZ(datetime.minute()) + ':' + addZ(datetime.second())
+    mementos[memento].time = `${addZ(datetime.hour())}:${addZ(datetime.minute())}:${addZ(datetime.second())}`
     times.push(mementos[memento])
   }
 
@@ -607,6 +621,8 @@ function bindArchivesLink () {
     }
     $(this).html(triangle + ' archives')
   })
+
+  //console.log(document.querySelectorAll('#mementosDropdown option[data-uri*="archive.org/"]'))
 
   var sortable = Sortable.create(document.getElementById('archivesList'))
 
