@@ -117,16 +117,20 @@ function addZ (n) {
 }
 
 function buildDropDown (mementos) {
-  let mementoSelections = ''
+  const dropdown = document.querySelector('#mementosDropdown')
   for (let mm = 0; mm < mementos.length; mm++) {
-    mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
+    let option = document.createElement('option')
+    const memento = mementos[mm]
+    option.setAttribute('data-uri', memento.uri)
+    option.setAttribute('data-datetime', memento.datetime)
+    option.appendChild(document.createTextNode(new Date(memento.datetime)))
+    dropdown.appendChild(option)
   }
 
-  $('#mementosDropdown').attr('data-memento-count', mementos.length)
+  dropdown.setAttribute('data-memento-count', mementos.length)
   if (mementos.length === 0) {
-    $('#title_dropdown').addClass('disabled')
+    document.querySelector('#title_drowndown').classList.add('disabled')
   }
-  $('#mementosDropdown').append(mementoSelections)
 }
 
 function switchToArchiveNowInterface () {
@@ -143,7 +147,7 @@ function switchToArchiveNowInterface () {
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.runtime.getURL('css/minkui.css'))
     .done(function (data) {
-      const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+      const styleElement = `<style type="text/css">\n${data}\n</style>\n`
       $('#minkuiX').prepend(styleElement)
       cb()
     })
