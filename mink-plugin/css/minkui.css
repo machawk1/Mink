@@ -53,3 +53,6 @@ button#backToLiveWeb {margin-right: 1.5em;}
 #archivesPanel #addSrc input {margin-right: 10px;}
 
 button#saveArchives {margin-right: 5px;}
+
+#archivesList li ul, #archivesList li ul li {list-style-type: none; margin: 0; padding: 0;}
+#archivesList li ul li span {display: inline-block; width: 30px; text-align: right; float: left;}

@@ -144,12 +144,43 @@ function countArchives (mementos) {
   for (let memento of mementos) {
     const host = (new URL(memento.uri)).host
     if (!(host in archives)) {
-      archives[host] = 1
+      archives[host] = {'count': 1, 'archiveName': getArchiveName(host)}
+      console.log(getArchiveName(host))
     } else {
-      archives[host] += 1
+      archives[host].count += 1
     }
   }
+  console.log(archives)
   return archives
+}
+
+function getArchiveName (host) {
+   // Ideally we should read the archives.json file internal to Mink here
+  //  for now, manually define the mapping
+  const archives = {
+    'web.archive.org': 'Internet Archive',
+    'webarchive.proni.gov.uk': 'PRONI Web Archive',
+    'www.pastpages.org': 'PastPages Web Archive',
+    'web.archive.bibalex.org': 'Bibliotheca Alexandrina Web Archive',
+    'www.webarchive.org.uk': 'UK Web Archive',
+    'webarchive.loc.gov': 'Library of Congress',
+    'wayback.archive-it.org': 'Archive-It',
+    'webarchive.parliament.uk': 'UK Parliament Web Archive',
+    'webarchive.nationalarchives.gov.uk': 'UK National Archives Web Archive',
+    'archive.today': 'archive.today',
+    'archive.is': 'archive.today',
+    'archive.md': 'archive.today',
+    'wayback.vefsafn.is': 'Icelandic Web Archive',
+    'swap.stanford.edu': 'Stanford Web Archive',
+    'arquivo.pt': 'Portuguese Web Archive',
+    'perma-archives.org': 'Perma Archive',
+    'webarchive.nrscotland.gov.uk': 'National Records of Scotland'}
+
+  if (host in archives) {
+    return archives[host]
+  } else {
+    return host
+  }
 }
 
 function switchToArchiveNowInterface () {
@@ -351,7 +382,7 @@ function buildDrilldownYear (mementos) {
   })
   $('#mg_oducs').append('<ul id="mg_oducs_archives"></ul>')
   for (archive in archives) {
-    $('#mg_oducs_archives').append(`<li>${archives[archive]} : ${archive}</li>`)
+    $('#mg_oducs_archives').append(`<li title="${archive}"><span>${archives[archive].count}</span> : ${archives[archive].archiveName}</li>`)
   }
 
   let memCountList = '<ul id="years">'
