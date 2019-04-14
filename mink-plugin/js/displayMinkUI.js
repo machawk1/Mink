@@ -106,6 +106,10 @@ function appendHTMLToShadowDOM () {
         }
         $('#mementosAvailable span#mementoPlurality').html(mementoPlurality)
 
+        const archiveCount = Object.keys(countArchives(mementos)).length
+        if (archiveCount > 0) {
+          $('#sources').html(` from ${archiveCount} archives`)
+        }
         // Append CSS2
         appendCSSToShadowDOM(cb)
       })
@@ -133,6 +137,19 @@ function buildDropDown (mementos) {
   if (mementos.length === 0) {
     document.querySelector('#title_drowndown').classList.add('disabled')
   }
+}
+
+function countArchives (mementos) {
+  let archives = {}
+  for (let memento of mementos) {
+    const host = (new URL(memento.uri)).host
+    if (!(host in archives)) {
+      archives[host] = 1
+    } else {
+      archives[host] += 1
+    }
+  }
+  return archives
 }
 
 function switchToArchiveNowInterface () {
@@ -325,19 +342,12 @@ function buildDrilldownYear (mementos) {
   // NOTE: Shadow DOM not yet built. Do so after this function
   years = null
   years = {}
-  let archives = {}
+  let archives = countArchives(mementos)
 
   $(mementos).each(function (mI, m) {
     const dt = moment(m.datetime)
     if (!years[dt.year()]) { years[dt.year()] = [] }
     years[dt.year()].push(m)
-
-    const host = (new URL(m.uri)).host
-    if (!(host in archives)) {
-      archives[host] = 1
-    } else {
-      archives[host] += 1
-    }
   })
   $('#mg_oducs').append('<ul id="mg_oducs_archives"></ul>')
   for (archive in archives) {
