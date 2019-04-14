@@ -135,7 +135,7 @@ function buildDropDown (mementos) {
 
   dropdown.setAttribute('data-memento-count', mementos.length)
   if (mementos.length === 0) {
-    document.querySelector('#title_drowndown').classList.add('disabled')
+    document.querySelector('#title_dropdown').classList.add('disabled')
   }
 }
 
