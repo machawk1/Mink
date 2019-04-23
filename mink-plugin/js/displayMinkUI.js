@@ -87,7 +87,14 @@ function appendHTMLToShadowDOM () {
           $('#steps .action').removeClass('active')
           $('#title_drilldown').addClass('active')
           buildDropDown([])
-          buildDrilldownYear(items.timemaps[document.URL].mementos.list)
+
+          let cleanedURIR = document.URL
+          // Strip URI-Rs with hashes if necessary
+          if (!items.timemaps.hasOwnProperty(document.URL)) {
+            cleanedURIR = document.URL.replace(/#.*$/, '')
+          }
+
+          buildDrilldownYear(items.timemaps[cleanedURIR].mementos.list)
         } else if (mCount === 0) {
           switchToArchiveNowInterface()
         } else {
