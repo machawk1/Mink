@@ -607,6 +607,7 @@ function setupUI () {
   bindOptions()
   bindArchivesLink()
   bindArchivesToggle()
+  bindShowLoadSaveMoreButtonsPanel()
   bindLoadArchives()
   bindViewButton()
   bindDropdown()
@@ -678,6 +679,15 @@ function bindLoadArchives () {
     window.fetch(chrome.runtime.getURL('./archives.json'))
       .then((response) => response.json())
       .then((json) => processConfig(json))
+  })
+}
+
+function bindShowLoadSaveMoreButtonsPanel () {
+  const moreButtonsPanel = $('#moreButtons_load')
+
+  // jquery cannot penetrate shadow dom for queries
+  $('#loadArchives_button').click(function () {
+    moreButtonsPanel.show()
   })
 }
 

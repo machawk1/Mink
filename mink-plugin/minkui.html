@@ -10,9 +10,12 @@
     <li class="aggregator" title="mementoweb.org">Aggregator @ MementoWeb</li>
   </ul>
   <span id="archivesButtons">
-    <button id="loadArchivesConfig">Load from Config</button>
-    <button id="loadArchives">Load from File</button><input type="file" id="loadFile" class="hidden" />
-    <button id="saveArchives">Save</button>
+    Config: <button id="loadArchives_button" onclick="$('#moreButtons').css('display');">Load</button><button id="saveArchives">Save</button>
+    <span id="moreButtons_load" style="display: none;">
+      <button id="loadArchivesConfig">Load from Config</button>
+      <button id="loadArchives">Load from File</button><input type="file" id="loadFile" class="hidden" />
+    </span>
+
   </span>
     <br style="clear: both;" />
   <!--<span id="addSrc">
