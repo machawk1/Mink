@@ -46,6 +46,9 @@ button#backToLiveWeb {margin-right: 1.5em;}
 #archivesPanel ul li.webArchive {border-left: 10px solid orange;}
 #archivesPanel ul li.aggregator {border-left: 10px solid blue;}
 #archivesPanel ul li.disabled {opacity: 0.5;}
+#archivesPanel #archivesButtons {text-align: left;}
+#archivesPanel #archivesButtons label {width: 100px; text-align: right; display: inline-block;}
+#archivesPanel #archivesButtons button {width: 50px;}
 #archivesButtons, #archivesButtons #moreButtons_load {background-color: #ccf; width: 400px; display: block; border-top: 3px solid #aaf; padding: 2px 0 2px 0;}
 #archivesButtons #moreButtons_load {border-top: 1px dotted #aaf;}
 
