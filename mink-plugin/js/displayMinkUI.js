@@ -688,6 +688,7 @@ function bindShowLoadSaveMoreButtonsPanel () {
   // jquery cannot penetrate shadow dom for queries
   $('#loadArchives_button').click(function () {
     moreButtonsPanel.show()
+    moreButtonsPanel.css('display', 'block')
   })
 }
 

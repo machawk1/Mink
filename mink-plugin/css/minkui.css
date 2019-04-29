@@ -47,7 +47,7 @@ button#backToLiveWeb {margin-right: 1.5em;}
 #archivesPanel ul li.aggregator {border-left: 10px solid blue;}
 #archivesPanel ul li.disabled {opacity: 0.5;}
 #archivesButtons, #archivesButtons #moreButtons_load {background-color: #ccf; width: 400px; display: block; border-top: 3px solid #aaf; padding: 2px 0 2px 0;}
-#archivesButtons #moreButtons_load {border-top: 1px dotted #aaf}
+#archivesButtons #moreButtons_load {border-top: 1px dotted #aaf;}
 
 #archivesPanel #addSrc {display: block; width: 400px; margin: 2px 0 2px 0;}
 #archivesPanel #addSrc:focus-within {background-color: #ddd;}
@@ -55,6 +55,7 @@ button#backToLiveWeb {margin-right: 1.5em;}
 #archivesPanel #addSrc input {margin-right: 10px;}
 
 button#saveArchives {margin-right: 5px;}
+#moreButtons_load {display: block;}
 
 #archivesList li ul, #archivesList li ul li {list-style-type: none; margin: 0; padding: 0;}
 #archivesList li ul li span {display: inline-block; width: 30px; text-align: right; float: left;}
