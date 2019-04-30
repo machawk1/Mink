@@ -56,6 +56,7 @@ button#backToLiveWeb {margin-right: 1.5em;}
 #archivesPanel #addSrc:focus-within {background-color: #ddd;}
 #archivesPanel #addSrc label {text-align: center; line-height: 25px;}
 #archivesPanel #addSrc input {margin-right: 10px;}
+.separator {height: 1px; border: 1px solid black;}
 
 button#saveArchives {margin-right: 5px;}
 #moreButtons_load {display: block;}
