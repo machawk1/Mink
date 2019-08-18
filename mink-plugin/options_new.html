@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html id="minkOptions">
 <head>
 <style type="text/css">
 body {margin: 0; padding: 0; color: #222;}
@@ -11,7 +12,7 @@ nav {
 	position: fixed;
 }
 nav ul {list-style-type: none; padding-left: 0; text-align: right;}
-nav ul li {height: 15%;  padding-right: 10%;}
+nav ul li {height: 15%;  padding-right: 10%; margin-bottom: 1.0em;}
 nav ul li:hover {color: #00f; cursor: pointer;}
 nav ul li p {font-size: 0.75em; margin: 0; padding: 0; color: #555; font-family: Times, serif; font-style: italic;}
 
@@ -20,8 +21,12 @@ nav ul li p {font-size: 0.75em; margin: 0; padding: 0; color: #555; font-family:
 
 main {margin-left: 26%; margin-top: -100px;}
 h1, h3 {font-weight: normal; margin: 0; padding: 0;}
-h3 {font-size: 1.1em; font-family: Arial, sans-serif; }
+h3 {font-size: 1.3em; font-family: Arial, sans-serif; }
+p {font-family: Times, sans-serif;}
+main h3 {margin-top: 1.0em;}
+main p {background-color: #f7f7f7; padding: 5px; margin-top: 0; border: 1px solid #f0f0f0}
 </style>
+<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
 <body>
 <section id="logo">
@@ -42,21 +47,61 @@ h3 {font-size: 1.1em; font-family: Arial, sans-serif; }
     <p>Mink is a Google Chrome extension that uses the <a href="https://tools.ietf.org/html/rfc7089">Memento protocol</a> to indicate that a page a user is viewing on the live web has an archived copy and to give the user access to the copy. If no copies exist, the extension provides one-button access to preserve the page in various web archives and to easily view the page once it has been preserved.
     </p>
     
-    <p>Pellentesque fringilla ultrices metus, ac consequat libero pharetra ac. Morbi non nisi sed felis euismod tristique ac a arcu. Sed imperdiet at erat id consequat. Sed et feugiat diam. Vestibulum gravida, eros quis faucibus facilisis, velit massa dignissim orci, ac ultricies arcu arcu quis urna. Curabitur id libero nec libero dapibus congue sit amet a est. In hac habitasse platea dictumst. Duis tincidunt sapien non bibendum ornare. Praesent posuere felis blandit metus gravida, vel lobortis dolor tempus. Cras porta, odio non malesuada varius, leo turpis commodo nibh, egestas tincidunt diam purus in ipsum. Aliquam lacus neque, ultricies et nisl et, maximus rutrum ex.</p>
-
-<p>Morbi sit amet dictum arcu. Vivamus luctus orci ut neque hendrerit, sed fringilla erat efficitur. Pellentesque in risus ut nisi hendrerit lobortis et a lorem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent varius, velit in molestie cursus, felis orci maximus dui, hendrerit pulvinar justo nisi at mauris. Aenean sagittis nisi id lectus laoreet sodales. Curabitur congue odio vel tempor sagittis. Mauris rutrum mi nulla, eget molestie nibh viverra sagittis. Ut sit amet eros vitae nunc fringilla tincidunt id vel massa. Suspendisse nulla sem, pretium a imperdiet vel, pulvinar at justo. Praesent ante orci, egestas nec pellentesque in, venenatis eu mi. Integer pellentesque pretium finibus. Nulla facilisi. Nullam vel laoreet sapien, et imperdiet risus. Duis molestie mi id massa pulvinar vestibulum.</p>
-    
     <h3>Archival Sources</h3>
     
-    <p>Praesent sed blandit elit. Donec id sem porta justo maximus imperdiet. Ut interdum dolor at mauris faucibus, at egestas justo tempor. Etiam consequat dapibus diam, vitae imperdiet nisi dictum ac. Duis ut sodales mi. Sed congue urna vel dictum scelerisque. Ut non bibendum leo. Suspendisse urna ipsum, sagittis quis convallis in, suscipit non mauris. Pellentesque porttitor dui velit, a rhoncus tortor aliquam a. Curabitur feugiat lorem vitae rhoncus sodales. Maecenas condimentum ac lacus at convallis. Aenean euismod id turpis sed faucibus.</p>
+    <p>Mink requests archival captures (mementos) for the URI currently being viewed from a source of archives. By default, a Memento aggregator is used. When a user requests a list of mementos from an aggregator, the aggregator in turn relays this request to a set of archives. An aggregator is not mandatory but simplifies the configuration. Mink is setup to use the Memento aggregator at https://memgator.cs.odu.edu by default. THis can be changed below by changing the aggregator as well as adding or removing additional archival sources.</p>
+
+  <fieldset class="hidden">
+  <legend>Memento Aggregator</legend>
+  <select>
+    <option>memgator.cs.odu.edu</option>
+    <option disabled>mementoweb.org</option>
+    <option disabled>localhost (MemGator via WAIL)</option>
+  </select>
+  </fieldset>
+
+  <fieldset disabled  class="hidden">
+  <legend>Additional Archives</legend>
+  <select>
+    <option>localhost via WAIL</option>
+  </select>
+  </fieldset>
     
     <h3>Cached TimeMaps</h3>
     
     <p>Integer faucibus ornare neque. Cras lobortis felis in nulla malesuada accumsan. Nam vel erat hendrerit, ultrices orci eget, facilisis massa. Mauris interdum ac tortor in fringilla. Curabitur metus elit, posuere eget convallis id, scelerisque euismod neque. Nullam at leo ac libero elementum gravida nec mattis massa. In vel nulla feugiat elit commodo pellentesque sit amet vitae nulla. Morbi ut urna ac eros dictum dignissim consequat at purus. Etiam vitae nisi convallis, imperdiet nisi eu, ornare tortor. Donec massa dolor, facilisis ut aliquet ac, dignissim non dolor. Aliquam posuere lacus vel risus tempus consectetur.</p>
+<fieldset>
+   <legend>Cached TimeMaps</legend>
+   <select id="cachedTimemaps"></select>
+   <button id="removeSelectedTMFromCache">Remove</button>
+   <!--<button id="removeSelectedTMFromCacheAndBlacklist">... & Blacklist</button>-->
+   <p id="mementoCount"></p>
+   <button id="removeAllTMsFromCache">Remove All</button>
+  </fieldset> 
     
     <h3>Blacklist</h3>
     
     <p>Donec maximus lectus id tortor lobortis, nec tincidunt orci hendrerit. Fusce nisl erat, tristique a suscipit in, viverra eget leo. Praesent in metus bibendum, efficitur eros nec, pulvinar magna. Praesent rutrum metus urna. Sed id nisi vestibulum, hendrerit lectus vitae, finibus dolor. Sed ex sem, venenatis consectetur bibendum semper, faucibus eu turpis. Donec aliquet odio sapien, sed hendrerit felis feugiat placerat. Duis in mi justo. Pellentesque in eros neque. Nam a sem quis sem maximus scelerisque. Mauris eget ligula mauris. Ut sed metus aliquet, luctus ante ac, eleifend augue. Morbi varius purus ut fringilla lobortis. Vivamus tempus, lacus ut porttitor dignissim, mi libero dictum nisl, rutrum dictum purus orci sit amet enim.</p>
+
+  <fieldset>
+  <legend>Blacklist <span>(do not run Mink on these URIs)</span></legend>
+  <button id="add" class="btn btn-default btn-xs" type="button">add</button>
+  <ul id="options"></ul>
+
+  <p id="status"></p>
+  
+  <button id="saveBlacklist">Save Blacklist</button>
+  <button id="clearBlacklist">Clear Blacklist</button>
+    
+  </fieldset>
+
+  
+  <div id="bottomButtons">
+    <button id="restoreDefaultsButton">Restore Defaults</button>
+    <button id="doneButton">Done</button>
+  </div>
+  
+  <script src="options.js"></script>
   </section>
 </main>
 </body>
