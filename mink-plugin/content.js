@@ -170,7 +170,7 @@ function displayUIBasedOnContext () {
 
         headers.forEach(function (header) {
           if (header.name.toUpperCase() === 'MEMENTO-DATETIME') {
-           isAMemento = true
+            isAMemento = true
           }
         })
         console.log('isAMemento: ' + isAMemento)
