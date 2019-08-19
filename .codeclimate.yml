@@ -5,9 +5,6 @@ languages:
    PHP: false
 exclude_paths:
 - "meta/*"
-- "mink-plugin/d3.makechart.js"
-- "mink-plugin/d3.v3/*"
-- "mink-plugin/dimple.v1.1.2.min.js"
 - "mink-plugin/font-awesome-4.0.3/*"
 - "mink-plugin/highchartsdata.js"
 - "mink-plugin/images/*"
