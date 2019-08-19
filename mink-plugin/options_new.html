@@ -1,108 +1,193 @@
 <!DOCTYPE html>
 <html id="minkOptions">
 <head>
-<style type="text/css">
-body {margin: 0; padding: 0; color: #222;}
-nav {
-	background: linear-gradient(180deg, #fff 0%, #eee 10%);
-	background-color: #eeeeee;
-	width: 25%;
-	height: 100%;
-	padding-top: 5%;
-	position: fixed;
-}
-nav ul {list-style-type: none; padding-left: 0; text-align: right;}
-nav ul li {height: 15%;  padding-right: 10%; margin-bottom: 1.0em;}
-nav ul li:hover {color: #00f; cursor: pointer;}
-nav ul li p {font-size: 0.75em; margin: 0; padding: 0; color: #555; font-family: Times, serif; font-style: italic;}
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            color: #222;
+        }
 
-#logo {width: 25%; text-align: center;}
-#logo img {width: 100px;}
+        nav {
+            background: linear-gradient(180deg, #fff 0%, #eee 10%);
+            background-color: #eeeeee;
+            width: 25%;
+            height: 100%;
+            padding-top: 5%;
+            position: fixed;
+        }
 
-main {margin-left: 26%; margin-top: -100px;}
-h1, h3 {font-weight: normal; margin: 0; padding: 0;}
-h3 {font-size: 1.3em; font-family: Arial, sans-serif; }
-p {font-family: Times, sans-serif;}
-main h3 {margin-top: 1.0em;}
-main p {background-color: #f7f7f7; padding: 5px; margin-top: 0; border: 1px solid #f0f0f0}
-</style>
-<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+        nav ul {
+            list-style-type: none;
+            padding-left: 0;
+            text-align: right;
+        }
+
+        nav ul li {
+            height: 15%;
+            padding-right: 5%;
+            margin-bottom: 1.0em;
+        }
+
+        nav ul li a {
+            font-size: 1.2em;
+            text-decoration: none;
+            color: #333;
+        }
+
+        nav ul li a:hover {
+            color: #00f;
+            cursor: pointer;
+        }
+
+        nav ul li p {
+            font-size: 1.0em;
+            margin: 0;
+            padding: 0;
+            color: #555;
+            font-family: Times, serif;
+            font-style: italic;
+        }
+
+        #logo {
+            width: 25%;
+            text-align: center;
+        }
+
+        #logo img {
+            width: 100px;
+        }
+
+        main {
+            margin-left: 26%;
+            margin-top: -100px;
+        }
+
+        h1, h3 {
+            font-weight: normal;
+            margin: 0;
+            padding: 0;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            font-family: Arial, sans-serif;
+        }
+
+        p {
+            font-family: Times, sans-serif;
+        }
+
+        main h3 {
+            margin-top: 1.0em;
+        }
+
+        main p {
+            background-color: #f7f7f7;
+            padding: 5px;
+            margin-top: 0;
+            border: 1px solid #f0f0f0;
+            margin-right: 1.0em;
+        }
+
+        fieldset {
+            margin-right: 1.0em;
+        }
+    </style>
+    <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
 </head>
 <body>
 <section id="logo">
-  <img src="https://github.com/machawk1/Mink/raw/master/meta/mink_marvel_300_noTrans.png" alt="Mink logo"/>
+    <img src="https://github.com/machawk1/Mink/raw/master/meta/mink_marvel_300_noTrans.png" alt="Mink logo"/>
 </section>
 <nav>
-  <ul>
-    <li><h3>Archival Sources</h3><p>where to query for captures</p></li>
-    <li><h3>Cached TimeMaps</h3><p>how much data to retain for query speedup</p></li>
-    <li><h3>Blacklist</h3><p>on which sites should archival querying be excluded</p></li>
-  </ul>
+    <ul>
+        <li><a href="#archivalSources">Archival Sources</a>
+            <p>where to query for captures</p></li>
+        <li><a href="#cachedTimeMaps">Cached TimeMaps</a>
+            <p>how much data to retain for query speedup</p></li>
+        <li><a href="#blacklist">Blacklist</a>
+            <p>on which sites should archival querying be excluded</p></li>
+    </ul>
 </nav>
 
 <main>
-  <section>
-    <h1>Mink</h1>
-    
-    <p>Mink is a Google Chrome extension that uses the <a href="https://tools.ietf.org/html/rfc7089">Memento protocol</a> to indicate that a page a user is viewing on the live web has an archived copy and to give the user access to the copy. If no copies exist, the extension provides one-button access to preserve the page in various web archives and to easily view the page once it has been preserved.
-    </p>
-    
-    <h3>Archival Sources</h3>
-    
-    <p>Mink requests archival captures (mementos) for the URI currently being viewed from a source of archives. By default, a Memento aggregator is used. When a user requests a list of mementos from an aggregator, the aggregator in turn relays this request to a set of archives. An aggregator is not mandatory but simplifies the configuration. Mink is setup to use the Memento aggregator at https://memgator.cs.odu.edu by default. THis can be changed below by changing the aggregator as well as adding or removing additional archival sources.</p>
+    <section>
+        <h1>Mink</h1>
 
-  <fieldset class="hidden">
-  <legend>Memento Aggregator</legend>
-  <select>
-    <option>memgator.cs.odu.edu</option>
-    <option disabled>mementoweb.org</option>
-    <option disabled>localhost (MemGator via WAIL)</option>
-  </select>
-  </fieldset>
+        <p>Mink is a Google Chrome extension that uses the <a href="https://tools.ietf.org/html/rfc7089">Memento
+            protocol</a> to indicate that a page a user is viewing on the live web has an archived copy and to give the
+            user access to the copy. If no copies exist, the extension provides one-button access to preserve the page
+            in various web archives and to easily view the page once it has been preserved.
+        </p>
 
-  <fieldset disabled  class="hidden">
-  <legend>Additional Archives</legend>
-  <select>
-    <option>localhost via WAIL</option>
-  </select>
-  </fieldset>
-    
-    <h3>Cached TimeMaps</h3>
-    
-    <p>Integer faucibus ornare neque. Cras lobortis felis in nulla malesuada accumsan. Nam vel erat hendrerit, ultrices orci eget, facilisis massa. Mauris interdum ac tortor in fringilla. Curabitur metus elit, posuere eget convallis id, scelerisque euismod neque. Nullam at leo ac libero elementum gravida nec mattis massa. In vel nulla feugiat elit commodo pellentesque sit amet vitae nulla. Morbi ut urna ac eros dictum dignissim consequat at purus. Etiam vitae nisi convallis, imperdiet nisi eu, ornare tortor. Donec massa dolor, facilisis ut aliquet ac, dignissim non dolor. Aliquam posuere lacus vel risus tempus consectetur.</p>
-<fieldset>
-   <legend>Cached TimeMaps</legend>
-   <select id="cachedTimemaps"></select>
-   <button id="removeSelectedTMFromCache">Remove</button>
-   <!--<button id="removeSelectedTMFromCacheAndBlacklist">... & Blacklist</button>-->
-   <p id="mementoCount"></p>
-   <button id="removeAllTMsFromCache">Remove All</button>
-  </fieldset> 
-    
-    <h3>Blacklist</h3>
-    
-    <p>Donec maximus lectus id tortor lobortis, nec tincidunt orci hendrerit. Fusce nisl erat, tristique a suscipit in, viverra eget leo. Praesent in metus bibendum, efficitur eros nec, pulvinar magna. Praesent rutrum metus urna. Sed id nisi vestibulum, hendrerit lectus vitae, finibus dolor. Sed ex sem, venenatis consectetur bibendum semper, faucibus eu turpis. Donec aliquet odio sapien, sed hendrerit felis feugiat placerat. Duis in mi justo. Pellentesque in eros neque. Nam a sem quis sem maximus scelerisque. Mauris eget ligula mauris. Ut sed metus aliquet, luctus ante ac, eleifend augue. Morbi varius purus ut fringilla lobortis. Vivamus tempus, lacus ut porttitor dignissim, mi libero dictum nisl, rutrum dictum purus orci sit amet enim.</p>
+    </section>
+    <section id="archivalSources">
+        <h3>Archival Sources</h3>
 
-  <fieldset>
-  <legend>Blacklist <span>(do not run Mink on these URIs)</span></legend>
-  <button id="add" class="btn btn-default btn-xs" type="button">add</button>
-  <ul id="options"></ul>
+        <p>Mink requests archival captures (mementos) for the URI currently being viewed from a source of archives. By
+            default, a Memento aggregator is used. When a user requests a list of mementos from an aggregator, the
+            aggregator in turn relays this request to a set of archives. An aggregator is not mandatory but simplifies
+            the configuration. Mink is setup to use the Memento aggregator at https://memgator.cs.odu.edu by default.
+            THis can be changed below by changing the aggregator as well as adding or removing additional archival
+            sources.</p>
 
-  <p id="status"></p>
-  
-  <button id="saveBlacklist">Save Blacklist</button>
-  <button id="clearBlacklist">Clear Blacklist</button>
-    
-  </fieldset>
+        <fieldset class="hidden">
+            <legend>Memento Aggregator</legend>
+            <select>
+                <option>memgator.cs.odu.edu</option>
+                <option disabled>mementoweb.org</option>
+                <option disabled>localhost (MemGator via WAIL)</option>
+            </select>
+        </fieldset>
 
-  
-  <div id="bottomButtons">
-    <button id="restoreDefaultsButton">Restore Defaults</button>
-    <button id="doneButton">Done</button>
-  </div>
-  
-  <script src="options.js"></script>
-  </section>
+        <fieldset disabled class="hidden">
+            <legend>Additional Archives</legend>
+            <select>
+                <option>localhost via WAIL</option>
+            </select>
+        </fieldset>
+    </section>
+
+    <section id="cachedTimeMaps">
+        <h3>Cached TimeMaps</h3>
+
+        <p>A request for a TimeMap, which contains archival captures, can take some time for an archival source to provide. Mink retains these TimeMaps until enough newer TimeMaps are received or the cache is cleared. This section allows you to manipulate the cache.</p>
+        <fieldset>
+            <legend>Cached TimeMaps</legend>
+            <select id="cachedTimemaps"></select>
+            <button id="removeSelectedTMFromCache">Remove</button>
+            <!--<button id="removeSelectedTMFromCacheAndBlacklist">... & Blacklist</button>-->
+            <p id="mementoCount"></p>
+            <button id="removeAllTMsFromCache">Remove All</button>
+        </fieldset>
+    </section>
+    <section id="blacklist">
+
+        <h3>Blacklist</h3>
+
+        <p>You may not want Mink to run on certain sites. On these sites, no request will be sent to the archival sources (above) to get a list of captures. This can be useful for sites like GMail, which you would not expect archives to have a copy due to the authentication requirement when accessing the site on the live Web.</p>
+
+        <fieldset>
+            <legend>Blacklist <span>(do not run Mink on these URIs)</span></legend>
+            <button id="add" class="btn btn-default btn-xs" type="button">add</button>
+            <ul id="options"></ul>
+
+            <p id="status"></p>
+
+            <button id="saveBlacklist">Save Blacklist</button>
+            <button id="clearBlacklist">Clear Blacklist</button>
+
+        </fieldset>
+
+
+        <div id="bottomButtons">
+            <button id="restoreDefaultsButton">Restore Defaults</button>
+            <button id="doneButton">Done</button>
+        </div>
+
+        <script src="options.js"></script>
+    </section>
 </main>
 </body>
 </html>
