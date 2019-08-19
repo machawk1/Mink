@@ -129,11 +129,12 @@ function buildDropDown (mementos) {
     mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
   }
 
-  $('#mementosDropdown').attr('data-memento-count', mementos.length)
+  let mementoDropdown = $('#mementosDropdown')
+  mementoDropdown.attr('data-memento-count', mementos.length)
   if (mementos.length === 0) {
     $('#title_dropdown').addClass('disabled')
   }
-  $('#mementosDropdown').append(mementoSelections)
+  mementoDropdown.append(mementoSelections)
 }
 
 function switchToArchiveNowInterface () {

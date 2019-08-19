@@ -43,9 +43,6 @@
         "moment-with-langs.min.js",
         "jquery.miller.js/js/jquery.miller.js",
 
-        "d3.v3/d3.v3.min.js","dimple.v1.1.2.min.js","d3.makechart.js",
-        
-
         "content.js","timemap.js"],
       "matches": ["http://*/*", "https://*/*"],
       "css": ["style.css",
