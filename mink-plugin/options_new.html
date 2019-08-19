@@ -78,11 +78,13 @@
             font-family: Times, sans-serif;
         }
 
+
+        main {margin-bottom: 100.0em;}
         main h3 {
             margin-top: 1.0em;
         }
 
-        main p {
+        main section > p {
             background-color: #f7f7f7;
             padding: 5px;
             margin-top: 0;
@@ -92,6 +94,51 @@
 
         fieldset {
             margin-right: 1.0em;
+        }
+
+        .glyphicon-plus-sign {
+            font-size: 18px;
+        }
+
+        .nevermind {
+            color: white;
+            background-color: red;
+            font-weight: bold;
+            margin-left: 1.0em;
+            width: 1.0em;
+            height: 1.0em;
+            border-radius: 15px;
+        }
+
+        ul {
+            margin-left: 0;
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        li {
+            vertical-align: middle;
+        }
+
+        button {
+            margin-right: 0.5em;
+        }
+
+        .strike span {
+            text-decoration: line-through;
+            background-color: #ffdddd
+        }
+
+        button#save {
+            color: blue;
+        }
+
+        button#save.disabled {
+            color: #999;
+        }
+
+        #add {
+            float: right;
         }
     </style>
     <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
@@ -152,7 +199,9 @@
     <section id="cachedTimeMaps">
         <h3>Cached TimeMaps</h3>
 
-        <p>A request for a TimeMap, which contains archival captures, can take some time for an archival source to provide. Mink retains these TimeMaps until enough newer TimeMaps are received or the cache is cleared. This section allows you to manipulate the cache.</p>
+        <p>A request for a TimeMap, which contains archival captures, can take some time for an archival source to
+            provide. Mink retains these TimeMaps until enough newer TimeMaps are received or the cache is cleared. This
+            section allows you to manipulate the cache.</p>
         <fieldset>
             <legend>Cached TimeMaps</legend>
             <select id="cachedTimemaps"></select>
@@ -166,7 +215,10 @@
 
         <h3>Blacklist</h3>
 
-        <p>You may not want Mink to run on certain sites. On these sites, no request will be sent to the archival sources (above) to get a list of captures. This can be useful for sites like GMail, which you would not expect archives to have a copy due to the authentication requirement when accessing the site on the live Web.</p>
+        <p>You may not want Mink to run on certain sites. On these sites, no request will be sent to the archival
+            sources (above) to get a list of captures. This can be useful for sites like GMail, which you would not
+            expect archives to have a copy due to the authentication requirement when accessing the site on the live
+            Web.</p>
 
         <fieldset>
             <legend>Blacklist <span>(do not run Mink on these URIs)</span></legend>
