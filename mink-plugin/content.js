@@ -166,6 +166,14 @@ function displayUIBasedOnContext () {
           normalDisplayUIBC(items)
         }
       } else if (mementoDateTimeHeader) { // Case 3
+        let isAMemento = false
+
+        headers.forEach(function (header) {
+          if (header.name.toUpperCase() === 'MEMENTO-DATETIME') {
+           isAMemento = true
+          }
+        })
+        console.log('isAMemento: ' + isAMemento)
         if (notStoredInCache) {
           tm = new Timemap(linkHeaderAsString)
           tm.datetime = mementoDateTimeHeader
