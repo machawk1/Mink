@@ -31,7 +31,7 @@ function getListItemHTML (uri, classIn, buttonText) {
   if (!buttonText) {
     buttonText = ''
   }
-  return '<li><button class="btn btn-default btn-xs glyphicon ' + classIn + ' remove" type="button">' + buttonText + '</button><span>' + uri + '</span></li>'
+  return `<li><button class="btn btn-default btn-xs glyphicon ${classIn} remove" type="button">${buttonText}</button><span>${uri}</span></li>`
 }
 
 function clearBlacklist () {
@@ -103,18 +103,19 @@ function addMinkBlacklistToBeSavedLI (valIn) {
   if (!valIn) {
     valIn = ''
   }
-  $('#options').prepend('<li><input type="text" placeholder="http://"  class="uriTextField" id="newURI" "' + valIn + '"/><button class="addToBlacklist" disabled>Add to Blacklist</button><button class="cancelAddToBlacklist">Cancel</button></li>')
+  $('#options').prepend(`<li><input type="text" placeholder="http://"  class="uriTextField" id="newURI" "${valIn}"/><button class="addToBlacklist" disabled>Add to Blacklist</button><button class="cancelAddToBlacklist">Cancel</button></li>`)
 }
 
 function addToBlacklistToBeSaved () {
   let uri = $(this).parent().find('.uriTextField').val()
   if (uri.substr(0, 4) !== 'http') {
-    uri = 'http://' + uri
+    uri = `http://${uri}`
   }
 
   $(this).parent().replaceWith(getListItemHTML(uri, 'glyphicon-remove newItem'))
-  $('.newItem').click(removeEntry)
-  $('.newItem').removeClass('newItem').parent().addClass('newEntry')
+  let newItem = $('.newItem')
+  newItem.click(removeEntry)
+  newItem.removeClass('newItem').parent().addClass('newEntry')
   // $('.newEntry').append('<button  class="btn btn-default btn-xs glyphicon glyphicon-chevron-left" style="font-size: 12px; margin-left: 1.0em;">Nevermind</button>');
   updateSaveButtonStatus()
 }
@@ -140,19 +141,20 @@ function populatedCachedTimeMapsUI () {
     const keys = tms ? Object.keys(tms) : 0
     // let uriPluralityString = keys.length === 1 ? 'URI' : 'URIs'
 
+    const cachedTimeMapsUI = $('#cachedTimemaps')
     if (keys.length) {
-      $('#cachedTimemaps').append(tmDropdownString)
+      cachedTimeMapsUI.append(tmDropdownString)
       for (let tm = 0; tm < keys.length; tm++) {
         let originalURI = tms[keys[tm]].original_uri
         if (!tms[keys[tm]].original_uri) {
           originalURI = keys[tm]
         }
-        $('#cachedTimemaps').append('<option>' + originalURI + '</option>')
+        cachedTimeMapsUI.append(`<option>${originalURI}</option>`)
       }
       enableRemoveButtons(false, '#removeAllTMsFromCache')
-      $('#cachedTimemaps').change(enableRemoveButtonsBasedOnDropdown)
+      cachedTimeMapsUI.change(enableRemoveButtonsBasedOnDropdown)
     } else {
-      $('#cachedTimemaps').append(tmDropdownNoTimemapsString)
+      cachedTimeMapsUI.append(tmDropdownNoTimemapsString)
       enableRemoveButtons(true, '#cachedTimemaps, #removeAllTMsFromCache')
     }
     enableRemoveButtonsBasedOnDropdown()
@@ -178,9 +180,9 @@ function resetMementoCount () {
 function enableRemoveButtons (disable, additionalIdsIn) {
   let additionalIds = ''
   if (additionalIdsIn) {
-    additionalIds = ',' + additionalIdsIn
+    additionalIds = `,${additionalIdsIn}`
   }
-  const buttonIds = '#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndBlacklist' + additionalIds
+  const buttonIds = `#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndBlacklist${additionalIds}`
   $(buttonIds).prop('disabled', disable)
 }
 
@@ -242,7 +244,7 @@ function removeSelectedURIFromTimeMapCache () {
 
 function addSelectedURIToBlacklist () {
   const oURI = $('#cachedTimemaps option:selected').text()
-  $('#options').append('<li class="strike"><span>' + oURI + '</li>')
+  $('#options').append(`<li class="strike"><span>${oURI}</li>`)
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions)
