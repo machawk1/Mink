@@ -41,13 +41,13 @@
       "js": [
         "js/jquery-2.1.1.min.js","js/select2/select2.min.js",
         "moment-with-langs.min.js",
-        "jquery.miller.js/js/jquery.miller.js",
+        "jquery.miller.js/jquery.miller.js",
 
         "content.js","timemap.js"],
       "matches": ["http://*/*", "https://*/*"],
       "css": ["style.css",
         "font-awesome-4.0.3/css/font-awesome-modified.css","js/select2/select2.min.css",
-        "jquery.miller.js/css/jquery.miller.css","css/select2.css"
+        "jquery.miller.js/jquery.miller.css","css/select2.css"
 
       ]
     }
@@ -84,7 +84,7 @@
     
     "images/archives/dropdown_ia.png", "images/archives/dropdown_ais.png", "images/archives/dropdown_wc.png", "css/select2.css",   
   
-    "jquery.miller.js/js/jquery.miller.js","jquery.miller.js/css/jquery.miller.css",
+    "jquery.miller.js/jquery.miller.js","jquery.miller.js/jquery.miller.css",
     "font-awesome-4.0.3/css/font-awesome-modified.css",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.eot",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.svg",
