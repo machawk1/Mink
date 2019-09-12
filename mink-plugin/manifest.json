@@ -4,7 +4,7 @@
   "short_name": "Mink",
   "version": "2.4.1",
   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
-  "homepage_url": "http://matkelly.com/mink",
+  "homepage_url": "https://matkelly.com/mink",
   "author": "Mat Kelly <mink@matkelly.com>",
   "background": {
     "scripts": ["js/jquery-2.1.1.min.js","js/date.js","timemap.js","mink.js"],
