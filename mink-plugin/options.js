@@ -6,12 +6,12 @@ const tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &d
 const tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
 
 function restoreOptions () {
-  chrome.storage.local.get('blacklist', function (items) {
-    $(items.blacklist).each(function (i, v) {
+  chrome.storage.local.get('ignorelist', function (items) {
+    $(items.ignorelist).each(function (i, v) {
       $('#options').append(getListItemHTML(v, 'glyphicon-remove'))
     })
     updateSaveButtonStatus()
-    updateRemoveAllBlacklistButtonStatus()
+    updateRemoveAllIgnorelistButtonStatus()
 
     $('.remove').click(function () {
       if ($(this).hasClass('glyphicon-remove')) {
@@ -22,7 +22,7 @@ function restoreOptions () {
         $(this).parent().removeClass('strike')
       }
       updateSaveButtonStatus()
-      updateRemoveAllBlacklistButtonStatus()
+      updateRemoveAllIgnorelistButtonStatus()
     })
   })
 }
@@ -34,20 +34,20 @@ function getListItemHTML (uri, classIn, buttonText) {
   return `<li><button class="btn btn-default btn-xs glyphicon ${classIn} remove" type="button">${buttonText}</button><span>${uri}</span></li>`
 }
 
-function clearBlacklist () {
-  chrome.storage.local.set({ 'blacklist': [] })
+function clearIgnorelist () {
+  chrome.storage.local.set({ 'ignorelist': [] })
   document.location.reload()
 }
 
-function saveBlacklist (dontReload) {
-  let blacklistJSON = {}
+function saveIgnorelist (dontReload) {
+  let ignorelistJSON = {}
   let uris = []
   $('#options li:not(.strike) span').each(function () {
     uris.push($(this).text())
   })
 
-  blacklistJSON.blacklist = uris
-  chrome.storage.local.set(blacklistJSON)
+  ignorelistJSON.ignorelist = uris
+  chrome.storage.local.set(ignorelistJSON)
   $('.newEntry').removeClass('newEntry') // Disable indicator for unsaved data
   updateSaveButtonStatus()
 
@@ -57,56 +57,56 @@ function saveBlacklist (dontReload) {
 }
 
 function updateSaveButtonStatus () {
-  let saveBlacklistButton = $('#saveBlacklist')
+  let saveIgnorelistButton = $('#saveIgnorelist')
   if ($('.glyphicon-ok').length > 0 || $('.newEntry').length > 0) {
-    saveBlacklistButton.removeAttr('disabled').removeClass('disabled')
+    saveIgnorelistButton.removeAttr('disabled').removeClass('disabled')
   } else {
-    saveBlacklistButton.attr('disabled', 'disabled').addClass('disabled')
+    saveIgnorelistButton.attr('disabled', 'disabled').addClass('disabled')
   }
 }
 
-function updateRemoveAllBlacklistButtonStatus () {
-  let clearBlacklistButton = $('#clearBlacklist')
+function updateRemoveAllIgnorelistButtonStatus () {
+  let clearIgnorelistButton = $('#clearIgnorelist')
   if (debug) {
     let lis = $('#options li')
     console.log(lis.length)
     console.log(lis)
   }
   if ($('#options li').length > 0) {
-    clearBlacklistButton.removeAttr('disabled').removeClass('disabled')
+    clearIgnorelistButton.removeAttr('disabled').removeClass('disabled')
   } else {
-    clearBlacklistButton.attr('disabled', 'disabled').addClass('disabled')
+    clearIgnorelistButton.attr('disabled', 'disabled').addClass('disabled')
   }
 }
 
 function createAddURIBinder () {
   $('#add').click(function () {
-    addMinkBlacklistToBeSavedLI()
-    bindAddBlacklistEntryUI()
+    addMinkIgnorelistToBeSavedLI()
+    bindAddIgnorelistEntryUI()
   })
 }
 
-function bindAddBlacklistEntryUI () {
+function bindAddIgnorelistEntryUI () {
   $('.uriTextField').keyup(function () {
     const uriFieldValue = $(this).val()
     if (uriFieldValue.length === 0) {
-      $(this).parent().find('button.addToBlacklist').attr('disabled', true)
+      $(this).parent().find('button.addToIgnorelist').attr('disabled', true)
     } else {
-      $(this).parent().find('button.addToBlacklist').removeAttr('disabled')
+      $(this).parent().find('button.addToIgnorelist').removeAttr('disabled')
     }
   })
-  $('.addToBlacklist').click(addToBlacklistToBeSaved)
-  $('.cancelAddToBlacklist').click(removeFromBlacklistToBeSaved)
+  $('.addToIgnorelist').click(addToIgnorelistToBeSaved)
+  $('.cancelAddToIgnorelist').click(removeFromIgnorelistToBeSaved)
 }
 
-function addMinkBlacklistToBeSavedLI (valIn) {
+function addMinkIgnorelistToBeSavedLI (valIn) {
   if (!valIn) {
     valIn = ''
   }
-  $('#options').prepend(`<li><input type="text" placeholder="http://"  class="uriTextField" id="newURI" "${valIn}"/><button class="addToBlacklist" disabled>Add to Blacklist</button><button class="cancelAddToBlacklist">Cancel</button></li>`)
+  $('#options').prepend(`<li><input type="text" placeholder="http://"  class="uriTextField" id="newURI" "${valIn}"/><button class="addToIgnorelist" disabled>Add to Ignore List</button><button class="cancelAddToIgnorelist">Cancel</button></li>`)
 }
 
-function addToBlacklistToBeSaved () {
+function addToIgnorelistToBeSaved () {
   let uri = $(this).parent().find('.uriTextField').val()
   if (uri.substr(0, 4) !== 'http') {
     uri = `http://${uri}`
@@ -120,7 +120,7 @@ function addToBlacklistToBeSaved () {
   updateSaveButtonStatus()
 }
 
-function removeFromBlacklistToBeSaved () {
+function removeFromIgnorelistToBeSaved () {
   $(this).parent().remove()
 }
 
@@ -182,7 +182,7 @@ function enableRemoveButtons (disable, additionalIdsIn) {
   if (additionalIdsIn) {
     additionalIds = `,${additionalIdsIn}`
   }
-  const buttonIds = `#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndBlacklist${additionalIds}`
+  const buttonIds = `#removeSelectedTMFromCache, #removeSelectedTMFromCacheAndIgnorelist${additionalIds}`
   $(buttonIds).prop('disabled', disable)
 }
 
@@ -228,12 +228,12 @@ function clearTimemapCache () {
 }
 
 function saveAndCloseOptionsPanel () {
-  saveBlacklist()
+  saveIgnorelist()
   window.close()
 }
 
 function restoreDefaults () {
-  clearBlacklist()
+  clearIgnorelist()
   clearTimemapCache()
 }
 
@@ -242,7 +242,7 @@ function removeSelectedURIFromTimeMapCache () {
   removeTMFromCache(oURI)
 }
 
-function addSelectedURIToBlacklist () {
+function addSelectedURIToIgnorelist () {
   const oURI = $('#cachedTimemaps option:selected').text()
   $('#options').append(`<li class="strike"><span>${oURI}</li>`)
 }
@@ -252,17 +252,17 @@ document.addEventListener('DOMContentLoaded', createAddURIBinder)
 document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI)
 
 $('#removeSelectedTMFromCache').click(removeSelectedURIFromTimeMapCache)
-$('#removeSelectedTMFromCacheAndBlacklist').click(function () {
-  addSelectedURIToBlacklist()
-  const dontReloadAfterSavingBlacklist = true
-  saveBlacklist(dontReloadAfterSavingBlacklist)
+$('#removeSelectedTMFromCacheAndIgnorelist').click(function () {
+  addSelectedURIToIgnorelist()
+  const dontReloadAfterSavingIgnorelist = true
+  saveIgnorelist(dontReloadAfterSavingIgnorelist)
   removeSelectedURIFromTimeMapCache()
 })
 
 $('#removeAllTMsFromCache').click(clearTimemapCache)
 
-$('#saveBlacklist').click(saveBlacklist)
-$('#clearBlacklist').click(clearBlacklist)
+$('#saveIgnorelist').click(saveIgnorelist)
+$('#clearIgnorelist').click(clearIgnorelist)
 $('#doneButton').click(saveAndCloseOptionsPanel)
 $('#restoreDefaultsButton').click(restoreDefaults)
 // document.getElementById('save').addEventListener('click', save_options)
