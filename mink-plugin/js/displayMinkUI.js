@@ -693,10 +693,11 @@ function bindArchiveLogos () {
       archiveURIArchiveOrg(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
       archiveURIArchiveDotIs(cb, openInNewTab)
-    } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 3 archives
+    } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 2 archives
       const iaNewSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
       const aisNewSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
 
+      // This might be better accomplished with Promise.all()
       const iaCb = function () {
         changeIconFor(iaLogo, iaNewSrc)
         changeArchiveAllIconWhenComplete(alaLogo)
@@ -719,7 +720,7 @@ function bindArchiveLogos () {
 var archivesFinished = 0 /* TOFIX This is doubly declared if 'let' */
 function changeArchiveAllIconWhenComplete (iconObj) {
   archivesFinished++
-  if (archivesFinished >= 3) {
+  if (archivesFinished >= 2) {
     $(iconObj).attr('src', chrome.extension.getURL('./images/archives/allListedArchives_success.png'))
     $(iconObj).unbind()
     $(iconObj).removeClass('archiveLogo')
