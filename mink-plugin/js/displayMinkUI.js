@@ -157,7 +157,7 @@ function appendCSSToShadowDOM (cb) {
     })
 }
 
-function randomEmail () {  // eslint-disable-line no-unused-vars
+function randomEmail () { // eslint-disable-line no-unused-vars
   // Create random-generating function
   const randy = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
