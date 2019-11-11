@@ -155,7 +155,7 @@
             <p>where to query for captures</p></li>
         <li><a href="#cachedTimeMaps">Cached TimeMaps</a>
             <p>how much data to retain for query speedup</p></li>
-        <li><a href="#blacklist">Blacklist</a>
+        <li><a href="#ignorelist">Ignore list</a>
             <p>on which sites should archival querying be excluded</p></li>
     </ul>
 </nav>
@@ -208,14 +208,14 @@
             <legend>Cached TimeMaps</legend>
             <select id="cachedTimemaps"></select>
             <button id="removeSelectedTMFromCache">Remove</button>
-            <!--<button id="removeSelectedTMFromCacheAndBlacklist">... & Blacklist</button>-->
+            <!--<button id="removeSelectedTMFromCacheAndIgnorelist">... & Ignore list</button>-->
             <p id="mementoCount"></p>
             <button id="removeAllTMsFromCache">Remove All</button>
         </fieldset>
     </section>
-    <section id="blacklist">
+    <section id="ignorelist">
 
-        <h3>Blacklist</h3>
+        <h3>Ignore List</h3>
 
         <p>You may not want Mink to run on certain sites. On these sites, no request will be sent to the archival
             sources (above) to get a list of captures. This can be useful for sites like GMail, which you would not
@@ -223,14 +223,14 @@
             Web.</p>
 
         <fieldset>
-            <legend>Blacklist <span>(do not run Mink on these URIs)</span></legend>
+            <legend>Ignore List <span>(do not run Mink on these URIs)</span></legend>
             <button id="add" class="btn btn-default btn-xs" type="button">add</button>
             <ul id="options"></ul>
 
             <p id="status"></p>
 
-            <button id="saveBlacklist">Save Blacklist</button>
-            <button id="clearBlacklist">Clear Blacklist</button>
+            <button id="saveIgnorelist">Save Ignore List</button>
+            <button id="clearIgnorelist">Clear Ignore List</button>
 
         </fieldset>
 

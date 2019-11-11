@@ -14,12 +14,12 @@ const memgatorJson = 'https://memgator.cs.odu.edu/timemap/json/'
 let animateBrowserActionIcon = false
 let animationTimer
 
-// TODO: check if in blacklist
-// getBlacklist()
+// TODO: check if in ignore list
+// getIgnorelist()
 
 // Faux promises for enabling/disabling UI
-let setBlacklisted = function () { setActiveBasedOnBlacklistedProperty(displayUIBasedOnContext) }
-const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setBlacklisted) }
+let setIgnorelisted = function () { setActiveBasedOnIgnorelistedProperty(displayUIBasedOnContext) }
+const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setIgnorelisted) }
 
 setInitialStateWithChecks()
 
@@ -33,18 +33,18 @@ function setActiveBasedOnDisabledProperty (cb) {
   })
 }
 
-function setActiveBasedOnBlacklistedProperty (cb) {
-  chrome.storage.local.get('blacklist', function (items) {
-    if (!items.blacklist) {
+function setActiveBasedOnIgnorelistedProperty (cb) {
+  chrome.storage.local.get('ignorelist', function (items) {
+    if (!items.ignorelist) {
       cb()
       return
     }
 
-    for (let ii = items.blacklist.length - 1; ii >= 0; ii--) {
+    for (let ii = items.ignorelist.length - 1; ii >= 0; ii--) {
       const documentHostname = (new window.URL(document.URL)).hostname
-      const blacklistEntryHostname = (new window.URL(items.blacklist[ii])).hostname
-      if (documentHostname === blacklistEntryHostname) {
-        chrome.runtime.sendMessage({ method: 'stopWatchingRequestsBlacklisted' })
+      const ignorelistEntryHostname = (new window.URL(items.ignorelist[ii])).hostname
+      if (documentHostname === ignorelistEntryHostname) {
+        chrome.runtime.sendMessage({ method: 'stopWatchingRequestsIgnorelisted' })
         return
       }
     }
@@ -222,16 +222,16 @@ function displayUIBasedOnStoredTimeMap (tmDataIn) {
   chrome.runtime.sendMessage({ method: 'setBadgeText', value: '' + mementoCountFromCache })
 }
 
-function getBlacklist (cb) {
+function getIgnorelist (cb) {
   const callbackArguments = arguments
-  chrome.storage.local.get('blacklist', function (items) {
+  chrome.storage.local.get('ignorelist', function (items) {
     if (debug) {
-      console.log('Current blacklist: ')
+      console.log('Current ignore list: ')
       console.log(items)
     }
 
     if (!cb) {
-      if (debug) { console.log('no callback specified for getBlacklist();') }
+      if (debug) { console.log('no callback specified for getIgnorelist();') }
       return
     }
 
@@ -239,52 +239,52 @@ function getBlacklist (cb) {
   })
 }
 
-function addToBlacklist (currentBlacklist, uriIn) {
+function addToIgnorelist (currentIgnorelist, uriIn) {
   const uri = uriIn
   let save = {
-    'blacklist': null
+    'ignorelist': null
   }
 
-  if ($.isEmptyObject(currentBlacklist)) {
-    save.blacklist = []
+  if ($.isEmptyObject(currentIgnorelist)) {
+    save.ignorelist = []
   } else {
-    save.blacklist = currentBlacklist.blacklist
+    save.ignorelist = currentIgnorelist.ignorelist
   }
 
-  if (!save.blacklist) {
-    save.blacklist = []
+  if (!save.ignorelist) {
+    save.ignorelist = []
   }
 
   // TODO (#191): Normalize uriIn?
 
-  // Check if URI is already in blacklist before adding
-  if (save.blacklist.indexOf(uriIn) > -1) {
+  // Check if URI is already in ignore list before adding
+  if (save.ignorelist.indexOf(uriIn) > -1) {
     if (debug) {
-      console.log('URI already in blacklist')
-      console.log(save.blacklist)
+      console.log('URI already in ignorelist')
+      console.log(save.ignorelist)
     }
     return
   }
 
   if (debug) {
-    console.log('Previous blacklist contents:')
-    console.log(save.blacklist)
+    console.log('Previous ignore list contents:')
+    console.log(save.ignorelist)
   }
 
-  save.blacklist.push(uriIn)
+  save.ignorelist.push(uriIn)
 
   if (debug) {
-    console.log('Current blacklist contents:')
-    console.log(save.blacklist)
+    console.log('Current ignore list contents:')
+    console.log(save.ignorelist)
   }
 
   chrome.storage.local.set(save,
     function () {
       if (debug) {
-        console.log('done adding ' + uri + ' to blacklist. Prev blacklist:')
-        console.log(currentBlacklist)
+        console.log('done adding ' + uri + ' to ignore list. Prev ignore list:')
+        console.log(currentIgnorelist)
       }
-      getBlacklist()
+      getIgnorelist()
     }
   )
 }
@@ -292,8 +292,8 @@ function addToBlacklist (currentBlacklist, uriIn) {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (debug) { console.log('in listener with ' + request.method) }
 
-  if (request.method === 'addToBlacklist') {
-    getBlacklist(addToBlacklist, request.uri) // And add uri
+  if (request.method === 'addToIgnorelist') {
+    getIgnorelist(addToIgnorelist, request.uri) // And add uri
     return
   }
 

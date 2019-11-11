@@ -8,16 +8,16 @@ const stillProcessingBadgeDisplay = 'WAIT'
 const browserActionTitleViewingMemento = 'Mink - Viewing Memento'
 const browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
 const browserActionTitleNoMementos = 'Mink - No Mementos Available'
-const browserActionTitleBlacklisted = 'Mink - Viewing Blacklisted Site'
+const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
 
 const badgeImagesDisabled = {
   '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
   '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
 }
 
-const badgeImagesBlacklisted = {
-  '38': chrome.extension.getURL('images/minkLogo38_blacklisted.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_blacklisted.png')
+const badgeImagesIgnorelisted = {
+  '38': chrome.extension.getURL('images/minkLogo38_ignorelisted.png'),
+  '19': chrome.extension.getURL('images/minkLogo19_ignorelisted.png')
 }
 
 const badgeImagesNoMementos = {
@@ -61,10 +61,10 @@ chrome.browserAction.onClicked.addListener(function (tab) {
   })
 })
 
-function setEnabledBasedOnURIInBlacklist (cb) {
+function setEnabledBasedOnURIInIgnorelist (cb) {
   chrome.tabs.query({ active: true }, function (tab) {
     if (debug) {
-      console.log('is URI in blacklist?')
+      console.log('is URI in ignore list?')
       console.log(tab)
     }
 
@@ -82,9 +82,9 @@ function showMinkBadgeInfoBasedOnProcessingState (tabid) {
 
     const cb = function () { setBadgeTextBasedOnBrowserActionState(tabid) }
 
-    // TODO: check if URI is in blacklist
-    if (debug) { console.warn('about to call setEnabledBasedOnURIBlacklist') }
-    setEnabledBasedOnURIInBlacklist(cb)
+    // TODO: check if URI is in ignore list
+    if (debug) { console.warn('about to call setEnabledBasedOnURIIgnorelist') }
+    setEnabledBasedOnURIInIgnorelist(cb)
   })
 }
 
@@ -100,7 +100,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
           return
         }
 
-        if (result === browserActionTitleBlacklisted) {
+        if (result === browserActionTitleIgnorelisted) {
           return // Prevent the below WAIT message from appearing if b-listed
         }
 
@@ -192,8 +192,8 @@ chrome.runtime.onMessage.addListener(
       chrome.runtime.openOptionsPage()
     } else if (request.method === 'stopWatchingRequests') {
       stopWatchingRequests()
-    } else if (request.method === 'stopWatchingRequestsBlacklisted') {
-      stopWatchingRequestsBlacklisted()
+    } else if (request.method === 'stopWatchingRequestsIgnorelisted') {
+      stopWatchingRequestsIgnorelisted()
     } else if (request.method === 'getMementosForHTTPSSource') {
       // Ideally, we would talk to an HTTPS version of the aggregator,
       // Instead, we will communicate with Mink's bg script to get around scheme issue
@@ -368,16 +368,16 @@ function stopWatchingRequests () {
   })
 }
 
-function stopWatchingRequestsBlacklisted () {
-  if (debug) { console.log('stopWatchingRequestsBlacklisted() executing') }
+function stopWatchingRequestsIgnorelisted () {
+  if (debug) { console.log('stopWatchingRequestsIgnorelisted() executing') }
 
   chrome.tabs.query({
     active: true,
     'currentWindow': true
   }, function (tab) {
-    setBadge(' ', badgeImagesBlacklisted, tab[0].id)
+    setBadge(' ', badgeImagesIgnorelisted, tab[0].id)
     setBadgeText('', tab[0].id)
-    setBadgeTitle(browserActionTitleBlacklisted, tab[0].id)
+    setBadgeTitle(browserActionTitleIgnorelisted, tab[0].id)
   })
 }
 
@@ -391,24 +391,24 @@ chrome.contextMenus.create({
 })
 
 chrome.contextMenus.create({
-  'title': 'Add URL to Mink Blacklist',
+  'title': 'Add URL to Mink Ignore List',
   'contexts': ['browser_action', 'all'],
-  'onclick': addToBlackList
+  'onclick': addToIgnoreList
 })
 
-function addToBlackList () {
+function addToIgnoreList () {
   chrome.tabs.query({
     'active': true,
     'currentWindow': true
   }, function (tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {
-      'method': 'addToBlacklist',
+      'method': 'addToIgnorelist',
       'uri': tabs[0].url
     })
 
-    setBadgeIcon(badgeImagesBlacklisted, tabs[0].id)
+    setBadgeIcon(badgeImagesIgnorelisted, tabs[0].id)
     setBadgeText('', tabs[0].id)
-    setBadgeTitle(browserActionTitleBlacklisted, tabs[0].id)
+    setBadgeTitle(browserActionTitleIgnorelisted, tabs[0].id)
   })
 }
 
