@@ -201,50 +201,6 @@ function randomEmail () {
   return text
 }
 
-function archiveURIWebCite (cb, openInNewTab) {
-  const remail = randomEmail()
-  $.ajax({
-    method: 'POST',
-    url: 'https://www.webcitation.org/archive',
-    data: {
-      url: document.URL,
-      email: remail
-    }
-  }).done(function (data, status, xhr) {
-    if (status === 'success') {
-      chrome.runtime.sendMessage({
-        method: 'notify',
-        title: 'Mink',
-        body: 'WebCitation.org Successfully Preserved page.\r\nSelect again to view.'
-      })
-
-      if (cb) {
-        cb()
-      }
-
-      const shadow = document.getElementById('minkWrapper').shadowRoot
-      shadow.getElementById('archivelogo_webcite').classList.add('archiveNowSuccess')
-
-      // Verbose regex but wanted to ensure exact capture
-      const archiveURI = data.match(/([A-Za-z]{4,5}:\/\/[a-z]{3}.[a-z]{11}.[a-z]{3}\/[a-zA-z0-9]{9})/g)[0]
-      shadow.getElementById('archivelogo_webcite').setAttribute('title', archiveURI)
-      shadow.getElementById('archivelogo_webcite').onclick = function () {
-        if (!openInNewTab) {
-          window.location = $(this).attr('title')
-        } else {
-          window.open($(this).attr('title'))
-        }
-      }
-    } else {
-      chrome.runtime.sendMessage({
-        method: 'notify',
-        title: 'Mink',
-        body: 'WebCitation.org Did Not Successfully Preserved page.\r\n'
-      })
-    }
-  })
-}
-
 function archiveURIArchiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
@@ -573,7 +529,6 @@ function replaceContentScriptImagesWithChromeExtensionImages () {
   document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png')
   document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png')
   document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png')
-  document.getElementById('archivelogo_webcite').src = chrome.extension.getURL('images/archives/webcitelogo.png')
 }
 
 function bindSteps () {
@@ -717,7 +672,6 @@ function bindGoBackToMainInterfaceButton () {
 function bindArchiveLogos () {
   let iaLogo = $('#archivelogo_ia')
   let aisLogo = $('#archivelogo_ais')
-  let wcLogo = $('#archivelogo_webcite')
 
   let alaLogo = $('#archivelogo_ala') // All archives
 
@@ -739,12 +693,9 @@ function bindArchiveLogos () {
       archiveURIArchiveOrg(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
       archiveURIArchiveDotIs(cb, openInNewTab)
-    } else if (archiveLogoID === 'archivelogo_webcite') {
-      archiveURIWebCite(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 3 archives
       const iaNewSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
       const aisNewSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
-      const wcNewSrc = $(wcLogo).attr('src').replace('.png', '_success.png')
 
       const iaCb = function () {
         changeIconFor(iaLogo, iaNewSrc)
@@ -754,19 +705,13 @@ function bindArchiveLogos () {
         changeIconFor(aisLogo, aisNewSrc)
         changeArchiveAllIconWhenComplete(alaLogo)
       }
-      const wcCb = function () {
-        changeIconFor(wcLogo, wcNewSrc)
-        changeArchiveAllIconWhenComplete(alaLogo)
-      }
 
       $(iaLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
       $(aisLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
-      $(wcLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
 
       openInNewTab = true
       archiveURIArchiveOrg(iaCb, openInNewTab)
       archiveURIArchiveDotIs(aisCb, openInNewTab)
-      archiveURIWebCite(wcCb, openInNewTab)
     }
   })
 }
