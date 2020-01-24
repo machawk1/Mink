@@ -201,52 +201,15 @@ function randomEmail () { // eslint-disable-line no-unused-vars
   return text
 }
 
-function archiveURIArchiveOrg (img, openInNewTab) {
-  console.log('sendinbg message')
+function archiveURI (img, archiveid, openInNewTab) {
   chrome.runtime.sendMessage({
     method: 'archive',
-    theurl: 'http://web.archive.org/save/' + document.URL,
+    archive: archiveid,
+    urir: document.URL,
     imgId: img.id,
-    imgURI: img.uri
+    imgURI: img.uri,
+    newTab: openInNewTab
   })
-}
-
-function archiveURIArchiveDotIs (cb, openInNewTab) {
-  $.ajax({
-    method: 'POST',
-    url: '//archive.is/submit/',
-    data: { coo: '', url: document.URL }
-  })
-    .done(function (data, status, xhr) {
-      if (status === 'success') {
-        chrome.runtime.sendMessage({
-          method: 'notify',
-          title: 'Mink',
-          body: 'Archive.is Successfully Preserved page.\r\nSelect again to view.'
-        })
-        if (cb) {
-          cb()
-        }
-
-        $('#archiveNow_archivedotis').addClass('archiveNowSuccess')
-
-        const linkHeader = xhr.getResponseHeader('link')
-        const tmFromLinkHeader = new Timemap(linkHeader)
-        const archiveURI = tmFromLinkHeader.mementos[tmFromLinkHeader.mementos.length - 1].uri
-
-        const shadow = document.getElementById('minkWrapper').shadowRoot
-        shadow.getElementById('archivelogo_ais').classList.add('archiveNowSuccess')
-
-        shadow.getElementById('archivelogo_ais').setAttribute('title', archiveURI)
-        shadow.getElementById('archivelogo_ais').onclick = function () {
-          if (!openInNewTab) {
-            window.location = $(this).attr('title')
-          } else {
-            window.open($(this).attr('title'))
-          }
-        }
-      }
-    })
 }
 
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
@@ -592,23 +555,19 @@ chrome.runtime.onMessage.addListener(
       console.log('caught showViewingMementoInterface, tweak UI here')
     } else if (request.method === 'archiveDone') {
       changeIconFor(request.imgId, request.imgURI)
-      showSuccessfullyArchivedURI(request.data)
+      showSuccessfullyArchivedURI(request.data, request.newTab)
     } else {
       console.log('caught message in minkui.html but did not react')
     }
   }
 )
 
-function showSuccessfullyArchivedURI(uri) {
+function showSuccessfullyArchivedURI(uri, openInNewTab) {
       chrome.runtime.sendMessage({
         method: 'notify',
         title: 'Mink',
         body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
       }, function (response) {})
-      console.log('showing ui')
-      //if (cb) {
-      //  cb()
-      //}
 
       const shadow = document.getElementById('minkWrapper').shadowRoot
       shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
@@ -701,10 +660,15 @@ function bindArchiveLogos () {
     }
 
     if (archiveLogoID === 'archivelogo_ia') {
-      archiveURIArchiveOrg(img, openInNewTab)
+      let archiveid = 'ia'
+      archiveURI(img, archiveid, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
-      archiveURIArchiveDotIs(cb, openInNewTab)
+      let archiveid='ais'
+      img['id'] = 'archivelogo_ais'
+      archiveURI(img, archiveid, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 2 archives
+
+      //TOFIX: match above calls
       const iaNewSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
       const aisNewSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
 

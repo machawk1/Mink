@@ -220,11 +220,23 @@ chrome.runtime.onMessage.addListener(
         }
       })
     } else if (request.method === 'archive') {
+      // Prepend based on archive destination
+      let submissionURI
+      let data = {}
+      if (request.archive === 'ia') {
+        submissionURI = 'http://web.archive.org/save/' + request.urir
+        method = 'GET'
+      } else if (request.archive === 'ais') {
+        submissionURI = 'archive.is/submit/'
+        method = 'POST'
+        data = { coo: '', url: request.urir }
+      }
+
       $.ajax({
         method: 'GET',
-        url: request.theurl
+        url: submissionURI,
+        data: data
       }).done(function (data, textStatus, xhr) {
-        sendResponse({ value: 'noise' })
         chrome.tabs.query({
           'active': true,
           'currentWindow': true
@@ -234,11 +246,11 @@ chrome.runtime.onMessage.addListener(
             'data': xhr.getResponseHeader('Content-Location'),
             'imgId': request.imgId,
             'imgURI': request.imgURI,
-            'callback': request.cb
+            'callback': request.cb,
+            'newTab': request.newTab
           })
         })
       })
-      sendResponse({ value: 'sync' })
     } else {
       if (debug) { console.log('Message sent using chrome.runtime not caught: ' + request.method) }
     }
