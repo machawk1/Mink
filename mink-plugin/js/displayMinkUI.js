@@ -201,37 +201,14 @@ function randomEmail () { // eslint-disable-line no-unused-vars
   return text
 }
 
-function archiveURIArchiveOrg (cb, openInNewTab) {
-  $.ajax({
-    method: 'GET',
-    url: '//web.archive.org/save/' + document.URL
+function archiveURIArchiveOrg (img, openInNewTab) {
+  console.log('sendinbg message')
+  chrome.runtime.sendMessage({
+    method: 'archive',
+    theurl: 'http://web.archive.org/save/' + document.URL,
+    imgId: img.id,
+    imgURI: img.uri
   })
-    .done(function (a, b, c) {
-      if (b === 'success') {
-        chrome.runtime.sendMessage({
-          method: 'notify',
-          title: 'Mink',
-          body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
-        }, function (response) {})
-        if (cb) {
-          cb()
-        }
-
-        const shadow = document.getElementById('minkWrapper').shadowRoot
-        shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
-
-        const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
-        const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
-        shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
-        shadow.getElementById('archivelogo_ia').onclick = function () {
-          if (!openInNewTab) {
-            window.location = $(this).attr('title')
-          } else {
-            window.open($(this).attr('title'))
-          }
-        }
-      }
-    })
 }
 
 function archiveURIArchiveDotIs (cb, openInNewTab) {
@@ -604,19 +581,48 @@ function bindDrilldown () {
   }
 }
 
-function changeIconFor (obj, src) {
-  $(obj).attr('src', src)
+function changeIconFor (id, src) {
+  const shadow = document.getElementById('minkWrapper').shadowRoot
+  shadow.querySelector('#' + id).setAttribute('src', src)
 }
 
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.method === 'showViewingMementoInterface') {
       console.log('caught showViewingMementoInterface, tweak UI here')
+    } else if (request.method === 'archiveDone') {
+      changeIconFor(request.imgId, request.imgURI)
+      showSuccessfullyArchivedURI(request.data)
     } else {
       console.log('caught message in minkui.html but did not react')
     }
   }
 )
+
+function showSuccessfullyArchivedURI(uri) {
+      chrome.runtime.sendMessage({
+        method: 'notify',
+        title: 'Mink',
+        body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
+      }, function (response) {})
+      console.log('showing ui')
+      //if (cb) {
+      //  cb()
+      //}
+
+      const shadow = document.getElementById('minkWrapper').shadowRoot
+      shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
+
+      const archiveURI = 'https://web.archive.org' + uri
+      shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
+      shadow.getElementById('archivelogo_ia').onclick = function () {
+        if (!openInNewTab) {
+          window.location = $(this).attr('title')
+        } else {
+          window.open($(this).attr('title'))
+        }
+      }
+}
 
 function displayAndHideShadowDOMElements (showElementsIds, hideElementsIds) {
   const shadow = document.getElementById('minkWrapper').shadowRoot
@@ -689,8 +695,13 @@ function bindArchiveLogos () {
     const archiveLogoID = $(this).attr('id')
     const cb = function () { changeIconFor(that, newSrc) }
 
+    let img = {
+      'id': 'archivelogo_ia',
+      'uri': newSrc
+    }
+
     if (archiveLogoID === 'archivelogo_ia') {
-      archiveURIArchiveOrg(cb, openInNewTab)
+      archiveURIArchiveOrg(img, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
       archiveURIArchiveDotIs(cb, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 2 archives

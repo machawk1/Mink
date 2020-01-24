@@ -219,6 +219,26 @@ chrome.runtime.onMessage.addListener(
           showArchiveNowUI()
         }
       })
+    } else if (request.method === 'archive') {
+      $.ajax({
+        method: 'GET',
+        url: request.theurl
+      }).done(function (data, textStatus, xhr) {
+        sendResponse({ value: 'noise' })
+        chrome.tabs.query({
+          'active': true,
+          'currentWindow': true
+        }, function (tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            'method': 'archiveDone',
+            'data': xhr.getResponseHeader('Content-Location'),
+            'imgId': request.imgId,
+            'imgURI': request.imgURI,
+            'callback': request.cb
+          })
+        })
+      })
+      sendResponse({ value: 'sync' })
     } else {
       if (debug) { console.log('Message sent using chrome.runtime not caught: ' + request.method) }
     }
