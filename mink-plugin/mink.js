@@ -227,6 +227,7 @@ chrome.runtime.onMessage.addListener(
         submissionURI = 'http://web.archive.org/save/' + request.urir
         method = 'GET'
       } else if (request.archive === 'ais') {
+        //TODO: get value of submitid from AIS interface
         submissionURI = 'archive.is/submit/'
         method = 'POST'
         data = { coo: '', url: request.urir }
