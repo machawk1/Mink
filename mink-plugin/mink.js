@@ -11,28 +11,28 @@ const browserActionTitleNoMementos = 'Mink - No Mementos Available'
 const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
 
 const badgeImagesDisabled = {
-  '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
+  38: chrome.extension.getURL('images/minkLogo38_disabled.png'),
+  19: chrome.extension.getURL('images/minkLogo19_disabled.png')
 }
 
 const badgeImagesIgnorelisted = {
-  '38': chrome.extension.getURL('images/minkLogo38_ignorelisted.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_ignorelisted.png')
+  38: chrome.extension.getURL('images/minkLogo38_ignorelisted.png'),
+  19: chrome.extension.getURL('images/minkLogo19_ignorelisted.png')
 }
 
 const badgeImagesNoMementos = {
-  '38': chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_noMementos2.png')
+  38: chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
+  19: chrome.extension.getURL('images/minkLogo19_noMementos2.png')
 }
 
 const badgeImagesMink = {
-  '38': chrome.extension.getURL('images/minkLogo38.png'),
-  '19': chrome.extension.getURL('images/minkLogo19.png')
+  38: chrome.extension.getURL('images/minkLogo38.png'),
+  19: chrome.extension.getURL('images/minkLogo19.png')
 }
 
 const badgeImagesIsAMemento = {
-  '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
-  '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
+  38: chrome.extension.getURL('images/mLogo38_isAMemento.png'),
+  19: chrome.extension.getURL('images/mLogo19_isAMemento.png')
 }
 
 chrome.webNavigation.onCommitted.addListener(function (e) {
@@ -158,7 +158,7 @@ chrome.runtime.onMessage.addListener(
       if (debug) { console.log('Got setTimemapInStorageAndCall') }
       setTimemapInStorageAndCall(request.tm, request.url, function () {
         chrome.tabs.sendMessage(sender.tab.id, {
-          'method': 'displayUI'
+          method: 'displayUI'
         })
       })
     } else if (request.method === 'retrieve') {
@@ -206,12 +206,12 @@ chrome.runtime.onMessage.addListener(
           console.log('We should parse and return the mementos here via a response')
         }
         chrome.tabs.query({
-          'active': true,
-          'currentWindow': true
+          active: true,
+          currentWindow: true
         }, function (tabs) {
           chrome.tabs.sendMessage(tabs[0].id, {
-            'method': 'displayThisMementoData',
-            'data': data
+            method: 'displayThisMementoData',
+            data: data
           })
         })
       }).fail(function (xhr, textStatus, error) {
@@ -223,11 +223,12 @@ chrome.runtime.onMessage.addListener(
       // Prepend based on archive destination
       let submissionURI
       let data = {}
+      let method = 'GET'
       if (request.archive === 'ia') {
         submissionURI = 'http://web.archive.org/save/' + request.urir
         method = 'GET'
       } else if (request.archive === 'ais') {
-        //TODO: get value of submitid from AIS interface
+        // TODO: get value of submitid from AIS interface
         submissionURI = 'archive.is/submit/'
         method = 'POST'
         data = { coo: '', url: request.urir }
@@ -239,16 +240,16 @@ chrome.runtime.onMessage.addListener(
         data: data
       }).done(function (data, textStatus, xhr) {
         chrome.tabs.query({
-          'active': true,
-          'currentWindow': true
+          active: true,
+          currentWindow: true
         }, function (tabs) {
           chrome.tabs.sendMessage(tabs[0].id, {
-            'method': 'archiveDone',
-            'data': xhr.getResponseHeader('Content-Location'),
-            'imgId': request.imgId,
-            'imgURI': request.imgURI,
-            'callback': request.cb,
-            'newTab': request.newTab
+            method: 'archiveDone',
+            data: xhr.getResponseHeader('Content-Location'),
+            imgId: request.imgId,
+            imgURI: request.imgURI,
+            callback: request.cb,
+            newTab: request.newTab
           })
         })
       })
@@ -306,7 +307,7 @@ function fetchTimeMap (uri, tabid) {
     }
   }).always(function () {
     chrome.tabs.sendMessage(tabid, {
-      'method': 'stopAnimatingBrowserActionIcon'
+      method: 'stopAnimatingBrowserActionIcon'
     })
   })
 }
@@ -369,13 +370,13 @@ chrome.tabs.onActivated.addListener(function (activeTabInfo) {
 function startWatchingRequests () {
   chrome.storage.local.remove('disabled', function () {
     chrome.contextMenus.update('mink_stopStartWatching', {
-      'title': 'Stop Watching Requests',
-      'onclick': stopWatchingRequests
+      title: 'Stop Watching Requests',
+      onclick: stopWatchingRequests
     })
 
     chrome.tabs.query({
       active: true,
-      'currentWindow': true
+      currentWindow: true
     }, function (tab) {
       setBadge('', badgeImagesMink, tab[0].id)
       setBadgeText('', tab[0].id)
@@ -385,15 +386,15 @@ function startWatchingRequests () {
 
 function stopWatchingRequests () {
   if (debug) { console.log('stopWatchingRequests() executing') }
-  chrome.storage.local.set({ 'disabled': true }, function () {
+  chrome.storage.local.set({ disabled: true }, function () {
     chrome.contextMenus.update('mink_stopStartWatching', {
-      'title': 'Restart Live-Archived Web Integration',
-      'onclick': startWatchingRequests
+      title: 'Restart Live-Archived Web Integration',
+      onclick: startWatchingRequests
     })
 
     chrome.tabs.query({
       active: true,
-      'currentWindow': true
+      currentWindow: true
     }, function (tab) {
       setBadge(' ', badgeImagesDisabled, tab[0].id)
       setBadgeText('', tab[0].id)
@@ -406,7 +407,7 @@ function stopWatchingRequestsIgnorelisted () {
 
   chrome.tabs.query({
     active: true,
-    'currentWindow': true
+    currentWindow: true
   }, function (tab) {
     setBadge(' ', badgeImagesIgnorelisted, tab[0].id)
     setBadgeText('', tab[0].id)
@@ -415,28 +416,28 @@ function stopWatchingRequestsIgnorelisted () {
 }
 
 chrome.contextMenus.create({
-  'id': 'mink_stopStartWatching',
-  'title': 'Stop Watching Requests',
-  'contexts': ['browser_action'],
-  'onclick': stopWatchingRequests
+  id: 'mink_stopStartWatching',
+  title: 'Stop Watching Requests',
+  contexts: ['browser_action'],
+  onclick: stopWatchingRequests
 }, function (err) {
   if (err) { console.log('error creating second contextmenu') }
 })
 
 chrome.contextMenus.create({
-  'title': 'Add URL to Mink Ignore List',
-  'contexts': ['browser_action', 'all'],
-  'onclick': addToIgnoreList
+  title: 'Add URL to Mink Ignore List',
+  contexts: ['browser_action', 'all'],
+  onclick: addToIgnoreList
 })
 
 function addToIgnoreList () {
   chrome.tabs.query({
-    'active': true,
-    'currentWindow': true
+    active: true,
+    currentWindow: true
   }, function (tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {
-      'method': 'addToIgnorelist',
-      'uri': tabs[0].url
+      method: 'addToIgnorelist',
+      uri: tabs[0].url
     })
 
     setBadgeIcon(badgeImagesIgnorelisted, tabs[0].id)
@@ -448,22 +449,22 @@ function addToIgnoreList () {
 function showArchiveNowUI () {
   if (debug) { console.warn('showing archive now ui') }
   chrome.tabs.query({
-    'active': true,
-    'currentWindow': true
+    active: true,
+    currentWindow: true
   }, function (tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {
-      'method': 'showArchiveNowUI'
+      method: 'showArchiveNowUI'
     })
   })
 }
 
 chrome.webRequest.onCompleted.addListener(function (deets) {
   chrome.tabs.query({
-    'active': true,
-    'currentWindow': true
+    active: true,
+    currentWindow: true
   }, function (tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {
-      'method': 'displayUI'
+      method: 'displayUI'
     })
   })
 },
@@ -489,7 +490,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     }
 
     data[deets.url] = deets.responseHeaders
-    chrome.storage.local.set({ 'headers': data }, function () {
+    chrome.storage.local.set({ headers: data }, function () {
       if (chrome.runtime.lastError) {
         if (debug) { console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message) }
         if (chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
@@ -518,7 +519,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   }).done(function (data, textStatus, xhr) {
     if (xhr.status === 200) {
       // Make the TimeMap
-      let tm = new Timemap(data)
+      const tm = new Timemap(data)
       const mementosFromTimeMap = tm.mementos
       tm.mementos = null
       tm.mementos = {}
@@ -533,7 +534,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
       } else {
         // Create single timemap from original
         accumulatedArrayOfTimemaps.push(tm) // Add final timemap
-        let firstTm = accumulatedArrayOfTimemaps[0] // Get the first one
+        const firstTm = accumulatedArrayOfTimemaps[0] // Get the first one
 
         // For all other tm, add them to the firsts list
         accumulatedArrayOfTimemaps.slice(1, accumulatedArrayOfTimemaps.length).forEach(function (elem) {
@@ -550,10 +551,10 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
         // Send two messages first stop animation then display stored
         // If use displayUIBasedOnContext the correctly gotten items wont be display
         // Rather we will ask memgator.cs for mementos
-        chrome.tabs.sendMessage(tabId, { 'method': 'stopAnimatingBrowserActionIcon' })
+        chrome.tabs.sendMessage(tabId, { method: 'stopAnimatingBrowserActionIcon' })
         chrome.tabs.sendMessage(tabId, {
-          'method': 'displayUIStoredTM',
-          'data': firstTm
+          method: 'displayUIStoredTM',
+          data: firstTm
         })
       }
     }
@@ -562,15 +563,15 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
 
 // e.g., http://ws-dl-05.cs.odu.edu/demo-headers/index.php/Seven_Kingdoms
 function displayMementosMissingTM (mementos, urir, tabId) {
-  let tm = new Timemap()
+  const tm = new Timemap()
   tm.mementos = { list: mementos }
   tm.original = urir
   setTimemapInStorage(tm, tm.original)
 
-  chrome.tabs.sendMessage(tabId, { 'method': 'stopAnimatingBrowserActionIcon' })
+  chrome.tabs.sendMessage(tabId, { method: 'stopAnimatingBrowserActionIcon' })
   chrome.tabs.sendMessage(tabId, {
-    'method': 'displayUIStoredTM',
-    'data': tm
+    method: 'displayUIStoredTM',
+    data: tm
   })
 }
 
@@ -598,7 +599,7 @@ function findTMURI (uri, tabid) {
     }
     // Tell content to start the timer
     chrome.tabs.sendMessage(tabid, {
-      'method': 'startTimer'
+      method: 'startTimer'
     })
 
     // No URI-T but we found a couple mementos
@@ -657,7 +658,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
       console.log(tms)
     }
 
-    chrome.storage.local.set({ 'timemaps': tms }, function () {
+    chrome.storage.local.set({ timemaps: tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
         if (debug) {
           console.log('current bytes used:' + bytesUsed)
@@ -677,7 +678,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
             console.log('Re-setting chrome.storage.local with:')
             console.log(tms)
           }
-          chrome.storage.local.set({ 'timemaps': tms }, function () {
+          chrome.storage.local.set({ timemaps: tms }, function () {
             cb()
           })
         }
@@ -721,7 +722,7 @@ function setTimemapInStorage (tm, url) {
       console.log(tms)
     }
 
-    chrome.storage.local.set({ 'timemaps': tms }, function () {
+    chrome.storage.local.set({ timemaps: tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
         if (debug) { console.log('current bytes used:' + bytesUsed) }
       })
@@ -735,7 +736,7 @@ function setTimemapInStorage (tm, url) {
             console.log('Re-setting chrome.storage.local with:')
             console.log(tms)
           }
-          chrome.storage.local.set({ 'timemaps': tms }, function () {})
+          chrome.storage.local.set({ timemaps: tms }, function () {})
         }
       }
     })
