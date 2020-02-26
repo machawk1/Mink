@@ -2,9 +2,9 @@
   "name": "Mink",
   "description": "Integrate the Live & Archived Web +Memento",
   "author": {
-    "email": "mkelly@cs.odu.edu",
+    "email": "mink@matkelly.com",
     "name": "Mat Kelly",
-    "url": "http://www.cs.odu.edu/~mkelly/"
+    "url": "http://matkelly.com"
   },
   "keywords": [
     "archive",
