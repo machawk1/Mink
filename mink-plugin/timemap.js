@@ -1,4 +1,15 @@
 /* global debug */
+const debug = false
+
+function isValidURL (string) {
+  try {
+    new URL(string)
+  } catch (_) {
+    return false
+  }
+
+  return true
+}
 
 function Timemap (fromString) {
   if (debug) { console.log('In timemap.js') }
@@ -50,7 +61,7 @@ function Timemap (fromString) {
     const partsOfEntry = linkHeaderEntries[lhe].split(';')
 
     for (let partOfEntry = 0; partOfEntry < partsOfEntry.length; partOfEntry++) {
-      if (partsOfEntry[partOfEntry].match(murlregex)) {
+      if (isValidURL(partsOfEntry[partOfEntry].slice(1, -1))) {
         url = partsOfEntry[partOfEntry]
       }
 
