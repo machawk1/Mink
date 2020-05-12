@@ -1,4 +1,15 @@
 /* global debug */
+const debug = false
+
+function isValidURL (string) {
+  try {
+    new URL(string)
+  } catch (_) {
+    return false
+  }
+
+  return true
+}
 
 function Timemap (fromString) {
   if (debug) { console.log('In timemap.js') }
@@ -26,9 +37,6 @@ function Timemap (fromString) {
 
   const linkHeaderEntries = this.str.split(',')
 
-  const mementoUrlExpression = /<[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?>/gi
-  const murlregex = new RegExp(mementoUrlExpression) // Regex to get a memento URI
-
   const mementoRelTimegateExpression = /rel=.*timegate.*/gi
   const mtimegateregex = new RegExp(mementoRelTimegateExpression) // Regex to get timegate
 
@@ -50,7 +58,7 @@ function Timemap (fromString) {
     const partsOfEntry = linkHeaderEntries[lhe].split(';')
 
     for (let partOfEntry = 0; partOfEntry < partsOfEntry.length; partOfEntry++) {
-      if (partsOfEntry[partOfEntry].match(murlregex)) {
+      if (isValidURL(partsOfEntry[partOfEntry].slice(1, -1))) {
         url = partsOfEntry[partOfEntry]
       }
 
