@@ -37,9 +37,6 @@ function Timemap (fromString) {
 
   const linkHeaderEntries = this.str.split(',')
 
-  const mementoUrlExpression = /<[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?>/gi
-  const murlregex = new RegExp(mementoUrlExpression) // Regex to get a memento URI
-
   const mementoRelTimegateExpression = /rel=.*timegate.*/gi
   const mtimegateregex = new RegExp(mementoRelTimegateExpression) // Regex to get timegate
 
