@@ -27,7 +27,7 @@ h1 {font-size: 14px; font-family: 'Futura', 'Century Gothic', AppleGothic, sans-
 
 #drilldownBox {border: 1px solid #999; z-index: 3;  padding: 2px; z-index: 1; font-family: Arial, sans-serif; background-color: white; margin-left: 210px; top: 91px; position: absolute; border-top: 5px solid #aaf; border-bottom: 5px solid #aaf;}
 #drilldownBox ul {list-style-type: none; width: 100px; float: left;  padding: 0; background-color: white; max-height: 500px; overflow-x: hidden; overflow-y: auto; margin-top: 0; margin-bottom: 0;}
-#drilldownBox ul li {list-style-type: none; padding: 0; margin: 0; width: 90px;}
+#drilldownBox ul li, #drilldownBox ul li a {list-style-type: none; padding: 0; margin: 0; width: 90px; text-decoration: none; color: inherit;}
 #drilldownBox ul li:hover {background-color: #ddddff; cursor: pointer;}
 #drilldownBox ul li.selectedOption {background-color: #ddddff; border-right:3px solid #aaf;}
 #drilldownBox ul li span.memCount {float: right;  font-family: Monaco, Courier, sans-serif; padding: 0px 3px; margin-right: 5px; border-radius: 2px; line-height: 10px;}

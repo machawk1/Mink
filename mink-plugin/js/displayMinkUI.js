@@ -483,13 +483,16 @@ function buildDrilldownTime (year, month, date) {
     li.setAttribute('data-day', date)
     li.setAttribute('data-month', month)
     li.setAttribute('data-year', year)
-    li.appendChild(document.createTextNode(times[timeIndex].time))
 
-    li.onclick = function (event) {
-      $(this).siblings().removeClass('selectedOption')
-      $(this).addClass('selectedOption')
-      window.location = times[timeIndex].uri
+    let a = document.createElement('a')
+    a.appendChild(document.createTextNode(times[timeIndex].time))
+    a.setAttribute('href', times[timeIndex].uri)
+
+    a.onclick = function (event) {
+      $(this).parent().siblings().removeClass('selectedOption')
+      $(this).parent().addClass('selectedOption')
     }
+    li.appendChild(a)
 
     timeUL.appendChild(li)
   }
