@@ -3,12 +3,10 @@ const debug = false
 
 function isValidURL (string) {
   try {
-    new URL(string)
+    return new URL(string) instanceof URL
   } catch (_) {
     return false
   }
-
-  return true
 }
 
 function Timemap (fromString) {
