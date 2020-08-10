@@ -1,5 +1,5 @@
 /* global debug */
-const debug = false
+debug = false
 
 function isValidURL (string) {
   try {
