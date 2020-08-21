@@ -89,7 +89,8 @@ function showMinkBadgeInfoBasedOnProcessingState (tabid) {
 }
 
 function setBadgeTextBasedOnBrowserActionState (tabid) {
-  // TODO: This should not rely on the badge count to detect zero mementos, as badges are no longer used for no mementos present
+  // TODO: This should not rely on the badge count to detect zero mementos, as badges
+  //  are no longer used for no mementos present.
   // - maybe rely on the title, since the icon's src path cannot be had.
   chrome.browserAction.getBadgeText({ tabId: tabid }, function (result) {
     if (!result.length && !Number.isInteger(result) && result !== maxBadgeDisplay) {
@@ -474,7 +475,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
     console.log('createTimemapFromURI() - includes write to localstorage')
     console.log(accumulatedArrayOfTimemaps)
   }
-  // The intial call of this function makes this null
+  // The initial call of this function makes this null
   if (!accumulatedArrayOfTimemaps) {
     accumulatedArrayOfTimemaps = []
   }
