@@ -40,6 +40,26 @@ For packaging the extension and releasing a new version, enter the `mink-plugin`
 
 ...access the [Chrome Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard/) and upload the `.zip` to the Mink entry.
 
+### Citing Project
+
+This project was originally presented at the ACM/IEEE Joint Conference on Digital Libraries ([Read the PDF](https://matkelly.com/papers/2014_dl_mink.pdf)) and can be cited as follows:
+
+> Mat Kelly, Michael L. Nelson, and Michele C. Weigle, __"Mink: Integrating the Live and Archived Web Viewing Experience Using Web Browsers and Memento,"__ In _Proceedings of the ACM/IEEE Joint Conference on Digital Libraries (JCDL)_, pages 469-470, London, England, September 2014.
+
+```bib
+@INPROCEEDINGS { kelly-dl2014-mink,
+    AUTHOR = { Mat Kelly, Michael L. Nelson, and Michele C. Weigle },
+    TITLE = { Mink: Integrating the Live and Archived Web Viewing Experience Using Web Browsers and Memento },
+    BOOKTITLE = { Proceedings of the ACM/IEEE Joint Conference on Digital Libraries (JCDL) },
+    YEAR = { 2014 },
+    MONTH = { September },
+    ADDRESS = { London, England },
+    PAGES = {469--470},
+    DOI = {10.1109/JCDL.2014.6970229}
+}
+```
+
+
 ## License
 
 MIT
