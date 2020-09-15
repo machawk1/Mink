@@ -310,9 +310,9 @@ function buildDrilldownYear (mementos) {
   years = {}
 
   $(mementos).each(function (mI, m) {
-    const dt = moment(m.datetime)
-    if (!years[dt.year()]) { years[dt.year()] = [] }
-    years[dt.year()].push(m)
+    const yr = (new Date(m.datetime)).getFullYear()
+    if (!years[yr]) { years[yr] = [] }
+    years[yr].push(m)
   })
 
   let memCountList = '<ul id="years">'
@@ -368,12 +368,15 @@ function buildDrilldownMonth (year) {
   let months = {}
 
   for (let memento in mementos) {
-    const datetime = moment(mementos[memento].datetime)
-    if (datetime.year() !== year) {
+    const mementoDate = new Date(mementos[memento].datetime)
+    const mementoYear = mementoDate.getFullYear()
+
+    if (mementoYear !== year) {
       continue
     }
 
-    const monthName = monthNames[datetime.month()]
+    const monthName = getShortMonthNameFromMonthInt('en', 'short', mementoDate.getMonth())
+
     if (!months[monthName]) {
       months[monthName] = []
     }
