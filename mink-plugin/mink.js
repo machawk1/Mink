@@ -113,10 +113,9 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
         }
       })
 
-      if (debug) { console.log('x') }
+      if (debug) { console.log('Badge has not been seen yet') }
       return // Badge has not yet been set
     }
-    if (debug) { console.log('u') }
 
     chrome.browserAction.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
       if (currentBadgeText !== stillProcessingBadgeDisplay) {
@@ -227,7 +226,7 @@ chrome.runtime.onMessage.addListener(
 )
 
 function fetchTimeMap (uri, tabid) {
-  if (debug) { console.log('Fetching TimeMap for ' + uri + ' in tab ' + tabid) }
+  if (debug) { console.log(`Fetching TimeMap for ${uri} in tab ${tabid}`) }
 
   $.ajax({
     url: uri,
@@ -579,7 +578,7 @@ function findTMURI (uri, tabid) {
     Promise.resolve(createTimemapFromURI(tmX.timemap, tabid))
   }).fail(function (xhr, status, err) {
     if (debug) {
-      console.error('Querying the tm ' + uri + ' failed')
+      console.error(`Querying the tm ${uri} failed`)
       console.error(xhr)
       console.log(status)
       console.log(err)
@@ -597,7 +596,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
   chrome.storage.local.get('timemaps', function (items) {
     let tms
     if (debug) {
-      console.log('setting TM for uri in storage, uri:' + url)
+      console.log(`setting TM for uri in storage, uri: ${url}`)
     }
 
     if (!items.timemaps) {
@@ -628,7 +627,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
     chrome.storage.local.set({ 'timemaps': tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
         if (debug) {
-          console.log('current bytes used:' + bytesUsed)
+          console.log(`current bytes used: ${bytesUsed}`)
         }
       })
       if (chrome.runtime.lastError) {
@@ -665,7 +664,7 @@ function setTimemapInStorage (tm, url) {
 
   chrome.storage.local.get('timemaps', function (items) {
     let tms
-    if (debug) { console.log('setting TM for uri in storage, uri:' + url) }
+    if (debug) { console.log(`setting TM for uri in storage, uri: ${url}`) }
 
     if (!items.timemaps) {
       tms = {}
@@ -691,7 +690,7 @@ function setTimemapInStorage (tm, url) {
 
     chrome.storage.local.set({ 'timemaps': tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
-        if (debug) { console.log('current bytes used:' + bytesUsed) }
+        if (debug) { console.log(`current bytes used: ${bytesUsed}`) }
       })
       if (chrome.runtime.lastError) {
         if (debug) { console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message) }
