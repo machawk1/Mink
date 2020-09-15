@@ -279,24 +279,24 @@ var dayNames = getDayNames()
 
 /* Begin date function, TODO: move to separate file */
 
-function getMonthNames() {
+function getMonthNames () {
   const months = []
-  Array.from({length: 12}, (_, m) =>
-    months.push((new Date(2020, m)).toLocaleDateString('en-us', {month: 'short'}))
+  Array.from({ length: 12 }, (_, m) =>
+    months.push((new Date(2020, m)).toLocaleDateString('en-us', { month: 'short' }))
   )
   return months
 }
 
-function getNumberWithOrdinal(n) {
+function getNumberWithOrdinal (n) {
   const s = ['th', 'st', 'nd', 'rd']
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
 
-function getDayNames() {
+function getDayNames () {
   const dayNames = ['NA']
 
-  Array.from({length: 31}, (_, d) =>
+  Array.from({ length: 31 }, (_, d) =>
     dayNames.push(getNumberWithOrdinal(d + 1))
   )
   return dayNames
