@@ -275,7 +275,6 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
 var years = {}
 var monthNames = getMonthNames('en', 'short')
-var dayNames = getDayNames()
 
 /* Begin date function, TODO: move to separate file */
 
@@ -284,20 +283,24 @@ function getMonthNames (locale, format) {
   return [...Array(12).keys()].map(m => formatter.format(new Date(2020, m)))
 }
 
+function getShortMonthNameFromMonthInt (locale, format, monthInt) {
+  return new Intl.DateTimeFormat(locale, { month: format }).format(new Date(2020, monthInt))
+}
+
 function getNumberWithOrdinal (n) {
   const s = ['th', 'st', 'nd', 'rd']
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
 
-function getDayNames () {
+/* function getDayNames () {
   const dayNames = ['NA']
 
   Array.from({ length: 31 }, (_, d) =>
     dayNames.push(getNumberWithOrdinal(d + 1))
   )
   return dayNames
-}
+} */
 
 /* End date functions */
 
@@ -428,13 +431,16 @@ function buildDrilldownDay (year, month) {
   let days = {}
 
   for (let memento in mementos) {
-    let datetime = moment(mementos[memento].datetime)
+    let dt = new Date(mementos[memento].datetime)
+    let monthShort = getShortMonthNameFromMonthInt('en', 'short', dt.getMonth())
+    let ordinalDate = getNumberWithOrdinal(dt.getDate())
 
-    if (datetime.year() !== year || monthNames[datetime.month()] !== month) {
+    if (dt.getFullYear() !== year || monthShort !== month) {
       continue
     }
 
-    const dayName = dayNames[datetime.date()]
+    const dayName = ordinalDate
+
     if (!days[dayName]) {
       days[dayName] = []
     }
