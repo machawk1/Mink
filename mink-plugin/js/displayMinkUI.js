@@ -1,4 +1,4 @@
-/* global chrome, $, Timemap, moment, tmData */
+/* global chrome, $, Timemap, tmData */
 
 var MAX_MEMENTOS_IN_DROPDOWN = 500
 
@@ -274,14 +274,7 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
 
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
 var years = {}
-var monthNames = getMonthNames('en', 'short')
-
 /* Begin date function, TODO: move to separate file */
-
-function getMonthNames (locale, format) {
-  const formatter = new Intl.DateTimeFormat(locale, { month: format })
-  return [...Array(12).keys()].map(m => formatter.format(new Date(2020, m)))
-}
 
 function getShortMonthNameFromMonthInt (locale, format, monthInt) {
   return new Intl.DateTimeFormat(locale, { month: format }).format(new Date(2020, monthInt))
@@ -292,15 +285,6 @@ function getNumberWithOrdinal (n) {
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
-
-/* function getDayNames () {
-  const dayNames = ['NA']
-
-  Array.from({ length: 31 }, (_, d) =>
-    dayNames.push(getNumberWithOrdinal(d + 1))
-  )
-  return dayNames
-} */
 
 /* End date functions */
 
@@ -497,14 +481,19 @@ function buildDrilldownTime (year, month, date) {
   let times = []
 
   for (let memento in mementos) {
-    let datetime = moment(mementos[memento].datetime)
+    const mementoDatetime = new Date(mementos[memento].datetime)
+    const mementoYear = mementoDatetime.getFullYear()
+    const monthName = getShortMonthNameFromMonthInt('en', 'short', mementoDatetime.getMonth())
+    const mementoDate = mementoDatetime.getDate()
 
-    if (datetime.year() !== year || monthNames[datetime.month()] !== month || datetime.date() !== date) {
+    if (mementoYear !== year || monthName !== month || mementoDate !== date) {
       // REJECT
       continue
     }
 
-    mementos[memento].time = addZ(datetime.hour()) + ':' + addZ(datetime.minute()) + ':' + addZ(datetime.second())
+    mementos[memento].time = addZ(mementoDatetime.getHours()) + ':' +
+      addZ(mementoDatetime.getMinutes()) + ':' +
+      addZ(mementoDatetime.getSeconds())
     times.push(mementos[memento])
   }
 
