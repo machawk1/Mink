@@ -40,7 +40,6 @@
     {
       "js": [
         "js/jquery-3.4.1.min.js","js/select2/select2.min.js",
-        "moment-with-langs.min.js",
         "jquery.miller.js/jquery.miller.js",
 
         "content.js","timemap.js"],

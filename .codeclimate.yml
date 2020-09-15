@@ -10,4 +10,3 @@ exclude_paths:
 - "mink-plugin/images/*"
 - "mink-plugin/jquery.miller.js/*"
 - "mink-plugin/js/jquery-3.4.1.min.js"
-- "mink-plugin/moment-with-langs.min.js"
