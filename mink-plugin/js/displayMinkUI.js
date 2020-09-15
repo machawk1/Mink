@@ -429,7 +429,6 @@ function buildDrilldownDay (year, month) {
 
   for (let memento in mementos) {
     let datetime = moment(mementos[memento].datetime)
-    console.log(mementos[memento].datetime)
 
     if (datetime.year() !== year || monthNames[datetime.month()] !== month) {
       continue
