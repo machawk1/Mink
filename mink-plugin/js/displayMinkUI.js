@@ -274,17 +274,14 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
 
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
 var years = {}
-var monthNames = getMonthNames()
+var monthNames = getMonthNames('en', 'short')
 var dayNames = getDayNames()
 
 /* Begin date function, TODO: move to separate file */
 
-function getMonthNames () {
-  const months = []
-  Array.from({ length: 12 }, (_, m) =>
-    months.push((new Date(2020, m)).toLocaleDateString('en-us', { month: 'short' }))
-  )
-  return months
+function getMonthNames (locale, format) {
+  const formatter = new Intl.DateTimeFormat(locale, { month: format })
+  return [...Array(12).keys()].map(m => formatter.format(new Date(2020, m)))
 }
 
 function getNumberWithOrdinal (n) {
