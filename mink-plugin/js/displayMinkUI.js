@@ -274,10 +274,35 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
 
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
 var years = {}
-var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-var dayNames = ['NA', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th',
-  '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th',
-  '21st', '22nd', '23rd', '24th', '25th', '26th', '27th', '28th', '29th', '30th', '31st']
+var monthNames = getMonthNames()
+var dayNames = getDayNames()
+
+/* Begin date function, TODO: move to separate file */
+
+function getMonthNames() {
+  const months = []
+  Array.from({length: 12}, (_, m) =>
+    months.push((new Date(2020, m)).toLocaleDateString('en-us', {month: 'short'}))
+  )
+  return months
+}
+
+function getNumberWithOrdinal(n) {
+  const s = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return n + (s[(v - 20) % 10] || s[v] || s[0])
+}
+
+function getDayNames() {
+  const dayNames = ['NA']
+
+  Array.from({length: 31}, (_, d) =>
+    dayNames.push(getNumberWithOrdinal(d + 1))
+  )
+  return dayNames
+}
+
+/* End date functions */
 
 function buildDrilldownYear (mementos) {
   // NOTE: Shadow DOM not yet built. Do so after this function
@@ -407,6 +432,7 @@ function buildDrilldownDay (year, month) {
 
   for (let memento in mementos) {
     let datetime = moment(mementos[memento].datetime)
+    console.log(mementos[memento].datetime)
 
     if (datetime.year() !== year || monthNames[datetime.month()] !== month) {
       continue
