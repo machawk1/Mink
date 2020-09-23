@@ -29,7 +29,6 @@
     "webRequestBlocking",
     "tabs",
     "storage",
-    "unlimitedStorage",
     "cookies",
     "notifications",
     "contextMenus",
