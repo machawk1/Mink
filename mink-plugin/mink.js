@@ -498,7 +498,7 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
         // Put them in the cache and tell content to display the ui
         setTimemapInStorage(firstTm, firstTm.original)
         // Send two messages first stop animation then display stored
-        // If use displayUIBasedOnContext the correctly gotten items wont be display
+        // If use displayUIBasedOnContext the correctly gotten items will not be display
         // Rather we will ask memgator.cs for mementos
         chrome.tabs.sendMessage(tabId, { 'method': 'stopAnimatingBrowserActionIcon' })
         chrome.tabs.sendMessage(tabId, {
@@ -558,6 +558,11 @@ function findTMURI (uri, tabid) {
     log(`Querying the tm ${uri} failed`, xhr, status, err)
 
     // TODO: Reject this request for invalidity, progress with next option (e.g., query aggregator)
+    // Perhaps clear this value from localStorage and send a message with the method displayUI
+    chrome.tabs.sendMessage(tabid, {
+      'method': 'clearLinkHeaderAndDisplayUI'
+    })
+
 
     // Promise.reject('Error querying URI specified in Link header')
   })

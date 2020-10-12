@@ -119,6 +119,8 @@ function displayUIBasedOnContext () {
        case 3: link header, datetime
        */
       for (let headerI = 0; headerI < headers.length; headerI++) {
+        // First line: previously deleting attribute (link header) leaves null
+        if (headers[headerI] == null) { continue }
         if (headers[headerI].name.toLowerCase() === 'memento-datetime') {
           mementoDateTimeHeader = headers[headerI].value
         } else if (headers[headerI].name.toLowerCase() === 'link') {
@@ -343,6 +345,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   if (request.method === 'showViewingMementoInterface') {
     log('We will show the "return to live web" interface but it is not implemented yet')
+  }
+
+  if (request.method === 'clearLinkHeaderAndDisplayUI') {
+    // This occurs when a previous attempt to fetch a TimeGate specified in a Link header fails but allows
+    // some funcitonality to proceed instead of failing hard. See #308
+    chrome.storage.local.get('headers', function (storedHeaders) {
+      let headers = storedHeaders.headers[document.URL]
+      console.log(storedHeaders)
+      for (let header in headers) {
+        if (headers[header].name.toUpperCase() == 'LINK') {
+          delete headers[header]
+          break
+        }
+      }
+      storedHeaders.headers[document.URL] = headers
+
+      chrome.storage.local.set(storedHeaders, displayUIBasedOnContext)
+
+    })
   }
 })
 
