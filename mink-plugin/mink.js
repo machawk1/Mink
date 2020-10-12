@@ -35,7 +35,6 @@ const badgeImagesIsAMemento = {
   '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
 }
 
-
 function log (...messages) {
   if (debug) {
     for (let msg of messages) {
@@ -600,7 +599,7 @@ function setTimemapInStorageAndCall (tm, url, cb) {
           // Chicken wire and duct tape! Clear the cache, do it again, yeah!
           log('LOCALSTORAGE full! clearing!')
           chrome.storage.local.clear()
-          log('Re-setting chrome.storage.local with:', tms))
+          log('Re-setting chrome.storage.local with:', tms)
 
           chrome.storage.local.set({ 'timemaps': tms }, function () {
             cb()

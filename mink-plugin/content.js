@@ -26,7 +26,7 @@ setInitialStateWithChecks()
 function log (...messages) {
   if (debug) {
     for (let msg of messages) {
-     console.log(msg)
+      console.log(msg)
     }
   }
 }
@@ -79,7 +79,6 @@ function normalDisplayUIBC (items) {
     } else { // Live web page revisited w/ a TM in cache
       log('Live web page revisited with a TM in cache')
 
-
       if (!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate &&
         items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length === 0) {
         // DBPedia specifies its own TG but lists no mementos/TM
@@ -123,7 +122,6 @@ function displayUIBasedOnContext () {
       if (!linkHeaderAsString && !mementoDateTimeHeader) { // Case 1
         normalDisplayUIBC(items)
         log('No linkheader and no memento date time header')
-
       } else if (linkHeaderAsString && !mementoDateTimeHeader) { // Case 2
         log('There was a Link header but no Memento-Datetime header')
 
