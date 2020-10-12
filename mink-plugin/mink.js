@@ -563,7 +563,6 @@ function findTMURI (uri, tabid) {
       'method': 'clearLinkHeaderAndDisplayUI'
     })
 
-
     // Promise.reject('Error querying URI specified in Link header')
   })
 }

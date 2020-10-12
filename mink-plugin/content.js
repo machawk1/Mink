@@ -354,7 +354,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       let headers = storedHeaders.headers[document.URL]
       console.log(storedHeaders)
       for (let header in headers) {
-        if (headers[header].name.toUpperCase() == 'LINK') {
+        if (headers[header].name.toUpperCase() === 'LINK') {
           delete headers[header]
           break
         }
@@ -362,7 +362,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       storedHeaders.headers[document.URL] = headers
 
       chrome.storage.local.set(storedHeaders, displayUIBasedOnContext)
-
     })
   }
 })
