@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-const debug = true
+const debug = false
 let tmData
 const maxBadgeDisplay = '> 1k'
 const stillProcessingBadgeDisplay = 'WAIT'

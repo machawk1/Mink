@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-let debug = true
+let debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
