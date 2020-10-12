@@ -21,7 +21,6 @@ function Timemap (fromString) {
 
   // Check if the string passed in is an Object, e.g., https://github.com/
   const strIsAnObject = (typeof this.str === 'object') && (this.str !== null)
-  log(`type: ${typeof this.str}`)
 
   if (strIsAnObject) {
     log('Handle fromString as an object, akin to github.com')

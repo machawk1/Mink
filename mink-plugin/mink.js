@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-const debug = false
+const debug = true
 let tmData
 const maxBadgeDisplay = '> 1k'
 const stillProcessingBadgeDisplay = 'WAIT'
@@ -196,7 +196,8 @@ chrome.runtime.onMessage.addListener(
     } else if (request.method === 'getMementosForHTTPSSource') {
       // Ideally, we would talk to an HTTPS version of the aggregator,
       // Instead, we will communicate with Mink's bg script to get around scheme issue
-      const uri = 'http' + request.value.substr(4)
+      const uri = `http${request.value.substr(4)}`
+
       $.ajax({
         url: uri,
         type: 'GET'
@@ -531,7 +532,7 @@ function tmInList (tmURI, tms) {
 }
 
 function findTMURI (uri, tabid) {
-  log('finding TM URI', uri)
+  log('Finding TimeMap URI', uri)
 
   $.ajax({
     url: uri
@@ -555,6 +556,8 @@ function findTMURI (uri, tabid) {
     Promise.resolve(createTimemapFromURI(tmX.timemap, tabid))
   }).fail(function (xhr, status, err) {
     log(`Querying the tm ${uri} failed`, xhr, status, err)
+
+    // TODO: Reject this request for invalidity, progress with next option (e.g., query aggregator)
 
     // Promise.reject('Error querying URI specified in Link header')
   })

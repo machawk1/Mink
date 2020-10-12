@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-let debug = false
+let debug = true
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
@@ -29,6 +29,13 @@ function log (...messages) {
       console.log(msg)
     }
   }
+  // console.trace()
+}
+
+function logGroup (groupName, ...messages) {
+  console.group(groupName)
+  log(messages)
+  console.groupEnd()
 }
 
 function setActiveBasedOnDisabledProperty (cb) {
@@ -123,19 +130,19 @@ function displayUIBasedOnContext () {
         normalDisplayUIBC(items)
         log('No linkheader and no memento date time header')
       } else if (linkHeaderAsString && !mementoDateTimeHeader) { // Case 2
-        log('There was a Link header but no Memento-Datetime header')
+        logGroup('Headers Present', '✅ Link', '❌ Memento-Datetime')
 
         if (notStoredInCache) {
           let specifiedTimegate = false
           let specifiedTimemap = false
-          log('case 2 not in cache putting link header specified into cache')
+          log('Adding Link header specified to cache')
 
           tm = new Timemap(linkHeaderAsString)
 
           log(`TimeGate header value: ${tm.timegate}`)
 
           if (tm.timegate) { // Specified own TimeGate, query this
-            log('The TimeGate header was specified')
+            logGroup('Headers Present', '✅ TimeGate')
 
             specifiedTimegate = true
 
@@ -145,7 +152,7 @@ function displayUIBasedOnContext () {
           }
 
           if (tm.timemap && !specifiedTimegate) { // e.g., w3c wiki
-            log('There was a TimeMap header but no TimeGate header')
+            logGroup('Headers Present', '✅ TimeMap', '❌ TimeGate')
 
             chrome.runtime.sendMessage({
               method: 'fetchTimeMap', value: tm.timemap
@@ -329,7 +336,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.method === 'displayUI') {
-    log(request.timegate, request.timamp, request.uri, '-----', 'no special handling, calling fallthrough')
+    log(request.timegate, request.timemap, request.uri, '-----', 'no special handling, calling fallthrough')
 
     displayUIBasedOnContext()
   }
