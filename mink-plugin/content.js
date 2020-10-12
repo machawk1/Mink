@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-let debug = false
+let debug = true
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
@@ -22,6 +22,14 @@ let setIgnorelisted = function () { setActiveBasedOnIgnorelistedProperty(display
 const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setIgnorelisted) }
 
 setInitialStateWithChecks()
+
+function log (...messages) {
+  if (debug) {
+    for (let msg of messages) {
+     console.log(msg)
+    }
+  }
+}
 
 function setActiveBasedOnDisabledProperty (cb) {
   chrome.storage.local.get('disabled', function (items) {
@@ -69,9 +77,8 @@ function normalDisplayUIBC (items) {
         }
       })
     } else { // Live web page revisited w/ a TM in cache
-      if (debug) {
-        console.log('Live web page revisited with a TM in cache')
-      }
+      log('Live web page revisited with a TM in cache')
+
 
       if (!items.timemaps[document.URL].timemap && items.timemaps[document.URL].timegate &&
         items.timemaps[document.URL].mementos && items.timemaps[document.URL].mementos.length === 0) {
@@ -84,18 +91,15 @@ function normalDisplayUIBC (items) {
       }
     }
   } else { // Not a Memento, no TM in cache
-    if (debug) {
-      console.log('not a memento, no TM in cache')
-    }
+    log('Not a memento, no TimeMap in cache')
+
     getMementos(document.URL)
   }
 }
 
 function displayUIBasedOnContext () {
-  if (debug) {
-    console.log('displayUIBasedOnContext()')
-    console.log(document.URL)
-  }
+  log('displayUIBasedOnContext()', document.URL)
+
   chrome.storage.local.get('headers', function (itemsh) {
     chrome.storage.local.get('timemaps', function (items) {
       const headers = itemsh.headers[document.URL]
@@ -118,28 +122,23 @@ function displayUIBasedOnContext () {
       let tm
       if (!linkHeaderAsString && !mementoDateTimeHeader) { // Case 1
         normalDisplayUIBC(items)
-        if (debug) {
-          console.log('No linkheader and no memento date time header')
-        }
+        log('No linkheader and no memento date time header')
+
       } else if (linkHeaderAsString && !mementoDateTimeHeader) { // Case 2
-        if (debug) {
-          console.log(' linkheader and no memento date time header')
-        }
+        log('There was a Link header but no Memento-Datetime header')
+
         if (notStoredInCache) {
           let specifiedTimegate = false
           let specifiedTimemap = false
-          if (debug) {
-            console.log('case 2 not in cache putting link header specified into cache')
-          }
+          log('case 2 not in cache putting link header specified into cache')
+
           tm = new Timemap(linkHeaderAsString)
 
-          if (debug) {
-            console.log('TG?: ' + tm.timegate)
-          }
+          log(`TimeGate header value: ${tm.timegate}`)
+
           if (tm.timegate) { // Specified own TimeGate, query this
-            if (debug) {
-              console.log('Specified Timegate')
-            }
+            log('The TimeGate header was specified')
+
             specifiedTimegate = true
 
             chrome.runtime.sendMessage({
@@ -148,9 +147,7 @@ function displayUIBasedOnContext () {
           }
 
           if (tm.timemap && !specifiedTimegate) { // e.g., w3c wiki
-            if (debug) {
-              console.log('time map and no timegate')
-            }
+            log('There was a TimeMap header but no TimeGate header')
 
             chrome.runtime.sendMessage({
               method: 'fetchTimeMap', value: tm.timemap
@@ -169,17 +166,15 @@ function displayUIBasedOnContext () {
         if (notStoredInCache) {
           tm = new Timemap(linkHeaderAsString)
           tm.datetime = mementoDateTimeHeader
-          if (debug) {
-            console.log('case 3: link header, datetime')
-            console.log(tm)
-          }
+
+          log('Case 3: Link header and datetime', tm)
+
           chrome.runtime.sendMessage({
             method: 'setTimemapInStorageAndCall', tm: tm, url: document.URL
           })
         } else {
-          if (debug) {
-            console.log('case 3: link header, datetime in cache')
-          }
+          log('Case 3: Link header, datetime in cache')
+
           normalDisplayUIBC(items)
         }
       }
@@ -211,13 +206,13 @@ function getTMThenCall (uri, cb) {
 }
 
 function displayUIBasedOnStoredTimeMap (tmDataIn) {
-  if (debug) { console.log('displayUIBasedOnStoredTimeMap') }
+  log('displayUIBasedOnStoredTimeMap()')
   chrome.runtime.sendMessage({
     method: 'setTMData',
     value: tmDataIn
   })
 
-  if (debug) { console.log(tmDataIn) }
+  log(tmDataIn)
   const mementoCountFromCache = tmDataIn.mementos.list.length
   chrome.runtime.sendMessage({ method: 'setBadgeText', value: '' + mementoCountFromCache })
 }
@@ -225,13 +220,10 @@ function displayUIBasedOnStoredTimeMap (tmDataIn) {
 function getIgnorelist (cb) {
   const callbackArguments = arguments
   chrome.storage.local.get('ignorelist', function (items) {
-    if (debug) {
-      console.log('Current ignore list: ')
-      console.log(items)
-    }
+    log('Current ignore list: ', items)
 
     if (!cb) {
-      if (debug) { console.log('no callback specified for getIgnorelist();') }
+      log('no callback specified for getIgnorelist();')
       return
     }
 
@@ -259,38 +251,26 @@ function addToIgnorelist (currentIgnorelist, uriIn) {
 
   // Check if URI is already in ignore list before adding
   if (save.ignorelist.indexOf(uriIn) > -1) {
-    if (debug) {
-      console.log('URI already in ignorelist')
-      console.log(save.ignorelist)
-    }
+    log('URI already in ignorelist', save.ignorelist)
+
     return
   }
 
-  if (debug) {
-    console.log('Previous ignore list contents:')
-    console.log(save.ignorelist)
-  }
-
+  log('Previous ignore list contents:', save.ignorelist)
   save.ignorelist.push(uriIn)
-
-  if (debug) {
-    console.log('Current ignore list contents:')
-    console.log(save.ignorelist)
-  }
+  log('Current ignore list contents:', save.ignorelist)
 
   chrome.storage.local.set(save,
     function () {
-      if (debug) {
-        console.log('done adding ' + uri + ' to ignore list. Prev ignore list:')
-        console.log(currentIgnorelist)
-      }
+      log(`Done adding ${uri} to ignore list. Prev ignore list:`, currentIgnorelist)
+
       getIgnorelist()
     }
   )
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (debug) { console.log('in listener with ' + request.method) }
+  console.log(`in listener with ${request.method}`)
 
   if (request.method === 'addToIgnorelist') {
     getIgnorelist(addToIgnorelist, request.uri) // And add uri
@@ -304,16 +284,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.method === 'displayUIStoredTM') {
-    if (debug) {
-      console.log('got message displayUIStoredTM')
-    }
+    log('got message displayUIStoredTM()')
+
     displayUIBasedOnStoredTimeMap(request.data)
   }
 
   if (request.method === 'startTimer') {
-    if (debug) {
-      console.log('Got startTimer')
-    }
+    log('Got startTimer')
+
     chrome.runtime.sendMessage({
       method: 'setBadge',
       text: '',
@@ -345,7 +323,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         method: 'fetchSecureSitesTimeMap',
         value: request.data.timemap_uri.json_format
       }, function (response) {
-        if (debug) { console.log('We have a response!') } // This will not occur due to async exec in mink.js
+        log('We have a response!') // This will not occur due to async exec in mink.js
       })
       return
     }
@@ -353,27 +331,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.method === 'displayUI') {
-    if (debug) {
-      console.log(request.timegate)
-      console.log(request.timemap)
-      console.log(request.uri)
-      console.log('-----')
-      console.warn('no special handling, calling fallthrough')
-      // displayUIBasedOnContext()
-    }
+    log(request.timegate, request.timamp, request.uri, '-----', 'no special handling, calling fallthrough')
 
     displayUIBasedOnContext()
   }
 
   if (request.method === 'showViewingMementoInterface') {
-    if (debug) {
-      console.log('We will show the "return to live web" interface but it is not implemented yet')
-    }
+    log('We will show the "return to live web" interface but it is not implemented yet')
   }
 })
 
 function getMementos (uri) {
-  if (debug) { console.log('getMementosWithTimemap()') }
+  log('getMementosWithTimemap()')
   const timemapLocation = memgatorJson + uri
 
   chrome.runtime.sendMessage({ method: 'setBadge',
@@ -390,7 +359,7 @@ function getMementos (uri) {
 
   setTimeout(animatePageActionIcon, 500)
 
-  if (debug) { console.log('in getMementos, sending "fetchTimeMap" message') }
+  log('in getMementos, sending "fetchTimeMap" message')
   chrome.runtime.sendMessage({
     method: 'fetchTimeMap',
     value: timemapLocation

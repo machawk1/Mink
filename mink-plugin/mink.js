@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-const debug = false
+const debug = true
 let tmData
 const maxBadgeDisplay = '> 1k'
 const stillProcessingBadgeDisplay = 'WAIT'
@@ -35,27 +35,33 @@ const badgeImagesIsAMemento = {
   '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
 }
 
-chrome.webNavigation.onCommitted.addListener(function (e) {
+
+function log (...messages) {
   if (debug) {
-    console.warn('NAVIGATION OCCURRED!')
-    console.log(e)
+    for (let msg of messages) {
+      console.log(msg)
+    }
   }
+}
+
+chrome.webNavigation.onCommitted.addListener(function (e) {
+  log('NAVIGATION OCCURRED!', e)
 })
 
 chrome.browserAction.onClicked.addListener(function (tab) {
   const scheme = (new window.URL(tab.url)).origin.substr(0, 4)
   if (scheme !== 'http') {
-    if (debug) { console.log('Invalid scheme for Mink: ' + scheme) }
+    log(`Invalid scheme for Mink: ${scheme}`)
     return
   }
 
   // Check if isA Memento
   chrome.storage.local.get('timemaps', function (items) {
     if (items.timemaps && items.timemaps[tab.url]) {
-      if (debug) { console.log('Clicked button and we are viewing a memento') }
+      log('Clicked button and we are viewing a memento')
       displayMinkUI(tab.id)
     } else {
-      if (debug) { console.log('No timemap stored in cache for ' + tab.url) }
+      log(`No timemap stored in cache for ${tab.url}`)
       showMinkBadgeInfoBasedOnProcessingState(tab.id)
     }
   })
@@ -63,10 +69,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 
 function setEnabledBasedOnURIInIgnorelist (cb) {
   chrome.tabs.query({ active: true }, function (tab) {
-    if (debug) {
-      console.log('is URI in ignore list?')
-      console.log(tab)
-    }
+    log('is URI in ignore list?', tab)
 
     if (cb) { cb() }
   })
@@ -83,7 +86,7 @@ function showMinkBadgeInfoBasedOnProcessingState (tabid) {
     const cb = function () { setBadgeTextBasedOnBrowserActionState(tabid) }
 
     // TODO: check if URI is in ignore list
-    if (debug) { console.warn('about to call setEnabledBasedOnURIIgnorelist') }
+    log('about to call setEnabledBasedOnURIIgnorelist')
     setEnabledBasedOnURIInIgnorelist(cb)
   })
 }
@@ -113,7 +116,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
         }
       })
 
-      if (debug) { console.log('Badge has not been seen yet') }
+      log('Badge has not been seen yet')
       return // Badge has not yet been set
     }
 
@@ -126,7 +129,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
 }
 
 function displayMinkUI (tabId) {
-  if (debug) { console.log('Injecting displayMinkUI.js') }
+  log('Injecting displayMinkUI.js')
   chrome.tabs.executeScript(tabId, { code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';' },
     function () {
       chrome.tabs.executeScript(tabId, {
@@ -135,10 +138,7 @@ function displayMinkUI (tabId) {
         //     thrown. Handle this more gracefully.
         file: 'js/displayMinkUI.js'
       }, function (res) {
-        if (debug) {
-          console.log('mink ui injected. res = ')
-          console.log(res)
-        }
+        log('Mink UI injected. res:', res)
       })
     })
 }
@@ -152,17 +152,17 @@ chrome.runtime.onMessage.addListener(
 
       sendResponse({ value: 'noise' })
     } else if (request.method === 'findTMURI') {
-      if (debug) { console.log('Got findTMURI') }
+      log('Got findTMURI')
       findTMURI(request.timegate, sender.tab.id)
     } else if (request.method === 'setTimemapInStorageAndCall') {
-      if (debug) { console.log('Got setTimemapInStorageAndCall') }
+      log('Got setTimemapInStorageAndCall')
       setTimemapInStorageAndCall(request.tm, request.url, function () {
         chrome.tabs.sendMessage(sender.tab.id, {
           'method': 'displayUI'
         })
       })
     } else if (request.method === 'retrieve') {
-      if (debug) { console.log('Retrieving items from localStorage') }
+      log('Retrieving items from localStorage')
       sendResponse({
         value: window.localStorage.getItem('minkURI'),
         mementos: window.localStorage.getItem('mementos'),
@@ -188,7 +188,7 @@ chrome.runtime.onMessage.addListener(
     } else if (request.method === 'setBadge') {
       setBadge(request.text, request.iconPath, sender.tab.id)
     } else if (request.method === 'openOptionsPage') {
-      if (debug) { console.log('opening options page') }
+      log('Opening options page')
       chrome.runtime.openOptionsPage()
     } else if (request.method === 'stopWatchingRequests') {
       stopWatchingRequests()
@@ -202,9 +202,8 @@ chrome.runtime.onMessage.addListener(
         url: uri,
         type: 'GET'
       }).done(function (data, textStatus, xhr) {
-        if (debug) {
-          console.log('We should parse and return the mementos here via a response')
-        }
+        log('We should parse and return the mementos here via a response')
+
         chrome.tabs.query({
           'active': true,
           'currentWindow': true
@@ -220,20 +219,20 @@ chrome.runtime.onMessage.addListener(
         }
       })
     } else {
-      if (debug) { console.log('Message sent using chrome.runtime not caught: ' + request.method) }
+      log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
   }
 )
 
 function fetchTimeMap (uri, tabid) {
-  if (debug) { console.log(`Fetching TimeMap for ${uri} in tab ${tabid}`) }
+  log(`Fetching TimeMap for ${uri} in tab ${tabid}`)
 
   $.ajax({
     url: uri,
     type: 'GET'
   }).done(function (data, textStatus, xhr, a, b) {
     tmData = data
-    if (debug) { console.log(tmData) }
+    log(tmData)
 
     if (!data.mementos) {
       data = new Timemap(data)
@@ -241,36 +240,26 @@ function fetchTimeMap (uri, tabid) {
       const mems = data.mementos
       delete data.mementos
       data.mementos = { list: mems }
-      if (debug) { console.log(data) }
+      log(data)
     }
 
     displaySecureSiteMementos(data.mementos.list, tabid)
-    if (debug) {
-      console.log('** ** displaySecureSiteMementos')
-      console.log(data.mementos.list)
-    }
+    log('** ** displaySecureSiteMementos', data.mementos.list)
 
     data.original = data.original ? data.original : data.original_uri
 
-    if (debug) {
-      data.matstest = 'foo'
-      console.log('#204: foo')
-      console.log(tmData)
-      console.log(data.original)
-      console.log(data)
-    }
+    data.matstest = 'foo'
+    log('#204: foo', tmData, data.original, data)
+
     tmData = data
 
     setTimemapInStorage(tmData, data.original)
   }).fail(function (xhr, data, error) {
     if (xhr.status === 404) {
-      if (debug) { console.log('querying secure FAILED, Display zero mementos interface') }
+      log('querying secure FAILED, Display zero mementos interface')
       showInterfaceForZeroMementos(tabid)
     }
-    if (debug) {
-      console.log('Some error occurred with a secure site that was not a 404')
-      console.log(xhr)
-    }
+    log('Some error occurred with a secure site that was not a 404', xhr)
   }).always(function () {
     chrome.tabs.sendMessage(tabid, {
       'method': 'stopAnimatingBrowserActionIcon'
@@ -299,7 +288,7 @@ function setBadgeText (value, tabid) {
 }
 
 function setBadgeTitle (newTitle, tabid) {
-  if (debug) { console.warn('setting badge title') }
+  log('Setting badge title')
   chrome.browserAction.setTitle({ title: newTitle, tabId: tabid })
 }
 
@@ -351,7 +340,7 @@ function startWatchingRequests () {
 }
 
 function stopWatchingRequests () {
-  if (debug) { console.log('stopWatchingRequests() executing') }
+  log('stopWatchingRequests() executing')
   chrome.storage.local.set({ 'disabled': true }, function () {
     chrome.contextMenus.update('mink_stopStartWatching', {
       'title': 'Restart Live-Archived Web Integration',
@@ -369,7 +358,7 @@ function stopWatchingRequests () {
 }
 
 function stopWatchingRequestsIgnorelisted () {
-  if (debug) { console.log('stopWatchingRequestsIgnorelisted() executing') }
+  log('stopWatchingRequestsIgnorelisted() executing')
 
   chrome.tabs.query({
     active: true,
@@ -413,7 +402,7 @@ function addToIgnoreList () {
 }
 
 function showArchiveNowUI () {
-  if (debug) { console.warn('showing archive now ui') }
+  log('Showing archive now ui')
   chrome.tabs.query({
     'active': true,
     'currentWindow': true
@@ -448,7 +437,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     if (items.headers) {
       const cachedTMKeys = Object.keys(items.headers)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
-        if (debug) { console.warn('******* Number of cached URL Headers:') }
+        log('******* Number of cached URL Headers:')
         const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
         const keyOfIndex = cachedTMKeys[indexToRemove]
         delete data[keyOfIndex]
@@ -458,7 +447,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     data[deets.url] = deets.responseHeaders
     chrome.storage.local.set({ 'headers': data }, function () {
       if (chrome.runtime.lastError) {
-        if (debug) { console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message) }
+        log(`There was an error last time we tried to store a memento ${chrome.runtime.lastError.message}`)
         if (chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
           // LocalStorage is full. Clear it again!
           chrome.storage.local.clear()
@@ -470,10 +459,8 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
 { urls: ['<all_urls>'], types: ['main_frame'] }, ['responseHeaders', 'blocking'])
 
 function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
-  if (debug) {
-    console.log('createTimemapFromURI() - includes write to localstorage')
-    console.log(accumulatedArrayOfTimemaps)
-  }
+  log('createTimemapFromURI() - includes write to localstorage', accumulatedArrayOfTimemaps)
+
   // The initial call of this function makes this null
   if (!accumulatedArrayOfTimemaps) {
     accumulatedArrayOfTimemaps = []
@@ -493,9 +480,8 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
 
       if (tm.timemap && tm.self && tm.timemap !== tm.self && !tmInList(tm.timemap, accumulatedArrayOfTimemaps)) { // Paginated TimeMaps likely
         // Recursing to find more TMs
-        if (debug) {
-          console.log(accumulatedArrayOfTimemaps)
-        }
+        log(accumulatedArrayOfTimemaps)
+
         return createTimemapFromURI(tm.timemap, tabId, accumulatedArrayOfTimemaps.concat(tm))
       } else {
         // Create single timemap from original
@@ -506,12 +492,9 @@ function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
         accumulatedArrayOfTimemaps.slice(1, accumulatedArrayOfTimemaps.length).forEach(function (elem) {
           firstTm.mementos.list = firstTm.mementos.list.concat(elem.mementos.list)
         })
-        if (debug) {
-          console.log('tm.timemap && tm.self.... else ')
-          console.log('First TimeMap', firstTm)
-          console.log('First TimeMap', firstTm.original)
-          console.log(accumulatedArrayOfTimemaps)
-        }
+        log('tm.timemap && tm.self.... else ', `First TimeMap ${firstTm}`,
+          `First TimeMap ${firstTm.original}`, accumulatedArrayOfTimemaps)
+
         // Put them in the cache and tell content to display the ui
         setTimemapInStorage(firstTm, firstTm.original)
         // Send two messages first stop animation then display stored
@@ -549,20 +532,15 @@ function tmInList (tmURI, tms) {
 }
 
 function findTMURI (uri, tabid) {
-  if (debug) {
-    console.log('finding TM URI')
-    console.log(uri)
-  }
+  log('finding TM URI', uri)
 
   $.ajax({
     url: uri
   }).done(function (data, status, xhr) {
     // Get the first timemap
     const tmX = new Timemap(xhr.getResponseHeader('link'))
-    if (debug) {
-      console.warn(tmX.timemap)
-      console.log(tmX)
-    }
+    log(tmX.timemap, tmX)
+
     // Tell content to start the timer
     chrome.tabs.sendMessage(tabid, {
       'method': 'startTimer'
@@ -577,27 +555,18 @@ function findTMURI (uri, tabid) {
     // Get the paginated list of timemaps
     Promise.resolve(createTimemapFromURI(tmX.timemap, tabid))
   }).fail(function (xhr, status, err) {
-    if (debug) {
-      console.error(`Querying the tm ${uri} failed`)
-      console.error(xhr)
-      console.log(status)
-      console.log(err)
-    }
+    log(`Querying the tm ${uri} failed`, xhr, status, err)
+
+    // Promise.reject('Error querying URI specified in Link header')
   })
 }
 
 function setTimemapInStorageAndCall (tm, url, cb) {
-  if (debug) {
-    console.log('setTimemapInStorageAndCall setting tm in storage')
-    console.log(tm)
-    console.log(url)
-  }
+  log('setTimemapInStorageAndCall setting tm in storage', tm, url)
 
   chrome.storage.local.get('timemaps', function (items) {
     let tms
-    if (debug) {
-      console.log(`setting TM for uri in storage, uri: ${url}`)
-    }
+    log(`setting TM for uri in storage, uri: ${url}`)
 
     if (!items.timemaps) {
       tms = {}
@@ -608,9 +577,8 @@ function setTimemapInStorageAndCall (tm, url, cb) {
 
     // Trim the cache if overfull
     if (items.timemaps) {
-      if (debug) {
-        console.warn('******* Number of cached TMs:')
-      }
+      log('******* Number of cached TMs:')
+
       const cachedTMKeys = Object.keys(items.timemaps)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
         const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
@@ -619,31 +587,21 @@ function setTimemapInStorageAndCall (tm, url, cb) {
       }
     }
 
-    if (debug) {
-      console.log('* * * setting tms')
-      console.log(tms)
-    }
+    log('* * * setting tms', tms)
 
     chrome.storage.local.set({ 'timemaps': tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
-        if (debug) {
-          console.log(`current bytes used: ${bytesUsed}`)
-        }
+        log(`current bytes used: ${bytesUsed}`)
       })
       if (chrome.runtime.lastError) {
-        if (debug) {
-          console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message)
-        }
+        log('There was an error last time we tried to store a memento ', chrome.runtime.lastError.message)
+
         if (chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
           // Chicken wire and duct tape! Clear the cache, do it again, yeah!
-          if (debug) {
-            console.warn('LOCALSTORAGE full! clearing!')
-          }
+          log('LOCALSTORAGE full! clearing!')
           chrome.storage.local.clear()
-          if (debug) {
-            console.log('Re-setting chrome.storage.local with:')
-            console.log(tms)
-          }
+          log('Re-setting chrome.storage.local with:', tms))
+
           chrome.storage.local.set({ 'timemaps': tms }, function () {
             cb()
           })
@@ -656,15 +614,11 @@ function setTimemapInStorageAndCall (tm, url, cb) {
 }
 
 function setTimemapInStorage (tm, url) {
-  if (debug) {
-    console.log('setting tm in storage')
-    console.log(tm)
-    console.log(url)
-  }
+  log('Setting tm in storage', tm, url)
 
   chrome.storage.local.get('timemaps', function (items) {
     let tms
-    if (debug) { console.log(`setting TM for uri in storage, uri: ${url}`) }
+    log(`setting TM for uri in storage, uri: ${url}`)
 
     if (!items.timemaps) {
       tms = {}
@@ -674,7 +628,7 @@ function setTimemapInStorage (tm, url) {
     tms[url] = tm
     // Trim the cache if overfull
     if (items.timemaps) {
-      if (debug) { console.warn('******* Number of cached TMs:') }
+      log('******* Number of cached TMs:')
       const cachedTMKeys = Object.keys(items.timemaps)
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
         const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
@@ -683,25 +637,20 @@ function setTimemapInStorage (tm, url) {
       }
     }
 
-    if (debug) {
-      console.log('* * * setting tms')
-      console.log(tms)
-    }
+    log('* * * setting tms', tms)
 
     chrome.storage.local.set({ 'timemaps': tms }, function () {
       chrome.storage.local.getBytesInUse('timemaps', function (bytesUsed) {
-        if (debug) { console.log(`current bytes used: ${bytesUsed}`) }
+        log(`current bytes used: ${bytesUsed}`)
       })
       if (chrome.runtime.lastError) {
-        if (debug) { console.log('There was an error last time we tried to store a memento ' + chrome.runtime.lastError.message) }
+        log('There was an error last time we tried to store a memento ', chrome.runtime.lastError.message)
         if (chrome.runtime.lastError.message.indexOf('QUOTA_BYTES_PER_ITEM') > -1) {
           // Chicken wire and duct tape! Clear the cache, do it again, yeah!
-          if (debug) { console.warn('LOCALSTORAGE full! clearing!') }
+          log('LOCALSTORAGE full! clearing!')
           chrome.storage.local.clear()
-          if (debug) {
-            console.log('Re-setting chrome.storage.local with:')
-            console.log(tms)
-          }
+          log('Re-setting chrome.storage.local with:', tms)
+
           chrome.storage.local.set({ 'timemaps': tms }, function () {})
         }
       }
@@ -714,7 +663,7 @@ function displaySecureSiteMementos (mementos, tabid) {
 }
 
 function showInterfaceForZeroMementos (tabid) {
-  if (debug) { console.log('Displaying zero mementos') }
+  log('Displaying zero mementos')
   tmData = {}
   tmData.mementos = {}
   tmData.mementos.list = []
