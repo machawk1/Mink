@@ -1,4 +1,4 @@
-/* global debug */
+/* global log */
 // debug = false
 
 function isValidURL (string) {
@@ -10,26 +10,21 @@ function isValidURL (string) {
 }
 
 function Timemap (fromString) {
-  if (debug) { console.log('In timemap.js') }
+  log('In timemap.js')
   let timemap, timegate, original, url, self
   this.str = fromString
   if (!this.str) {
-    if (debug) {
-      console.log('data passed in was null')
-    }
+    log('Data passed in was null')
+
     return
   }
 
   // Check if the string passed in is an Object, e.g., https://github.com/
   const strIsAnObject = (typeof this.str === 'object') && (this.str !== null)
-  if (debug) {
-    // console.log(this.str)
-    console.log('type: ' + typeof this.str)
-  }
+  log(`type: ${typeof this.str}`)
+
   if (strIsAnObject) {
-    if (debug) {
-      console.log('Handle fromString as an object, akin to github.com')
-    }
+    log('Handle fromString as an object, akin to github.com')
   //    this = this.str
   }
 
@@ -63,19 +58,19 @@ function Timemap (fromString) {
       /* Splitting into multiple ifs instead of if-else allows for e.g., rel="timegate original" */
       if (partsOfEntry[partOfEntry].match(mtimegateregex)) {
         timegate = url
-        if (debug) { console.log('found tg: ' + url) }
+        log(`Found TimeGate: ${url}`)
       }
       if (partsOfEntry[partOfEntry].match(mtimemapregex)) {
         timemap = url
-        if (debug) { console.log('found tm: ' + url) }
+        log(`Found TimeMap: ${url}`)
       }
       if (partsOfEntry[partOfEntry].match(moriginalregex)) {
         original = url
-        if (debug) { console.log('found orig: ' + url) }
+        log(`Found orig: ${url}`)
       }
       if (partsOfEntry[partOfEntry].match(mselfregex)) {
         self = url
-        if (debug) { console.log('found self: ' + url) }
+        log(`Found self: ${url}`)
       }
       if (partsOfEntry[partOfEntry].match(mementoregex)) {
         this.mementos.push(new Memento(linkHeaderEntries[lhe] + linkHeaderEntries[lhe + 1]))
@@ -89,13 +84,8 @@ function Timemap (fromString) {
   if (self) { this.self = sanitizeMementoURI(self) }
 
   if (!timemap && !timegate && !original) {
-    if (debug) {
-      console.log("Link header exists, but we didn't find a timemap, timegate or original value in the header.")
-      console.log('link header: ')
-      console.log(this.str)
-      console.log(linkHeaderEntries)
-      console.log(linkHeaderEntries)
-    }
+    log('Link header exists, but we did not find a TimeMap, TimeGate or original value in the header.',
+      'link header: ', this.str, linkHeaderEntries, linkHeaderEntries)
   }
 }
 
