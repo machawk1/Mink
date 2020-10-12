@@ -348,7 +348,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 function getMementos (uri) {
   log('getMementosWithTimemap()')
-  const timemapLocation = memgatorJson + uri
+  const timemapLocation = `${memgatorJson}${uri}`
 
   chrome.runtime.sendMessage({ method: 'setBadge',
     text: '',
