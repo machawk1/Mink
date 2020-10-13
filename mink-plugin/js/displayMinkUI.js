@@ -49,7 +49,7 @@ function appendHTMLToShadowDOM () {
           $('#archiveNow').addClass('hidden')
           $('#viewingMementoInterface').removeClass('hidden')
 
-          $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)))
+          $('#mementosAvailable').html(`Viewing memento at ${(new Date(items.timemaps[document.URL].datetime))}`)
 
           const firstButton = $('#memento_first')
           const lastButton = $('#memento_last')
@@ -126,7 +126,7 @@ function addZ (n) {
 function buildDropDown (mementos) {
   let mementoSelections = ''
   for (let mm = 0; mm < mementos.length; mm++) {
-    mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
+    mementoSelections += `<option data-uri="${mementos[mm].uri}" data-datetime="${mementos[mm].datetime}">${(new Date(mementos[mm].datetime))}</option>`
   }
 
   let mementoDropdown = $('#mementosDropdown')
@@ -151,7 +151,7 @@ function switchToArchiveNowInterface () {
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
     .done(function (data) {
-      const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+      const styleElement = `<style type="text/css">\n${data}\n</style>\n`
       $('#minkuiX').prepend(styleElement)
       cb()
     })
@@ -204,7 +204,7 @@ function randomEmail () { // eslint-disable-line no-unused-vars
 function archiveURIArchiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
-    url: '//web.archive.org/save/' + document.URL
+    url: `//web.archive.org/save/${document.URL}`
   })
     .done(function (a, b, c) {
       if (b === 'success') {
@@ -221,7 +221,7 @@ function archiveURIArchiveOrg (cb, openInNewTab) {
         shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
         const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
-        const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
+        const archiveURI = `https://web.archive.org${parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)}`
         shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
         shadow.getElementById('archivelogo_ia').onclick = function () {
           if (!openInNewTab) {
@@ -760,7 +760,7 @@ function bindGoBackToLiveWebButton () {
 
 function bindNavigationButtons () {
   ['first', 'last', 'next', 'prev'].forEach(function attachURI (rel) {
-    document.getElementById('memento_' + rel).addEventListener('click', event => {
+    document.getElementById(`memento_${rel}`).addEventListener('click', event => {
       window.location = event.target.getAttribute('data-uri')
     })
   })
