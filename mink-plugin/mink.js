@@ -43,10 +43,6 @@ function log (...messages) {
   }
 }
 
-chrome.webNavigation.onCommitted.addListener(function (e) {
-  log('NAVIGATION OCCURRED!', e)
-})
-
 chrome.browserAction.onClicked.addListener(function (tab) {
   const scheme = (new window.URL(tab.url)).origin.substr(0, 4)
   if (scheme !== 'http') {

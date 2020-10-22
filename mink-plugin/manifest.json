@@ -24,7 +24,6 @@
   },
   "permissions": [
     "webRequest",
-    "webNavigation",
     "<all_urls>",
     "webRequestBlocking",
     "tabs",
