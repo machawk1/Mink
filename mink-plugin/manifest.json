@@ -25,7 +25,6 @@
   "permissions": [
     "webRequest",
     "<all_urls>",
-    "webRequestBlocking",
     "tabs",
     "storage",
     "notifications",

@@ -452,7 +452,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
     })
   })
 },
-{ urls: ['<all_urls>'], types: ['main_frame'] }, ['responseHeaders', 'blocking'])
+{ urls: ['<all_urls>'], types: ['main_frame'] }, ['responseHeaders'])
 
 function createTimemapFromURI (uri, tabId, accumulatedArrayOfTimemaps) {
   log('createTimemapFromURI() - includes write to localstorage', accumulatedArrayOfTimemaps)
