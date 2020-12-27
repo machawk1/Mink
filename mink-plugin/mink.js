@@ -11,28 +11,28 @@ const browserActionTitleNoMementos = 'Mink - No Mementos Available'
 const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
 
 const badgeImagesDisabled = {
-  '38': chrome.extension.getURL('images/minkLogo38_disabled.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_disabled.png')
+  '38': chrome.runtime.getURL('images/minkLogo38_disabled.png'),
+  '19': chrome.runtime.getURL('images/minkLogo19_disabled.png')
 }
 
 const badgeImagesIgnorelisted = {
-  '38': chrome.extension.getURL('images/minkLogo38_ignorelisted.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_ignorelisted.png')
+  '38': chrome.runtime.getURL('images/minkLogo38_ignorelisted.png'),
+  '19': chrome.runtime.getURL('images/minkLogo19_ignorelisted.png')
 }
 
 const badgeImagesNoMementos = {
-  '38': chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
-  '19': chrome.extension.getURL('images/minkLogo19_noMementos2.png')
+  '38': chrome.runtime.getURL('images/minkLogo38_noMementos2.png'),
+  '19': chrome.runtime.getURL('images/minkLogo19_noMementos2.png')
 }
 
 const badgeImagesMink = {
-  '38': chrome.extension.getURL('images/minkLogo38.png'),
-  '19': chrome.extension.getURL('images/minkLogo19.png')
+  '38': chrome.runtime.getURL('images/minkLogo38.png'),
+  '19': chrome.runtime.getURL('images/minkLogo19.png')
 }
 
 const badgeImagesIsAMemento = {
-  '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
-  '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
+  '38': chrome.runtime.getURL('images/mLogo38_isAMemento.png'),
+  '19': chrome.runtime.getURL('images/mLogo19_isAMemento.png')
 }
 
 function log (...messages) {
