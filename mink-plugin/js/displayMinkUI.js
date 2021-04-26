@@ -42,19 +42,20 @@ function appendHTMLToShadowDOM () {
         if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
           mCount = items.timemaps[document.URL].mementos.length
 
-          $('.dropdown').addClass('hidden')
-          $('#drilldownBox').addClass('hidden')
-          $('#steps').addClass('hidden')
-          $('#title_dropdown').addClass('hidden')
-          $('#archiveNow').addClass('hidden')
-          $('#viewingMementoInterface').removeClass('hidden')
+          document.querySelector('.dropdown').classList.add('hidden')
+          document.querySelector('#drilldownBox').classList.add('hidden')
+          document.querySelector('#steps').classList.add('hidden')
+          document.querySelector('#title_dropdown').classList.add('hidden')
+          document.querySelector('#archiveNow').classList.add('hidden')
+          document.querySelector('#viewingMementoInterface').classList.remove('hidden')
 
-          $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)))
+          document.querySelector('#mementosAvailable').innerHTML =
+            `Viewing memento at ${(new Date(items.timemaps[document.URL].datetime))}`
 
-          const firstButton = $('#memento_first')
-          const lastButton = $('#memento_last')
-          const prevButton = $('#memento_prev')
-          const nextButton = $('#memento_next')
+          const firstButton = document.querySelector('#memento_first')
+          const lastButton = document.querySelector('#memento_last')
+          const prevButton = document.querySelector('#memento_prev')
+          const nextButton = document.querySelector('#memento_next')
 
           items.timemaps[document.URL].mementos.forEach(function (mem) {
             let targetButton
@@ -73,19 +74,19 @@ function appendHTMLToShadowDOM () {
 
             if (typeof targetButton !== 'undefined') {
               if (mem.uri === window.document.URL) {
-                targetButton.addClass('viewingMemento')
+                targetButton.classList.add('viewingMemento')
               }
 
-              targetButton.removeAttr('disabled')
-              targetButton.attr('data-uri', mem.uri)
+              targetButton.removeAttribute('disabled')
+              targetButton.dataset.uri = mem.uri
             }
           })
 
           cb = createShadowDOM
         } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
-          $('.dropdown').addClass('hidden')
-          $('#steps .action').removeClass('active')
-          $('#title_drilldown').addClass('active')
+          document.querySelector('.dropdown').classList.add('hidden')
+          document.querySelector('#steps .action').classList.remove('active')
+          document.querySelector('#title_drilldown').classList.add('active')
           buildDropDown([])
 
           let cleanedURIR = document.URL
@@ -100,18 +101,18 @@ function appendHTMLToShadowDOM () {
         } else {
           buildDropDown(mementos)
           buildDrilldownYear(mementos)
-          $('#drilldownBox').addClass('hidden')
-          $('#steps .action').removeClass('active')
-          $('#title_dropdown').addClass('active')
+          document.querySelector('#drilldownBox').classList.add('hidden')
+          // $('#steps .action').removeClass('active')
+          document.querySelector('#title_dropdown').classList.add('active')
         }
 
         // Append CSS1
         let mementoPlurality = 'mementos'
-        $('#mementosAvailable span#mementoCount').html(mCount.toLocaleString())
+        document.querySelector('#mementosAvailable span#mementoCount').innerHTML = mCount.toLocaleString()
         if (mCount === 1) {
           mementoPlurality = 'memento'
         }
-        $('#mementosAvailable span#mementoPlurality').html(mementoPlurality)
+        document.querySelector('#mementosAvailable span#mementoPlurality').innerHTML = mementoPlurality
 
         // Append CSS2
         appendCSSToShadowDOM(cb)
@@ -119,33 +120,35 @@ function appendHTMLToShadowDOM () {
     })
 }
 
-function addZ (n) {
+const addZ = (n) => {
   return n < 10 ? '0' + n : '' + n
 }
 
-function buildDropDown (mementos) {
-  let mementoSelections = ''
+const buildDropDown = (mementos) => {
+  let mementoDropdown = document.querySelector('#mementosDropdown')
   for (let mm = 0; mm < mementos.length; mm++) {
-    mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
+    let newOption = document.createElement('option')
+    newOption.dataset.uri = mementos[mm].uri
+    newOption.dataset.datetime = mementos[mm].datetime
+    newOption.text = (new Date(mementos[mm].datetime))
+    mementoDropdown.appendChild(newOption)
   }
+  mementoDropdown.dataset.mementoCount = mementos.length
 
-  let mementoDropdown = $('#mementosDropdown')
-  mementoDropdown.attr('data-memento-count', mementos.length)
   if (mementos.length === 0) {
-    $('#title_dropdown').addClass('disabled')
+    document.querySelector('#title_dropdown').classList.add('disabled')
   }
-  mementoDropdown.append(mementoSelections)
 }
 
-function switchToArchiveNowInterface () {
-  $('#mementosDropdown').addClass('noMementos')
-  $('#drilldownBox').addClass('noMementos')
-  $('#viewMementoButton').addClass('noMementos')
-  $('#minkStatus #steps').addClass('noMementos')
+const switchToArchiveNowInterface = () => {
+  document.querySelector('#mementosDropdown').classList.add('noMementos')
+  document.querySelector('#drilldownBox').classList.add('noMementos')
+  document.querySelector('#viewMementoButton').classList.add('noMementos')
+  document.querySelector('#minkStatus #steps').classList.add('noMementos')
 
-  $('#archiveNow').addClass('noMementos')
-  $('#archiveNowInterface').removeClass('hidden')
-  $('.hideInNoMementosInterface').addClass('hidden')
+  document.querySelector('#archiveNow').classList.add('noMementos')
+  document.querySelector('#archiveNowInterface').classList.remove('hidden')
+  document.querySelector('.hideInNoMementosInterface').classList.add('hidden')
 }
 
 function appendCSSToShadowDOM (cb) {
