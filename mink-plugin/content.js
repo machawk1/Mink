@@ -5,11 +5,16 @@ let debug = true
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-const memgatorJson = 'https://memgator.cs.odu.edu/timemap/json/'
+const memgatorHosts = [
+    'https://memgator.cs.odu.edu',
+    'https://aggregator.matkelly.com']
+const memgatorJsonEndpoint = '/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
 // var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/'
+
+let hostI = 0  // Aggregator host to use, change in fallback
 
 let animateBrowserActionIcon = false
 let animationTimer
@@ -99,8 +104,36 @@ function normalDisplayUIBC (items) {
   } else { // Not a Memento, no TM in cache
     log('Not a memento, no TimeMap in cache')
 
-    getMementos(document.URL)
+    log(`Checking is aggregator at ${memgatorHosts[hostI]} is alive`)
+    checkAggregatorHealthAndSet(hostI).then(_ => {
+      log(`Getting URL ${document.URL} with aggregator ${memgatorHosts[hostI]}`)
+      getMementos(document.URL)
+        }
+    )
   }
+}
+
+function checkAggregatorHealthAndSet (aggregator_index) {
+  if (aggregator_index >= memgatorHosts.length) {
+    log('Exhausted all aggregators')
+    return
+  }
+
+  const url = memgatorHosts[aggregator_index]
+  const timeout = 2000
+  const aborter = new AbortController()
+  const signal = aborter.signal
+
+  const options = { mode: 'no-cors', signal }
+
+
+  return fetch(url, options)
+      .then(setTimeout(() => { aborter.abort() }, timeout))
+      .then(response => {
+      }).catch(error => {
+        log(`${url} appears to be down, incrementing host counter`)
+        hostI += 1
+      })
 }
 
 function displayUIBasedOnContext () {
@@ -348,7 +381,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 function getMementos (uri) {
   log('getMementosWithTimemap()')
-  const timemapLocation = `${memgatorJson}${uri}`
+  let timemapLocation = `${memgatorHosts[hostI]}${memgatorJsonEndpoint}${uri}`
 
   chrome.runtime.sendMessage({ method: 'setBadge',
     text: '',
