@@ -4,7 +4,7 @@
 <p align="center">
   <a href="https://travis-ci.org/machawk1/Mink"><img src="https://travis-ci.org/machawk1/Mink.svg" alt="TravisCI build status" /></a>
   <a href="http://standardjs.com/"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" /></a>
-  <br /><a href="http://matkelly.com/mink"><img src="https://developer.chrome.com/webstore/images/ChromeWebStore_BadgeWBorder_v2_206x58.png"></a>
+  <br /><a href="http://matkelly.com/mink"><img src="https://github.com/machawk1/Mink/blob/main/meta/chromeWebStore.png?raw=true"></a>
 </p>
 
 
