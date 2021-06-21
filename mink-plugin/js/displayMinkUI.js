@@ -42,11 +42,12 @@ function appendHTMLToShadowDOM () {
         if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
           mCount = items.timemaps[document.URL].mementos.length
 
-          document.querySelector('.dropdown').classList.add('hidden')
-          document.querySelector('#drilldownBox').classList.add('hidden')
-          document.querySelector('#steps').classList.add('hidden')
-          document.querySelector('#title_dropdown').classList.add('hidden')
-          document.querySelector('#archiveNow').classList.add('hidden')
+          // Hide initially irrelevant UI items
+          const selectors_to_hide = ['.dropdown', '#drildownBox', '#steps', '#title_dropdown', '#archiveNow']
+          selectors_to_hide.forEach(selector => {
+            document.querySelector(selector).classList.add('hidden')
+          })
+          
           document.querySelector('#viewingMementoInterface').classList.remove('hidden')
 
           document.querySelector('#mementosAvailable').innerHTML =
@@ -85,7 +86,7 @@ function appendHTMLToShadowDOM () {
           cb = createShadowDOM
         } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
           document.querySelector('.dropdown').classList.add('hidden')
-          document.querySelector('#steps .action').classList.remove('active')
+          // document.querySelectorAll('#steps .action').classList.remove('active')
           document.querySelector('#title_drilldown').classList.add('active')
           buildDropDown([])
 
@@ -154,7 +155,7 @@ const switchToArchiveNowInterface = () => {
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.extension.getURL('css/minkui.css'))
     .done(function (data) {
-      const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+      const styleElement = `<style type="text/css">\n${data}\n</style>\n`
       $('#minkuiX').prepend(styleElement)
       cb()
     })
@@ -207,7 +208,7 @@ function randomEmail () { // eslint-disable-line no-unused-vars
 function archiveURIArchiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
-    url: '//web.archive.org/save/' + document.URL
+    url: `//web.archive.org/save/${document.URL}`
   })
     .done(function (a, b, c) {
       if (b === 'success') {
@@ -224,7 +225,7 @@ function archiveURIArchiveOrg (cb, openInNewTab) {
         shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
         const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
-        const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
+        const archiveURI = `https://web.archive.org${parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)}`
         shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
         shadow.getElementById('archivelogo_ia').onclick = function () {
           if (!openInNewTab) {
@@ -763,7 +764,7 @@ function bindGoBackToLiveWebButton () {
 
 function bindNavigationButtons () {
   ['first', 'last', 'next', 'prev'].forEach(function attachURI (rel) {
-    document.getElementById('memento_' + rel).addEventListener('click', event => {
+    document.getElementById(`memento_${rel}`).addEventListener('click', event => {
       window.location = event.target.getAttribute('data-uri')
     })
   })

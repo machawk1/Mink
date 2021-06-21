@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-let debug = true
+let debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
@@ -38,6 +38,8 @@ function log (...messages) {
 }
 
 function logGroup (groupName, ...messages) {
+  if (!debug) { return }
+
   console.group(groupName)
   log(messages)
   console.groupEnd()
@@ -149,7 +151,10 @@ function displayUIBasedOnContext () {
        case 2: link header, no datetime
        case 3: link header, datetime
        */
+      console.warn(headers)
       for (let headerI = 0; headerI < headers.length; headerI++) {
+        // First line: previously deleting attribute (link header) leaves null
+        if (headers[headerI] == null) { continue }
         if (headers[headerI].name.toLowerCase() === 'memento-datetime') {
           mementoDateTimeHeader = headers[headerI].value
         } else if (headers[headerI].name.toLowerCase() === 'link') {
@@ -306,7 +311,7 @@ function addToIgnorelist (currentIgnorelist, uriIn) {
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(`in listener with ${request.method}`)
+  log(`in listener with ${request.method}`)
 
   if (request.method === 'addToIgnorelist') {
     getIgnorelist(addToIgnorelist, request.uri) // And add uri
@@ -374,6 +379,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
   if (request.method === 'showViewingMementoInterface') {
     log('We will show the "return to live web" interface but it is not implemented yet')
+  }
+
+  if (request.method === 'clearLinkHeaderAndDisplayUI') {
+    // This occurs when a previous attempt to fetch a TimeGate specified in a Link header fails but allows
+    // some functionality to proceed instead of failing hard. See #308
+    chrome.storage.local.get('headers', function (storedHeaders) {
+      let headers = storedHeaders.headers[document.URL]
+      console.log(storedHeaders)
+      for (let header in headers) {
+        if (headers[header].name.toUpperCase() === 'LINK') {
+          delete headers[header]
+          break
+        }
+      }
+      storedHeaders.headers[document.URL] = headers
+      console.log(storedHeaders)
+
+      chrome.storage.local.set(storedHeaders, displayUIBasedOnContext)
+    })
   }
 })
 
