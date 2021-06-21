@@ -5,11 +5,16 @@ let debug = false
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-const memgatorJson = 'https://memgator.cs.odu.edu/timemap/json/'
+const memgatorHosts = [
+  'https://memgator.cs.odu.edu',
+  'https://aggregator.matkelly.com']
+const memgatorJsonEndpoint = '/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
 // var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/'
+
+let hostI = 0 // Aggregator host to use, change in fallback
 
 let animateBrowserActionIcon = false
 let animationTimer
@@ -18,14 +23,14 @@ let animationTimer
 // getIgnorelist()
 
 // Faux promises for enabling/disabling UI
-let setIgnorelisted = function () { setActiveBasedOnIgnorelistedProperty(displayUIBasedOnContext) }
+const setIgnorelisted = function () { setActiveBasedOnIgnorelistedProperty(displayUIBasedOnContext) }
 const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setIgnorelisted) }
 
 setInitialStateWithChecks()
 
 function log (...messages) {
   if (debug) {
-    for (let msg of messages) {
+    for (const msg of messages) {
       console.log(msg)
     }
   }
@@ -101,8 +106,34 @@ function normalDisplayUIBC (items) {
   } else { // Not a Memento, no TM in cache
     log('Not a memento, no TimeMap in cache')
 
-    getMementos(document.URL)
+    log(`Checking is aggregator at ${memgatorHosts[hostI]} is alive`)
+    checkAggregatorHealthAndSet(hostI).then(_ => {
+      log(`Getting URL ${document.URL} with aggregator ${memgatorHosts[hostI]}`)
+      getMementos(document.URL)
+    })
   }
+}
+
+function checkAggregatorHealthAndSet (aggregatorIndex) {
+  if (aggregatorIndex >= memgatorHosts.length) {
+    log('Exhausted all aggregators')
+    return
+  }
+
+  const url = memgatorHosts[aggregatorIndex]
+  const timeout = 2000
+  const aborter = new window.AbortController()
+  const signal = aborter.signal
+
+  const options = { mode: 'no-cors', signal }
+
+  return window.fetch(url, options)
+    .then(setTimeout(() => { aborter.abort() }, timeout))
+    .then(response => {})
+    .catch(error => {
+      log(`${url} appears to be down, incrementing host counter`)
+      hostI += 1
+    })
 }
 
 function displayUIBasedOnContext () {
@@ -372,9 +403,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 function getMementos (uri) {
   log('getMementosWithTimemap()')
-  const timemapLocation = `${memgatorJson}${uri}`
+  const timemapLocation = `${memgatorHosts[hostI]}${memgatorJsonEndpoint}${uri}`
 
-  chrome.runtime.sendMessage({ method: 'setBadge',
+  chrome.runtime.sendMessage({
+    method: 'setBadge',
     text: '',
     iconPath: {
       '38': clockIcons38[clockIcons38.length - 1],
@@ -421,7 +453,8 @@ function animatePageActionIcon () {
   chrome.runtime.sendMessage({
     method: 'setBadge',
     text: '',
-    iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] } })
+    iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] }
+  })
   iteration--
 
   if (iteration < 0) { iteration = clockIcons38.length - 1 }
