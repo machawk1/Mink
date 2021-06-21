@@ -42,11 +42,12 @@ function appendHTMLToShadowDOM () {
         if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
           mCount = items.timemaps[document.URL].mementos.length
 
-          document.querySelector('.dropdown').classList.add('hidden')
-          document.querySelector('#drilldownBox').classList.add('hidden')
-          document.querySelector('#steps').classList.add('hidden')
-          document.querySelector('#title_dropdown').classList.add('hidden')
-          document.querySelector('#archiveNow').classList.add('hidden')
+          // Hide initially irrelevant UI items
+          const selectors_to_hide = ['.dropdown', '#drildownBox', '#steps', '#title_dropdown', '#archiveNow']
+          selectors_to_hide.forEach(selector => {
+            document.querySelector(selector).classList.add('hidden')
+          })
+          
           document.querySelector('#viewingMementoInterface').classList.remove('hidden')
 
           document.querySelector('#mementosAvailable').innerHTML =
