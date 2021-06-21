@@ -293,8 +293,7 @@ function getNumberWithOrdinal (n) {
 
 function buildDrilldownYear (mementos) {
   // NOTE: Shadow DOM not yet built. Do so after this function
-  years = null
-  years = {}
+  let years = {}
 
   $(mementos).each(function (mI, m) {
     const yr = (new Date(m.datetime)).getFullYear()
