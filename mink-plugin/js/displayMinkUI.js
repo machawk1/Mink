@@ -142,12 +142,11 @@ const buildDropDown = (mementos) => {
 }
 
 const switchToArchiveNowInterface = () => {
-  document.querySelector('#mementosDropdown').classList.add('noMementos')
-  document.querySelector('#drilldownBox').classList.add('noMementos')
-  document.querySelector('#viewMementoButton').classList.add('noMementos')
-  document.querySelector('#minkStatus #steps').classList.add('noMementos')
+  const showElements = ['#mementosDropdown', '#drilldownBox', '#viewMementoButton','#minkStatus #steps', '#archiveNow']
+  showElements.forEach(element => {
+    document.querySelector(element).classList.add('noMementos')
+  })
 
-  document.querySelector('#archiveNow').classList.add('noMementos')
   document.querySelector('#archiveNowInterface').classList.remove('hidden')
   document.querySelector('.hideInNoMementosInterface').classList.add('hidden')
 }
