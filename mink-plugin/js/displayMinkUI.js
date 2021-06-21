@@ -85,7 +85,7 @@ function appendHTMLToShadowDOM () {
           cb = createShadowDOM
         } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
           document.querySelector('.dropdown').classList.add('hidden')
-          document.querySelector('#steps .action').classList.remove('active')
+          // document.querySelectorAll('#steps .action').classList.remove('active')
           document.querySelector('#title_drilldown').classList.add('active')
           buildDropDown([])
 
