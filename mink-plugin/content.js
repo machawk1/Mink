@@ -151,7 +151,7 @@ function displayUIBasedOnContext () {
        case 2: link header, no datetime
        case 3: link header, datetime
        */
-      console.warn(headers)
+      log(headers)
       for (let headerI = 0; headerI < headers.length; headerI++) {
         // First line: previously deleting attribute (link header) leaves null
         if (headers[headerI] == null) { continue }
