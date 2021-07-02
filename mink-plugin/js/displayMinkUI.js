@@ -38,25 +38,26 @@ function appendHTMLToShadowDOM () {
           createShadowDOM(setupDrilldownInteractions)
         }
         let mCount = mementos.length
+        const minkuiRoot = document.querySelector('#minkuiX')
 
         if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
           mCount = items.timemaps[document.URL].mementos.length
 
           // Hide initially irrelevant UI items
-          const selectors_to_hide = ['.dropdown', '#drildownBox', '#steps', '#title_dropdown', '#archiveNow']
-          selectors_to_hide.forEach(selector => {
-            document.querySelector(selector).classList.add('hidden')
+          const selectorsToHide = ['.dropdown', '#drildownBox', '#steps', '#title_dropdown', '#archiveNow']
+          selectorsToHide.forEach(selector => {
+            minkuiRoot.querySelector(selector).classList.add('hidden')
           })
-          
-          document.querySelector('#viewingMementoInterface').classList.remove('hidden')
 
-          document.querySelector('#mementosAvailable').innerHTML =
+          minkuiRoot.querySelector('#viewingMementoInterface').classList.remove('hidden')
+
+          minkuiRoot.querySelector('#mementosAvailable').innerHTML =
             `Viewing memento at ${(new Date(items.timemaps[document.URL].datetime))}`
 
-          const firstButton = document.querySelector('#memento_first')
-          const lastButton = document.querySelector('#memento_last')
-          const prevButton = document.querySelector('#memento_prev')
-          const nextButton = document.querySelector('#memento_next')
+          const firstButton = minkuiRoot.querySelector('#memento_first')
+          const lastButton = minkuiRoot.querySelector('#memento_last')
+          const prevButton = minkuiRoot.querySelector('#memento_prev')
+          const nextButton = minkuiRoot.querySelector('#memento_next')
 
           items.timemaps[document.URL].mementos.forEach(function (mem) {
             let targetButton
@@ -85,9 +86,8 @@ function appendHTMLToShadowDOM () {
 
           cb = createShadowDOM
         } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
-          document.querySelector('.dropdown').classList.add('hidden')
-          // document.querySelectorAll('#steps .action').classList.remove('active')
-          document.querySelector('#title_drilldown').classList.add('active')
+          minkuiRoot.querySelector('#minkuiX .dropdown').classList.add('hidden')
+          minkuiRoot.querySelector('#minkuiX #title_drilldown').classList.add('active')
           buildDropDown([])
 
           let cleanedURIR = document.URL
@@ -102,18 +102,17 @@ function appendHTMLToShadowDOM () {
         } else {
           buildDropDown(mementos)
           buildDrilldownYear(mementos)
-          document.querySelector('#drilldownBox').classList.add('hidden')
-          // $('#steps .action').removeClass('active')
-          document.querySelector('#title_dropdown').classList.add('active')
+          minkuiRoot.querySelector('#drilldownBox').classList.add('hidden')
+          minkuiRoot.querySelector('#title_dropdown').classList.add('active')
         }
 
         // Append CSS1
         let mementoPlurality = 'mementos'
-        document.querySelector('#mementosAvailable span#mementoCount').innerHTML = mCount.toLocaleString()
+        minkuiRoot.querySelector('#mementosAvailable span#mementoCount').innerHTML = mCount.toLocaleString()
         if (mCount === 1) {
           mementoPlurality = 'memento'
         }
-        document.querySelector('#mementosAvailable span#mementoPlurality').innerHTML = mementoPlurality
+        minkuiRoot.querySelector('#mementosAvailable span#mementoPlurality').innerHTML = mementoPlurality
 
         // Append CSS2
         appendCSSToShadowDOM(cb)
