@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-let debug = false
+const debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
@@ -86,8 +86,8 @@ function normalDisplayUIBC (items) {
         method: 'setBadge',
         text: '',
         iconPath: {
-          '38': chrome.extension.getURL('images/mLogo38_isAMemento.png'),
-          '19': chrome.extension.getURL('images/mLogo19_isAMemento.png')
+          38: chrome.extension.getURL('images/mLogo38_isAMemento.png'),
+          19: chrome.extension.getURL('images/mLogo19_isAMemento.png')
         }
       })
     } else { // Live web page revisited w/ a TM in cache
@@ -274,8 +274,8 @@ function getIgnorelist (cb) {
 
 function addToIgnorelist (currentIgnorelist, uriIn) {
   const uri = uriIn
-  let save = {
-    'ignorelist': null
+  const save = {
+    ignorelist: null
   }
 
   if ($.isEmptyObject(currentIgnorelist)) {
@@ -337,8 +337,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       method: 'setBadge',
       text: '',
       iconPath: {
-        '38': clockIcons38[clockIcons38.length - 1],
-        '19': clockIcons19[clockIcons19.length - 1]
+        38: clockIcons38[clockIcons38.length - 1],
+        19: clockIcons19[clockIcons19.length - 1]
       }
     })
     chrome.runtime.sendMessage({ method: 'setBadgeText', text: '' }, function (response) {
@@ -409,8 +409,8 @@ function getMementos (uri) {
     method: 'setBadge',
     text: '',
     iconPath: {
-      '38': clockIcons38[clockIcons38.length - 1],
-      '19': clockIcons19[clockIcons19.length - 1]
+      38: clockIcons38[clockIcons38.length - 1],
+      19: clockIcons19[clockIcons19.length - 1]
     }
   })
 
