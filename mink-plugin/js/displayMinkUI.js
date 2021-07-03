@@ -272,6 +272,7 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
         }
       }
     })
+}
 
 function archiveURI (img, archiveid, openInNewTab) {
   chrome.runtime.sendMessage({
@@ -281,6 +282,7 @@ function archiveURI (img, archiveid, openInNewTab) {
     imgId: img.id,
     imgURI: img.uri,
     newTab: openInNewTab
+  })
 }
 
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
