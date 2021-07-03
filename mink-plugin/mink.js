@@ -138,6 +138,36 @@ function displayMinkUI (tabId) {
     })
 }
 
+async function fetchArchiveIsSubmitID () {
+  const response = await fetch('https://archive.is')
+  const submitid_regex = /name="submitid" value="(.*?)"/
+  const body = await response.text()
+  const matches = body.match(submitid_regex)
+  const submitid = matches[1]
+  return submitid
+}
+
+function readArchiveIsResponse (resp) {
+  if (this.readyState === window.XMLHttpRequest.DONE && this.status === 200) {
+    console.log('archive.is submission response')
+    console.log(this.response)
+    chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    }, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        method: 'archiveDone',
+        data: xhr.getResponseHeader('Content-Location'),
+        imgId: request.imgId,
+        imgURI: request.imgURI,
+        callback: request.cb,
+        newTab: request.newTab
+      })
+    })
+
+  }
+}
+
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.method === 'store') {
@@ -220,17 +250,31 @@ chrome.runtime.onMessage.addListener(
       let data = {}
       let method = 'GET'
       if (request.archive === 'ia') {
-        submissionURI = 'http://web.archive.org/save/' + request.urir
+        submissionURI = `http://web.archive.org/save/${request.urir}`
         method = 'GET'
       } else if (request.archive === 'ais') {
-        // TODO: get value of submitid from AIS interface
-        submissionURI = 'archive.is/submit/'
+        // TODO: get value of submitted from AIS interface
+        submissionURI = 'https://archive.is/submit/'
         method = 'POST'
-        data = { coo: '', url: request.urir }
+        fetchArchiveIsSubmitID().then(submitidExtracted => {
+          data = {
+            submitid: submitidExtracted,
+            url: request.urir
+          }
+
+          // xhr used instead of fetch bc we need the Content-Location response header
+          let xhr = new XMLHttpRequest()
+          xhr.addEventListener('load', readArchiveIsResponse)
+          xhr.open(method, submissionURI)
+          xhr.send()
+
+          return
+        })
       }
 
+      // TODO: refactor to rm jQuery and be applicable to either source above
       $.ajax({
-        method: 'GET',
+        method: method,
         url: submissionURI,
         data: data
       }).done(function (data, textStatus, xhr) {
