@@ -148,22 +148,12 @@ async function fetchArchiveIsSubmitID () {
 }
 
 function readArchiveIsResponse (resp) {
+
   if (this.readyState === window.XMLHttpRequest.DONE && this.status === 200) {
+    console.log(resp)
     console.log('archive.is submission response')
     console.log(this.response)
-    chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    }, function (tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        method: 'archiveDone',
-        data: xhr.getResponseHeader('Content-Location'),
-        imgId: request.imgId,
-        imgURI: request.imgURI,
-        callback: request.cb,
-        newTab: request.newTab
-      })
-    })
+
 
   }
 }
@@ -255,18 +245,49 @@ chrome.runtime.onMessage.addListener(
       } else if (request.archive === 'ais') {
         // TODO: get value of submitted from AIS interface
         submissionURI = 'https://archive.is/submit/'
-        method = 'POST'
+        method = 'post'
         fetchArchiveIsSubmitID().then(submitidExtracted => {
-          data = {
-            submitid: submitidExtracted,
-            url: request.urir
+          console.log(`Submitted to archive.is with url ${request.urir} and submitid ${submitidExtracted}`)
+          const data = new FormData()
+          data.append('submitid', submitidExtracted)
+          data.append('url', request.urir)
+
+          for(let pair of data.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`)
           }
+          fetch(submissionURI, {
+            method: 'POST',
+            body: data
+          }).then(
+            response => response.text()
+          ).then(
+            html => console.log(html)
+          )
+          return
 
           // xhr used instead of fetch bc we need the Content-Location response header
           let xhr = new XMLHttpRequest()
           xhr.addEventListener('load', readArchiveIsResponse)
           xhr.open(method, submissionURI)
-          xhr.send()
+          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+
+          xhr.send(data)
+          console.log(xhr)
+          return
+
+          chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+              method: 'archiveDone',
+              data: xhr.getResponseHeader('Content-Location'),
+              imgId: request.imgId,
+              imgURI: request.imgURI,
+              callback: request.cb,
+              newTab: request.newTab
+            })
+          })
 
           return
         })
