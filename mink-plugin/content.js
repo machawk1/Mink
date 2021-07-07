@@ -29,12 +29,16 @@ const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty
 setInitialStateWithChecks()
 
 function log (...messages) {
-  if (debug) {
+  if (inDevelopmentMode()) {
     for (const msg of messages) {
       console.log(msg)
     }
   }
   // console.trace()
+}
+
+function inDevelopmentMode () {
+  return !('update_url' in chrome.runtime.getManifest())
 }
 
 function logGroup (groupName, ...messages) {
@@ -129,7 +133,6 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
 
   return window.fetch(url, options)
     .then(setTimeout(() => { aborter.abort() }, timeout))
-    .then(response => {})
     .catch(error => {
       log(`${url} appears to be down, incrementing host counter`)
       hostI += 1
