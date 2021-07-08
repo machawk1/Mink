@@ -220,7 +220,7 @@ chrome.runtime.onMessage.addListener(
       let data = {}
       let method = 'GET'
       if (request.archive === 'ia') {
-        submissionURI = 'http://web.archive.org/save/' + request.urir
+        submissionURI = `http://web.archive.org/save/${request.urir}`
         method = 'GET'
       } else if (request.archive === 'ais') {
         // TODO: get value of submitid from AIS interface
@@ -228,31 +228,33 @@ chrome.runtime.onMessage.addListener(
         method = 'POST'
         data = { coo: '', url: request.urir }
       }
-
-      $.ajax({
-        method: 'GET',
-        url: submissionURI,
-        data: data
-      }).done(function (data, textStatus, xhr) {
-        chrome.tabs.query({
-          active: true,
-          currentWindow: true
-        }, function (tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {
-            method: 'archiveDone',
-            data: xhr.getResponseHeader('Content-Location'),
-            imgId: request.imgId,
-            imgURI: request.imgURI,
-            callback: request.cb,
-            newTab: request.newTab
-          })
-        })
-      })
+      window.fetch(submissionURI).then(
+        response => {
+          changeArchiveIcon(request, response)
+        }
+      )
     } else {
       log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
   }
 )
+
+function changeArchiveIcon (request, response) {
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      method: 'archiveDone',
+      data: response.url,
+      imgId: request.imgId,
+      imgURI: request.imgURI,
+      callback: request.cb,
+      newTab: request.newTab
+    })
+  })
+
+}
 
 function fetchTimeMap (uri, tabid) {
   log(`Fetching TimeMap for ${uri} in tab ${tabid}`)
