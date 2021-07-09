@@ -5,9 +5,16 @@ const debug = false
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-const memgatorHosts = [
+let memgatorHosts = [
   'https://memgator.cs.odu.edu',
   'https://aggregator.matkelly.com']
+
+// Set aggregators if specified in options
+chrome.storage.local.get('aggregators', function (ls) {
+  if (ls.aggregators) {
+    memgatorHosts = ls.aggregators
+  }
+})
 const memgatorJsonEndpoint = '/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
