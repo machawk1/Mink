@@ -130,7 +130,7 @@ var addZ = (n) => {
   return n < 10 ? '0' + n : '' + n
 }
 
-const buildDropDown = (mementos) => {
+function buildDropDown (mementos) {
   let mementoDropdown = document.querySelector('#mementosDropdown')
   for (let mm = 0; mm < mementos.length; mm++) {
     let newOption = document.createElement('option')
@@ -146,7 +146,7 @@ const buildDropDown = (mementos) => {
   }
 }
 
-const switchToArchiveNowInterface = () => {
+function switchToArchiveNowInterface () {
   const showElements = ['#mementosDropdown', '#drilldownBox', '#viewMementoButton','#minkStatus #steps', '#archiveNow']
   showElements.forEach(element => {
     document.querySelector(element).classList.add('noMementos')
