@@ -36,11 +36,16 @@ const badgeImagesIsAMemento = {
 }
 
 function log (...messages) {
-  if (debug) {
-    for (let msg of messages) {
+  if (inDevelopmentMode()) {
+    for (const msg of messages) {
       console.log(msg)
     }
   }
+  // console.trace()
+}
+
+function inDevelopmentMode () {
+  return !('update_url' in chrome.runtime.getManifest())
 }
 
 chrome.browserAction.onClicked.addListener(function (tab) {
