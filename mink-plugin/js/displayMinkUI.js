@@ -5,7 +5,7 @@ var MAX_MEMENTOS_IN_DROPDOWN = 500
 function createShadowDOM (cb) {
   const selector = '#minkuiX'
 
-  let shadow = document.querySelector('#minkWrapper').attachShadow({ mode: 'open' })
+  const shadow = document.querySelector('#minkWrapper').attachShadow({ mode: 'open' })
   const template = document.querySelector(selector)
   shadow.appendChild(template)
 
@@ -38,23 +38,29 @@ function appendHTMLToShadowDOM () {
           createShadowDOM(setupDrilldownInteractions)
         }
         let mCount = mementos.length
+        const minkuiRoot = document.querySelector('#minkuiX')
+        const viewingMemento = items.timemaps && items.timemaps[document.URL] &&
+          items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime
 
-        if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
+        if (viewingMemento) {
           mCount = items.timemaps[document.URL].mementos.length
 
-          $('.dropdown').addClass('hidden')
-          $('#drilldownBox').addClass('hidden')
-          $('#steps').addClass('hidden')
-          $('#title_dropdown').addClass('hidden')
-          $('#archiveNow').addClass('hidden')
-          $('#viewingMementoInterface').removeClass('hidden')
+          // Hide initially irrelevant UI items
+          const selectorsToHide = ['.dropdown', '#drilldownBox', '#steps', '#title_dropdown', '#archiveNow']
 
-          $('#mementosAvailable').html('Viewing memento at ' + (new Date(items.timemaps[document.URL].datetime)))
+          selectorsToHide.forEach(selector => {
+            minkuiRoot.querySelector(selector).classList.add('hidden')
+          })
 
-          const firstButton = $('#memento_first')
-          const lastButton = $('#memento_last')
-          const prevButton = $('#memento_prev')
-          const nextButton = $('#memento_next')
+          minkuiRoot.querySelector('#viewingMementoInterface').classList.remove('hidden')
+
+          minkuiRoot.querySelector('#mementosAvailable').innerHTML =
+            `Viewing memento at ${(new Date(items.timemaps[document.URL].datetime))}`
+
+          const firstButton = minkuiRoot.querySelector('#memento_first')
+          const lastButton = minkuiRoot.querySelector('#memento_last')
+          const prevButton = minkuiRoot.querySelector('#memento_prev')
+          const nextButton = minkuiRoot.querySelector('#memento_next')
 
           items.timemaps[document.URL].mementos.forEach(function (mem) {
             let targetButton
@@ -73,19 +79,18 @@ function appendHTMLToShadowDOM () {
 
             if (typeof targetButton !== 'undefined') {
               if (mem.uri === window.document.URL) {
-                targetButton.addClass('viewingMemento')
+                targetButton.classList.add('viewingMemento')
               }
 
-              targetButton.removeAttr('disabled')
-              targetButton.attr('data-uri', mem.uri)
+              targetButton.removeAttribute('disabled')
+              targetButton.dataset.uri = mem.uri
             }
           })
 
           cb = createShadowDOM
         } else if (mCount > MAX_MEMENTOS_IN_DROPDOWN) {
-          $('.dropdown').addClass('hidden')
-          $('#steps .action').removeClass('active')
-          $('#title_drilldown').addClass('active')
+          minkuiRoot.querySelector('#minkuiX .dropdown').classList.add('hidden')
+          minkuiRoot.querySelector('#minkuiX #title_drilldown').classList.add('active')
           buildDropDown([])
 
           let cleanedURIR = document.URL
@@ -100,18 +105,19 @@ function appendHTMLToShadowDOM () {
         } else {
           buildDropDown(mementos)
           buildDrilldownYear(mementos)
-          $('#drilldownBox').addClass('hidden')
-          $('#steps .action').removeClass('active')
-          $('#title_dropdown').addClass('active')
+          minkuiRoot.querySelector('#drilldownBox').classList.add('hidden')
+          minkuiRoot.querySelector('#title_dropdown').classList.add('active')
         }
 
         // Append CSS1
-        let mementoPlurality = 'mementos'
-        $('#mementosAvailable span#mementoCount').html(mCount.toLocaleString())
-        if (mCount === 1) {
-          mementoPlurality = 'memento'
+        if (!viewingMemento) {
+          let mementoPlurality = 'mementos'
+          minkuiRoot.querySelector('#mementosAvailable span#mementoCount').innerHTML = mCount.toLocaleString()
+          if (mCount === 1) {
+            mementoPlurality = 'memento'
+          }
+          minkuiRoot.querySelector('#mementosAvailable span#mementoPlurality').innerHTML = mementoPlurality
         }
-        $('#mementosAvailable span#mementoPlurality').html(mementoPlurality)
 
         // Append CSS2
         appendCSSToShadowDOM(cb)
@@ -119,39 +125,41 @@ function appendHTMLToShadowDOM () {
     })
 }
 
-function addZ (n) {
+// In some places, getting addZ has already been declared, thus var for now
+var addZ = (n) => {
   return n < 10 ? '0' + n : '' + n
 }
 
 function buildDropDown (mementos) {
-  let mementoSelections = ''
+  let mementoDropdown = document.querySelector('#mementosDropdown')
   for (let mm = 0; mm < mementos.length; mm++) {
-    mementoSelections += '<option data-uri="' + mementos[mm].uri + '" data-datetime="' + mementos[mm].datetime + '">' + (new Date(mementos[mm].datetime)) + '</option>'
+    let newOption = document.createElement('option')
+    newOption.dataset.uri = mementos[mm].uri
+    newOption.dataset.datetime = mementos[mm].datetime
+    newOption.text = (new Date(mementos[mm].datetime))
+    mementoDropdown.appendChild(newOption)
   }
+  mementoDropdown.dataset.mementoCount = mementos.length
 
-  let mementoDropdown = $('#mementosDropdown')
-  mementoDropdown.attr('data-memento-count', mementos.length)
   if (mementos.length === 0) {
-    $('#title_dropdown').addClass('disabled')
+    document.querySelector('#title_dropdown').classList.add('disabled')
   }
-  mementoDropdown.append(mementoSelections)
 }
 
 function switchToArchiveNowInterface () {
-  $('#mementosDropdown').addClass('noMementos')
-  $('#drilldownBox').addClass('noMementos')
-  $('#viewMementoButton').addClass('noMementos')
-  $('#minkStatus #steps').addClass('noMementos')
+  const showElements = ['#mementosDropdown', '#drilldownBox', '#viewMementoButton','#minkStatus #steps', '#archiveNow']
+  showElements.forEach(element => {
+    document.querySelector(element).classList.add('noMementos')
+  })
 
-  $('#archiveNow').addClass('noMementos')
-  $('#archiveNowInterface').removeClass('hidden')
-  $('.hideInNoMementosInterface').addClass('hidden')
+  document.querySelector('#archiveNowInterface').classList.remove('hidden')
+  document.querySelector('.hideInNoMementosInterface').classList.add('hidden')
 }
 
 function appendCSSToShadowDOM (cb) {
   $.ajax(chrome.runtime.getURL('css/minkui.css'))
     .done(function (data) {
-      const styleElement = '<style type="text/css">\n' + data + '\n</style>\n'
+      const styleElement = `<style type="text/css">\n${data}\n</style>\n`
       $('#minkuiX').prepend(styleElement)
       cb()
     })
@@ -204,7 +212,7 @@ function randomEmail () { // eslint-disable-line no-unused-vars
 function archiveURIArchiveOrg (cb, openInNewTab) {
   $.ajax({
     method: 'GET',
-    url: '//web.archive.org/save/' + document.URL
+    url: `//web.archive.org/save/${document.URL}`
   })
     .done(function (a, b, c) {
       if (b === 'success') {
@@ -221,7 +229,7 @@ function archiveURIArchiveOrg (cb, openInNewTab) {
         shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
 
         const parsedRawArchivedURI = a.match(/"\/web\/.*"/g)
-        const archiveURI = 'https://web.archive.org' + parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)
+        const archiveURI = `https://web.archive.org${parsedRawArchivedURI[0].substring(1, parsedRawArchivedURI[0].length - 1)}`
         shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
         shadow.getElementById('archivelogo_ia').onclick = function () {
           if (!openInNewTab) {
@@ -272,6 +280,17 @@ function archiveURIArchiveDotIs (cb, openInNewTab) {
     })
 }
 
+function archiveURI (img, archiveid, openInNewTab) {
+  chrome.runtime.sendMessage({
+    method: 'archive',
+    archive: archiveid,
+    urir: document.URL,
+    imgId: img.id,
+    imgURI: img.uri,
+    newTab: openInNewTab
+  })
+}
+
 /* Vars in this namespace get "already declared" error when injected, hence var instead of let */
 var years = {}
 /* Begin date function, TODO: move to separate file */
@@ -290,8 +309,7 @@ function getNumberWithOrdinal (n) {
 
 function buildDrilldownYear (mementos) {
   // NOTE: Shadow DOM not yet built. Do so after this function
-  years = null
-  years = {}
+  let years = {}
 
   $(mementos).each(function (mI, m) {
     const yr = (new Date(m.datetime)).getFullYear()
@@ -300,7 +318,7 @@ function buildDrilldownYear (mementos) {
   })
 
   let memCountList = '<ul id="years">'
-  for (let year in years) {
+  for (const year in years) {
     memCountList += `<li data-year="${year}">${year}<span class="memCount">${years[year].length}</span></li>\r\n`
   }
 
@@ -315,7 +333,7 @@ function setupDrilldownInteractionYear () {
   // No stored TM, halt building irrelevant drilldown
   if (!shadow.getElementById('years')) { return }
 
-  let yearsDOM = shadow.getElementById('years').childNodes
+  const yearsDOM = shadow.getElementById('years').childNodes
 
   for (let year = 0; year < yearsDOM.length; year++) {
     yearsDOM[year].onclick = function (event) {
@@ -344,12 +362,12 @@ function setupDrilldownInteractionYear () {
 }
 
 function buildDrilldownMonth (year) {
-  let mementos = tmData.mementos.list
+  const mementos = tmData.mementos.list
 
-  let monthUL = document.createElement('ul')
+  const monthUL = document.createElement('ul')
   monthUL.id = 'months'
 
-  let months = {}
+  const months = {}
 
   for (let memento in mementos) {
     const mementoDate = new Date(mementos[memento].datetime)
@@ -367,13 +385,13 @@ function buildDrilldownMonth (year) {
     months[monthName].push(year[memento])
   }
 
-  for (let month in months) {
-    let li = document.createElement('li')
+  for (const month in months) {
+    const li = document.createElement('li')
     li.setAttribute('data-month', month)
     li.setAttribute('data-year', year)
     li.appendChild(document.createTextNode(month))
 
-    let liSpan = document.createElement('span')
+    const liSpan = document.createElement('span')
     liSpan.className = 'memCount'
     liSpan.appendChild(document.createTextNode(months[month].length))
 
@@ -412,10 +430,10 @@ function buildDrilldownMonth (year) {
 function buildDrilldownDay (year, month) {
   const mementos = tmData.mementos.list
 
-  let dayUL = document.createElement('ul')
+  const dayUL = document.createElement('ul')
   dayUL.id = 'days'
 
-  let days = {}
+  const days = {}
 
   for (let memento in mementos) {
     let dt = new Date(mementos[memento].datetime)
@@ -434,14 +452,14 @@ function buildDrilldownDay (year, month) {
     days[dayName].push(mementos[memento])
   }
 
-  for (let day in days) {
-    let li = document.createElement('li')
+  for (const day in days) {
+    const li = document.createElement('li')
     li.setAttribute('data-date', day)
     li.setAttribute('data-month', month)
     li.setAttribute('data-year', year)
     li.appendChild(document.createTextNode(day))
 
-    let liSpan = document.createElement('span')
+    const liSpan = document.createElement('span')
     liSpan.className = 'memCount'
     liSpan.appendChild(document.createTextNode(days[day].length))
 
@@ -475,10 +493,10 @@ function buildDrilldownDay (year, month) {
 function buildDrilldownTime (year, month, date) {
   const mementos = tmData.mementos.list
 
-  let timeUL = document.createElement('ul')
+  const timeUL = document.createElement('ul')
   timeUL.id = 'times'
 
-  let times = []
+  const times = []
 
   for (let memento in mementos) {
     const mementoDatetime = new Date(mementos[memento].datetime)
@@ -497,8 +515,8 @@ function buildDrilldownTime (year, month, date) {
     times.push(mementos[memento])
   }
 
-  for (let timeIndex in times) {
-    let li = document.createElement('li')
+  for (const timeIndex in times) {
+    const li = document.createElement('li')
     li.setAttribute('data-time', timeIndex)
     li.setAttribute('data-day', date)
     li.setAttribute('data-month', month)
@@ -520,7 +538,7 @@ function buildDrilldownTime (year, month, date) {
   const shadow = document.getElementById('minkWrapper').shadowRoot
 
   const existingTimesUL = shadow.getElementById('times')
-  let drilldownShadow = shadow.getElementById('drilldownBox')
+  const drilldownShadow = shadow.getElementById('drilldownBox')
 
   if (existingTimesUL) {
     drilldownShadow.removeChild(existingTimesUL)
@@ -573,7 +591,7 @@ function bindOptions () {
 }
 
 function bindViewButton () {
-  let viewButton = $('#viewMementoButton')
+  const viewButton = $('#viewMementoButton')
 
   $('#mementosDropdown').change(function () {
     if ($(this)[0].selectedIndex === 0) {
@@ -589,9 +607,9 @@ function bindViewButton () {
 function bindDropdown () {
   document.getElementById('title_dropdown').onclick = function () {
     const shadow = document.getElementById('minkWrapper').shadowRoot
-    let mementosDropdown = shadow.getElementById('mementosDropdown')
-    let viewMementoButton = shadow.getElementById('viewMementoButton')
-    let drilldownBox = shadow.getElementById('drilldownBox')
+    const mementosDropdown = shadow.getElementById('mementosDropdown')
+    const viewMementoButton = shadow.getElementById('viewMementoButton')
+    const drilldownBox = shadow.getElementById('drilldownBox')
 
     if (mementosDropdown.getAttribute('data-memento-count') + '' === '0') {
       window.alert('The dropdown interface is unavailable for large collections of mementos due to browser performance degradation.')
@@ -610,10 +628,10 @@ function bindDropdown () {
 function bindDrilldown () {
   document.getElementById('title_drilldown').onclick = function () {
     const shadow = document.getElementById('minkWrapper').shadowRoot
-    let mementosDropdown = shadow.getElementById('mementosDropdown')
-    let viewMementoButton = shadow.getElementById('viewMementoButton')
-    let drilldownBox = shadow.getElementById('drilldownBox')
-    let drilldownTitle = shadow.getElementById('title_drilldown')
+    const mementosDropdown = shadow.getElementById('mementosDropdown')
+    const viewMementoButton = shadow.getElementById('viewMementoButton')
+    const drilldownBox = shadow.getElementById('drilldownBox')
+    const drilldownTitle = shadow.getElementById('title_drilldown')
     const dropdownTitle = shadow.getElementById('title_dropdown')
 
     if (!dropdownTitle.classList.contains('disabled')) {
@@ -627,19 +645,42 @@ function bindDrilldown () {
   }
 }
 
-function changeIconFor (obj, src) {
-  $(obj).attr('src', src)
+function changeIconFor (id, src) {
+  const shadow = document.getElementById('minkWrapper').shadowRoot
+  shadow.querySelector('#' + id).setAttribute('src', src)
 }
 
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.method === 'showViewingMementoInterface') {
       console.log('caught showViewingMementoInterface, tweak UI here')
+    } else if (request.method === 'archiveDone') {
+      changeIconFor(request.imgId, request.imgURI)
+      showSuccessfullyArchivedURI(request.data, request.newTab)
     } else {
       console.log('caught message in minkui.html but did not react')
     }
   }
 )
+
+function showSuccessfullyArchivedURI (archiveURI, openInNewTab) {
+  chrome.runtime.sendMessage({
+    method: 'notify',
+    title: 'Mink',
+    body: 'Archive.org Successfully Preserved page.\r\nSelect again to view.'
+  }, function (response) {})
+
+  const shadow = document.getElementById('minkWrapper').shadowRoot
+  shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
+  shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
+  shadow.getElementById('archivelogo_ia').onclick = function () {
+    if (!openInNewTab) {
+      window.location = $(this).attr('title')
+    } else {
+      window.open($(this).attr('title'))
+    }
+  }
+}
 
 function displayAndHideShadowDOMElements (showElementsIds, hideElementsIds) {
   const shadow = document.getElementById('minkWrapper').shadowRoot
@@ -657,7 +698,7 @@ function displayAndHideShadowDOMElements (showElementsIds, hideElementsIds) {
 function bindArchiveNowButton () {
   $('#minkuiX #archiveNow').click(function () {
     const show = ['archiveNowInterface']
-    let hide = ['archiveNow', 'steps']
+    const hide = ['archiveNow', 'steps']
 
     const shadow = document.getElementById('minkWrapper').shadowRoot
     const dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active')
@@ -676,7 +717,7 @@ function bindArchiveNowButton () {
 function bindGoBackToMainInterfaceButton () {
   $('#minkuiX #goBackButton').click(function () {
     const hide = ['archiveNowInterface']
-    let show = ['archiveNow', 'steps']
+    const show = ['archiveNow', 'steps']
 
     const shadow = document.getElementById('minkWrapper').shadowRoot
     const dropdownActive = shadow.getElementById('title_dropdown').classList.contains('active')
@@ -693,30 +734,39 @@ function bindGoBackToMainInterfaceButton () {
 }
 
 function bindArchiveLogos () {
-  let iaLogo = $('#archivelogo_ia')
-  let aisLogo = $('#archivelogo_ais')
+  const iaLogo = $('#archivelogo_ia')
+  const aisLogo = $('#archivelogo_ais')
 
-  let alaLogo = $('#archivelogo_ala') // All archives
+  const alaLogo = $('#archivelogo_ala') // All archives
 
-  let openInNewTab = false
+  const openInNewTab = false
 
   $('.archiveLogo').click(function () {
     if ($(this).attr('src').indexOf('_success') > -1) { // Already archived, view
       return
     }
 
-    let that = this
+    const that = this
     const newSrc = $(this).attr('src').replace('.png', '_success.png')
     $(this).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
 
     const archiveLogoID = $(this).attr('id')
-    const cb = function () { changeIconFor(that, newSrc) }
+
+    const img = {
+      id: 'archivelogo_ia',
+      uri: newSrc
+    }
 
     if (archiveLogoID === 'archivelogo_ia') {
-      archiveURIArchiveOrg(cb, openInNewTab)
+      const archiveid = 'ia'
+      archiveURI(img, archiveid, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ais') {
-      archiveURIArchiveDotIs(cb, openInNewTab)
+      const archiveid = 'ais'
+      img.id = 'archivelogo_ais'
+      archiveURI(img, archiveid, openInNewTab)
     } else if (archiveLogoID === 'archivelogo_ala') { // Async calls to 2 archives
+      // TOFIX: match above calls
+      /*
       const iaNewSrc = $(iaLogo).attr('src').replace('.png', '_success.png')
       const aisNewSrc = $(aisLogo).attr('src').replace('.png', '_success.png')
 
@@ -736,6 +786,7 @@ function bindArchiveLogos () {
       openInNewTab = true
       archiveURIArchiveOrg(iaCb, openInNewTab)
       archiveURIArchiveDotIs(aisCb, openInNewTab)
+      */
     }
   })
 }
@@ -760,7 +811,7 @@ function bindGoBackToLiveWebButton () {
 
 function bindNavigationButtons () {
   ['first', 'last', 'next', 'prev'].forEach(function attachURI (rel) {
-    document.getElementById('memento_' + rel).addEventListener('click', event => {
+    document.getElementById(`memento_${rel}`).addEventListener('click', event => {
       window.location = event.target.getAttribute('data-uri')
     })
   })

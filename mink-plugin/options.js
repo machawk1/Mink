@@ -25,6 +25,16 @@ function restoreOptions () {
       updateRemoveAllIgnorelistButtonStatus()
     })
   })
+
+  chrome.storage.local.get('aggregators', function (ls) {
+    let dropdownOptions = document.querySelector('#aggregator').options
+    for (let i=0; i< dropdownOptions.length; i++) {
+      if (dropdownOptions[i].value == ls.aggregators[0]) {
+        document.querySelector('#aggregator').selectedIndex = i
+        break
+      }
+    }
+  })
 }
 
 function getListItemHTML (uri, classIn, buttonText) {
@@ -35,13 +45,13 @@ function getListItemHTML (uri, classIn, buttonText) {
 }
 
 function clearIgnorelist () {
-  chrome.storage.local.set({ 'ignorelist': [] })
+  chrome.storage.local.set({ ignorelist: [] })
   document.location.reload()
 }
 
 function saveIgnorelist (dontReload) {
-  let ignorelistJSON = {}
-  let uris = []
+  const ignorelistJSON = {}
+  const uris = []
   $('#options li:not(.strike) span').each(function () {
     uris.push($(this).text())
   })
@@ -56,8 +66,23 @@ function saveIgnorelist (dontReload) {
   }
 }
 
+function saveAggregatorSource () {
+  let dropdown = document.querySelector('#aggregator')
+  let availableOptions = [dropdown.options[dropdown.selectedIndex].value]
+
+  for(let i = 0; i < dropdown.options.length; i++) {
+    if (!dropdown.options[i].disabled && i != dropdown.selectedIndex) {
+      availableOptions.push(dropdown.options[i].value)
+    }
+  }
+  if (debug) {
+    console.log(`Setting aggregator chain to ${availableOptions.join(',')}`)
+  }
+  chrome.storage.local.set({'aggregators': availableOptions})
+}
+
 function updateSaveButtonStatus () {
-  let saveIgnorelistButton = $('#saveIgnorelist')
+  const saveIgnorelistButton = $('#saveIgnorelist')
   if ($('.glyphicon-ok').length > 0 || $('.newEntry').length > 0) {
     saveIgnorelistButton.removeAttr('disabled').removeClass('disabled')
   } else {
@@ -66,9 +91,9 @@ function updateSaveButtonStatus () {
 }
 
 function updateRemoveAllIgnorelistButtonStatus () {
-  let clearIgnorelistButton = $('#clearIgnorelist')
+  const clearIgnorelistButton = $('#clearIgnorelist')
   if (debug) {
-    let lis = $('#options li')
+    const lis = $('#options li')
     console.log(lis.length)
     console.log(lis)
   }
@@ -113,7 +138,7 @@ function addToIgnorelistToBeSaved () {
   }
 
   $(this).parent().replaceWith(getListItemHTML(uri, 'glyphicon-remove newItem'))
-  let newItem = $('.newItem')
+  const newItem = $('.newItem')
   newItem.click(removeEntry)
   newItem.removeClass('newItem').parent().addClass('newEntry')
   // $('.newEntry').append('<button  class="btn btn-default btn-xs glyphicon glyphicon-chevron-left" style="font-size: 12px; margin-left: 1.0em;">Nevermind</button>');
@@ -187,7 +212,7 @@ function enableRemoveButtons (disable, additionalIdsIn) {
 }
 
 function enableRemoveButtonsBasedOnDropdown () {
-  let selectedIndex = $(this).find('option:selected').index()
+  const selectedIndex = $(this).find('option:selected').index()
   if (selectedIndex > 0) { // -1 would be valid with the verbose conditional
     enableRemoveButtons(false)
     updateMementoCount()
@@ -199,9 +224,9 @@ function enableRemoveButtonsBasedOnDropdown () {
 
 function removeTMFromCache (originalURI) {
   chrome.storage.local.get('timemaps', function (items) {
-    let tms = items.timemaps
+    const tms = items.timemaps
     delete tms[originalURI]
-    chrome.storage.local.set({ 'timemaps': tms },
+    chrome.storage.local.set({ timemaps: tms },
       function () {
         console.log('Cache updated, updating UI')
         $('#cachedTimemaps').empty()
@@ -212,7 +237,7 @@ function removeTMFromCache (originalURI) {
 }
 
 function clearTimemapCache () {
-  chrome.storage.local.set({ 'timemaps': {} },
+  chrome.storage.local.set({ timemaps: {} },
     function () {
       console.log('Remove all cached TMs')
       $('#cachedTimemaps').empty()
@@ -220,7 +245,7 @@ function clearTimemapCache () {
     }
   )
 
-  chrome.storage.local.set({ 'headers': {} },
+  chrome.storage.local.set({ headers: {} },
     function () {
       console.log('Remove headers')
     }
@@ -229,7 +254,8 @@ function clearTimemapCache () {
 
 function saveAndCloseOptionsPanel () {
   saveIgnorelist()
-  window.close()
+  saveAggregatorSource()
+  // window.close()
 }
 
 function restoreDefaults () {
@@ -244,25 +270,26 @@ function removeSelectedURIFromTimeMapCache () {
 
 function addSelectedURIToIgnorelist () {
   const oURI = $('#cachedTimemaps option:selected').text()
-  $('#options').append(`<li class="strike"><span>${oURI}</li>`)
+  $('#options').append(`<li class="strike"><span>${oURI}</span>></li>`)
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions)
 document.addEventListener('DOMContentLoaded', createAddURIBinder)
 document.addEventListener('DOMContentLoaded', populatedCachedTimeMapsUI)
 
-$('#removeSelectedTMFromCache').click(removeSelectedURIFromTimeMapCache)
-$('#removeSelectedTMFromCacheAndIgnorelist').click(function () {
+document.querySelector('#removeSelectedTMFromCache').addEventListener('click', removeSelectedURIFromTimeMapCache)
+
+/* Not yet well-positioned in the GUI
+document.querySelector('#removeSelectedTMFromCacheAndIgnorelist').addEventListener('click', function () {
   addSelectedURIToIgnorelist()
   const dontReloadAfterSavingIgnorelist = true
   saveIgnorelist(dontReloadAfterSavingIgnorelist)
   removeSelectedURIFromTimeMapCache()
 })
+ */
 
-$('#removeAllTMsFromCache').click(clearTimemapCache)
-
-$('#saveIgnorelist').click(saveIgnorelist)
-$('#clearIgnorelist').click(clearIgnorelist)
-$('#doneButton').click(saveAndCloseOptionsPanel)
-$('#restoreDefaultsButton').click(restoreDefaults)
-// document.getElementById('save').addEventListener('click', save_options)
+document.querySelector('#removeAllTMsFromCache').addEventListener('click', clearTimemapCache)
+document.querySelector('#saveIgnorelist').addEventListener('click', saveIgnorelist)
+document.querySelector('#clearIgnorelist').addEventListener('click', clearIgnorelist)
+document.querySelector('#doneButton').addEventListener('click', saveAndCloseOptionsPanel)
+document.querySelector('#restoreDefaultsButton').addEventListener('click', restoreDefaults)

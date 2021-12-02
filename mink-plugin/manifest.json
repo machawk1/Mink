@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Mink - Integrate Live & Archived Web +Memento",
   "short_name": "Mink",
-  "version": "2.5",
+  "version": "2.5.4",
   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
   "homepage_url": "https://matkelly.com/mink",
   "author": "Mat Kelly <mink@matkelly.com>",
@@ -53,7 +53,7 @@
   },
   "minimum_chrome_version": "88",
   "options_ui": {
-    "page": "options_new.html",
+    "page": "options.html",
     "open_in_tab": true
   },
   "web_accessible_resources": [

@@ -1,15 +1,27 @@
 /* global chrome, $, Timemap */
 
-let debug = true
+const debug = false
 
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-const memgatorJson = 'https://memgator.cs.odu.edu/timemap/json/'
+let memgatorHosts = [
+  'https://memgator.cs.odu.edu',
+  'https://aggregator.matkelly.com']
+
+// Set aggregators if specified in options
+chrome.storage.local.get('aggregators', function (ls) {
+  if (ls.aggregators) {
+    memgatorHosts = ls.aggregators
+  }
+})
+const memgatorJsonEndpoint = '/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
 // var aggregator_diy_link = 'http://timetravel.mementoweb.org/timemap/link/'
 // var aggregator_diy_json = 'http://timetravel.mementoweb.org/timemap/json/'
+
+let hostI = 0 // Aggregator host to use, change in fallback
 
 let animateBrowserActionIcon = false
 let animationTimer
@@ -18,21 +30,27 @@ let animationTimer
 // getIgnorelist()
 
 // Faux promises for enabling/disabling UI
-let setIgnorelisted = function () { setActiveBasedOnIgnorelistedProperty(displayUIBasedOnContext) }
+const setIgnorelisted = function () { setActiveBasedOnIgnorelistedProperty(displayUIBasedOnContext) }
 const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty(setIgnorelisted) }
 
 setInitialStateWithChecks()
 
 function log (...messages) {
-  if (debug) {
-    for (let msg of messages) {
+  if (inDevelopmentMode()) {
+    for (const msg of messages) {
       console.log(msg)
     }
   }
   // console.trace()
 }
 
+function inDevelopmentMode () {
+  return !('update_url' in chrome.runtime.getManifest())
+}
+
 function logGroup (groupName, ...messages) {
+  if (!debug) { return }
+
   console.group(groupName)
   log(messages)
   console.groupEnd()
@@ -79,8 +97,8 @@ function normalDisplayUIBC (items) {
         method: 'setBadge',
         text: '',
         iconPath: {
-          '38': chrome.runtime.getURL('images/mLogo38_isAMemento.png'),
-          '19': chrome.runtime.getURL('images/mLogo19_isAMemento.png')
+          38: chrome.runtime.getURL('images/mLogo38_isAMemento.png'),
+          19: chrome.runtime.getURL('images/mLogo19_isAMemento.png')
         }
       })
     } else { // Live web page revisited w/ a TM in cache
@@ -99,8 +117,33 @@ function normalDisplayUIBC (items) {
   } else { // Not a Memento, no TM in cache
     log('Not a memento, no TimeMap in cache')
 
-    getMementos(document.URL)
+    log(`Checking is aggregator at ${memgatorHosts[hostI]} is alive`)
+    checkAggregatorHealthAndSet(hostI).then(_ => {
+      log(`Getting URL ${document.URL} with aggregator ${memgatorHosts[hostI]}`)
+      getMementos(document.URL)
+    })
   }
+}
+
+function checkAggregatorHealthAndSet (aggregatorIndex) {
+  if (aggregatorIndex >= memgatorHosts.length) {
+    log('Exhausted all aggregators')
+    return
+  }
+
+  const url = memgatorHosts[aggregatorIndex]
+  const timeout = 2000
+  const aborter = new window.AbortController()
+  const signal = aborter.signal
+
+  const options = { mode: 'no-cors', signal }
+
+  return window.fetch(url, options)
+    .then(setTimeout(() => { aborter.abort() }, timeout))
+    .catch(error => {
+      log(`${url} appears to be down, incrementing host counter`)
+      hostI += 1
+    })
 }
 
 function displayUIBasedOnContext () {
@@ -118,7 +161,10 @@ function displayUIBasedOnContext () {
        case 2: link header, no datetime
        case 3: link header, datetime
        */
+      log(headers)
       for (let headerI = 0; headerI < headers.length; headerI++) {
+        // First line: previously deleting attribute (link header) leaves null
+        if (headers[headerI] == null) { continue }
         if (headers[headerI].name.toLowerCase() === 'memento-datetime') {
           mementoDateTimeHeader = headers[headerI].value
         } else if (headers[headerI].name.toLowerCase() === 'link') {
@@ -238,8 +284,8 @@ function getIgnorelist (cb) {
 
 function addToIgnorelist (currentIgnorelist, uriIn) {
   const uri = uriIn
-  let save = {
-    'ignorelist': null
+  const save = {
+    ignorelist: null
   }
 
   if ($.isEmptyObject(currentIgnorelist)) {
@@ -275,7 +321,7 @@ function addToIgnorelist (currentIgnorelist, uriIn) {
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(`in listener with ${request.method}`)
+  log(`in listener with ${request.method}`)
 
   if (request.method === 'addToIgnorelist') {
     getIgnorelist(addToIgnorelist, request.uri) // And add uri
@@ -301,8 +347,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       method: 'setBadge',
       text: '',
       iconPath: {
-        '38': clockIcons38[clockIcons38.length - 1],
-        '19': clockIcons19[clockIcons19.length - 1]
+        38: clockIcons38[clockIcons38.length - 1],
+        19: clockIcons19[clockIcons19.length - 1]
       }
     })
     chrome.runtime.sendMessage({ method: 'setBadgeText', text: '' }, function (response) {
@@ -344,17 +390,37 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.method === 'showViewingMementoInterface') {
     log('We will show the "return to live web" interface but it is not implemented yet')
   }
+
+  if (request.method === 'clearLinkHeaderAndDisplayUI') {
+    // This occurs when a previous attempt to fetch a TimeGate specified in a Link header fails but allows
+    // some functionality to proceed instead of failing hard. See #308
+    chrome.storage.local.get('headers', function (storedHeaders) {
+      let headers = storedHeaders.headers[document.URL]
+      console.log(storedHeaders)
+      for (let header in headers) {
+        if (headers[header].name.toUpperCase() === 'LINK') {
+          delete headers[header]
+          break
+        }
+      }
+      storedHeaders.headers[document.URL] = headers
+      console.log(storedHeaders)
+
+      chrome.storage.local.set(storedHeaders, displayUIBasedOnContext)
+    })
+  }
 })
 
 function getMementos (uri) {
   log('getMementosWithTimemap()')
-  const timemapLocation = `${memgatorJson}${uri}`
+  const timemapLocation = `${memgatorHosts[hostI]}${memgatorJsonEndpoint}${uri}`
 
-  chrome.runtime.sendMessage({ method: 'setBadge',
+  chrome.runtime.sendMessage({
+    method: 'setBadge',
     text: '',
     iconPath: {
-      '38': clockIcons38[clockIcons38.length - 1],
-      '19': clockIcons19[clockIcons19.length - 1]
+      38: clockIcons38[clockIcons38.length - 1],
+      19: clockIcons19[clockIcons19.length - 1]
     }
   })
 
@@ -397,7 +463,8 @@ function animatePageActionIcon () {
   chrome.runtime.sendMessage({
     method: 'setBadge',
     text: '',
-    iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] } })
+    iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] }
+  })
   iteration--
 
   if (iteration < 0) { iteration = clockIcons38.length - 1 }
