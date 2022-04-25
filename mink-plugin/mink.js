@@ -258,7 +258,6 @@ function changeArchiveIcon (request, response) {
       newTab: request.newTab
     })
   })
-
 }
 
 function fetchTimeMap (uri, tabid) {
