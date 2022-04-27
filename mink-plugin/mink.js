@@ -143,6 +143,26 @@ function displayMinkUI (tabId) {
     })
 }
 
+async function fetchArchiveIsSubmitID () {
+  const response = await fetch('https://archive.is')
+  const submitid_regex = /name="submitid" value="(.*?)"/
+  const body = await response.text()
+  const matches = body.match(submitid_regex)
+  const submitid = matches[1]
+  return submitid
+}
+
+function readArchiveIsResponse (resp) {
+
+  if (this.readyState === window.XMLHttpRequest.DONE && this.status === 200) {
+    console.log(resp)
+    console.log('archive.is submission response')
+    console.log(this.response)
+
+
+  }
+}
+
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.method === 'store') {
@@ -228,11 +248,56 @@ chrome.runtime.onMessage.addListener(
         submissionURI = `http://web.archive.org/save/${request.urir}`
         method = 'GET'
       } else if (request.archive === 'ais') {
-        // TODO: get value of submitid from AIS interface
-        submissionURI = 'archive.is/submit/'
-        method = 'POST'
-        data = { coo: '', url: request.urir }
+        // TODO: get value of submitted from AIS interface
+        submissionURI = 'https://archive.is/submit/'
+        method = 'post'
+        fetchArchiveIsSubmitID().then(submitidExtracted => {
+          console.log(`Submitted to archive.is with url ${request.urir} and submitid ${submitidExtracted}`)
+          const data = new FormData()
+          data.append('submitid', submitidExtracted)
+          data.append('url', request.urir)
+
+          for(let pair of data.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`)
+          }
+          fetch(submissionURI, {
+            method: 'POST',
+            body: data
+          }).then(
+            response => response.text()
+          ).then(
+            html => console.log(html)
+          )
+          return
+
+          // xhr used instead of fetch bc we need the Content-Location response header
+          let xhr = new XMLHttpRequest()
+          xhr.addEventListener('load', readArchiveIsResponse)
+          xhr.open(method, submissionURI)
+          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+
+          xhr.send(data)
+          console.log(xhr)
+          return
+
+          chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+              method: 'archiveDone',
+              data: xhr.getResponseHeader('Content-Location'),
+              imgId: request.imgId,
+              imgURI: request.imgURI,
+              callback: request.cb,
+              newTab: request.newTab
+            })
+          })
+
+          return
+        })
       }
+
       window.fetch(submissionURI).then(
         response => {
           changeArchiveIcon(request, response)
