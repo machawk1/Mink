@@ -5,9 +5,16 @@ const debug = false
 // var proxy = 'http://timetravel.mementoweb.org/timemap/link/'
 // var memgator_proxy = 'http://memgator.cs.odu.edu/timemap/link/'
 // var aggregator_wdi_json = 'http://labs.mementoweb.org/timemap/json/'
-const memgatorHosts = [
+let memgatorHosts = [
   'https://memgator.cs.odu.edu',
   'https://aggregator.matkelly.com']
+
+// Set aggregators if specified in options
+chrome.storage.local.get('aggregators', function (ls) {
+  if (ls.aggregators) {
+    memgatorHosts = ls.aggregators
+  }
+})
 const memgatorJsonEndpoint = '/timemap/json/'
 
 // var aggregator_wdi_link = 'http://labs.mementoweb.org/timemap/link/'
@@ -29,12 +36,16 @@ const setInitialStateWithChecks = function () { setActiveBasedOnDisabledProperty
 setInitialStateWithChecks()
 
 function log (...messages) {
-  if (debug) {
+  if (inDevelopmentMode()) {
     for (const msg of messages) {
       console.log(msg)
     }
   }
   // console.trace()
+}
+
+function inDevelopmentMode () {
+  return !('update_url' in chrome.runtime.getManifest())
 }
 
 function logGroup (groupName, ...messages) {
@@ -129,9 +140,9 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
 
   return window.fetch(url, options)
     .then(setTimeout(() => { aborter.abort() }, timeout))
-    .then(response => {})
     .catch(error => {
       log(`${url} appears to be down, incrementing host counter`)
+      log(error)
       hostI += 1
     })
 }

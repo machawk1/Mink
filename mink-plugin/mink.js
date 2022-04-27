@@ -36,11 +36,16 @@ const badgeImagesIsAMemento = {
 }
 
 function log (...messages) {
-  if (debug) {
-    for (let msg of messages) {
+  if (inDevelopmentMode()) {
+    for (const msg of messages) {
       console.log(msg)
     }
   }
+  // console.trace()
+}
+
+function inDevelopmentMode () {
+  return !('update_url' in chrome.runtime.getManifest())
 }
 
 chrome.browserAction.onClicked.addListener(function (tab) {
@@ -293,31 +298,32 @@ chrome.runtime.onMessage.addListener(
         })
       }
 
-      // TODO: refactor to rm jQuery and be applicable to either source above
-      $.ajax({
-        method: method,
-        url: submissionURI,
-        data: data
-      }).done(function (data, textStatus, xhr) {
-        chrome.tabs.query({
-          active: true,
-          currentWindow: true
-        }, function (tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {
-            method: 'archiveDone',
-            data: xhr.getResponseHeader('Content-Location'),
-            imgId: request.imgId,
-            imgURI: request.imgURI,
-            callback: request.cb,
-            newTab: request.newTab
-          })
-        })
-      })
+      window.fetch(submissionURI).then(
+        response => {
+          changeArchiveIcon(request, response)
+        }
+      )
     } else {
       log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
   }
 )
+
+function changeArchiveIcon (request, response) {
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      method: 'archiveDone',
+      data: response.url,
+      imgId: request.imgId,
+      imgURI: request.imgURI,
+      callback: request.cb,
+      newTab: request.newTab
+    })
+  })
+}
 
 function fetchTimeMap (uri, tabid) {
   log(`Fetching TimeMap for ${uri} in tab ${tabid}`)

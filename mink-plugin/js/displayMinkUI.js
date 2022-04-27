@@ -39,12 +39,15 @@ function appendHTMLToShadowDOM () {
         }
         let mCount = mementos.length
         const minkuiRoot = document.querySelector('#minkuiX')
+        const viewingMemento = items.timemaps && items.timemaps[document.URL] &&
+          items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime
 
-        if (items.timemaps && items.timemaps[document.URL] && items.timemaps[document.URL].mementos && items.timemaps[document.URL].datetime) {
+        if (viewingMemento) {
           mCount = items.timemaps[document.URL].mementos.length
 
           // Hide initially irrelevant UI items
-          const selectorsToHide = ['.dropdown', '#drildownBox', '#steps', '#title_dropdown', '#archiveNow']
+          const selectorsToHide = ['.dropdown', '#drilldownBox', '#steps', '#title_dropdown', '#archiveNow']
+
           selectorsToHide.forEach(selector => {
             minkuiRoot.querySelector(selector).classList.add('hidden')
           })
@@ -107,12 +110,14 @@ function appendHTMLToShadowDOM () {
         }
 
         // Append CSS1
-        let mementoPlurality = 'mementos'
-        minkuiRoot.querySelector('#mementosAvailable span#mementoCount').innerHTML = mCount.toLocaleString()
-        if (mCount === 1) {
-          mementoPlurality = 'memento'
+        if (!viewingMemento) {
+          let mementoPlurality = 'mementos'
+          minkuiRoot.querySelector('#mementosAvailable span#mementoCount').innerHTML = mCount.toLocaleString()
+          if (mCount === 1) {
+            mementoPlurality = 'memento'
+          }
+          minkuiRoot.querySelector('#mementosAvailable span#mementoPlurality').innerHTML = mementoPlurality
         }
-        minkuiRoot.querySelector('#mementosAvailable span#mementoPlurality').innerHTML = mementoPlurality
 
         // Append CSS2
         appendCSSToShadowDOM(cb)
@@ -120,11 +125,12 @@ function appendHTMLToShadowDOM () {
     })
 }
 
-const addZ = (n) => {
+// In some places, getting addZ has already been declared, thus var for now
+var addZ = (n) => {
   return n < 10 ? '0' + n : '' + n
 }
 
-const buildDropDown = (mementos) => {
+function buildDropDown (mementos) {
   let mementoDropdown = document.querySelector('#mementosDropdown')
   for (let mm = 0; mm < mementos.length; mm++) {
     let newOption = document.createElement('option')
@@ -140,7 +146,7 @@ const buildDropDown = (mementos) => {
   }
 }
 
-const switchToArchiveNowInterface = () => {
+function switchToArchiveNowInterface () {
   const showElements = ['#mementosDropdown', '#drilldownBox', '#viewMementoButton','#minkStatus #steps', '#archiveNow']
   showElements.forEach(element => {
     document.querySelector(element).classList.add('noMementos')
@@ -657,7 +663,7 @@ chrome.runtime.onMessage.addListener(
   }
 )
 
-function showSuccessfullyArchivedURI (uri, openInNewTab) {
+function showSuccessfullyArchivedURI (archiveURI, openInNewTab) {
   chrome.runtime.sendMessage({
     method: 'notify',
     title: 'Mink',
@@ -666,8 +672,6 @@ function showSuccessfullyArchivedURI (uri, openInNewTab) {
 
   const shadow = document.getElementById('minkWrapper').shadowRoot
   shadow.getElementById('archivelogo_ia').classList.add('archiveNowSuccess')
-
-  const archiveURI = 'https://web.archive.org' + uri
   shadow.getElementById('archivelogo_ia').setAttribute('title', archiveURI)
   shadow.getElementById('archivelogo_ia').onclick = function () {
     if (!openInNewTab) {
