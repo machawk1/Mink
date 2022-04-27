@@ -244,62 +244,42 @@ chrome.runtime.onMessage.addListener(
       let submissionURI
       let data = {}
       let method = 'GET'
+      console.log(`sending request to ${request.archive}`)
       if (request.archive === 'ia') {
         submissionURI = `http://web.archive.org/save/${request.urir}`
         method = 'GET'
       } else if (request.archive === 'ais') {
         // TODO: get value of submitted from AIS interface
         submissionURI = 'https://archive.is/submit/'
-        method = 'post'
+        method = 'get'
         fetchArchiveIsSubmitID().then(submitidExtracted => {
           console.log(`Submitted to archive.is with url ${request.urir} and submitid ${submitidExtracted}`)
-          const data = new FormData()
-          data.append('submitid', submitidExtracted)
-          data.append('url', request.urir)
+          submissionURI = `${submissionURI}?url=${request.urir}&submitid=${submitidExtracted}`
 
-          for(let pair of data.entries()) {
-            console.log(`${pair[0]}: ${pair[1]}`)
-          }
-          fetch(submissionURI, {
-            method: 'POST',
-            body: data
-          }).then(
-            response => response.text()
-          ).then(
-            html => console.log(html)
+          window.fetch(submissionURI).then(
+            response => {
+              // e.g., https://archive.ph/C2NCh/again?url=https://weiglemc.github.io/
+              // TODO: trim off everything before /again?
+              // ?again might only occur when a URL is newly minted, to research
+              console.log(response.url.split('/again').pop())
+              // TODO: the call below does not have a properly formed response object
+              changeArchiveIcon(request, response)
+
+            }
           )
-          return
-
-          // xhr used instead of fetch bc we need the Content-Location response header
-          let xhr = new XMLHttpRequest()
-          xhr.addEventListener('load', readArchiveIsResponse)
-          xhr.open(method, submissionURI)
-          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-
-          xhr.send(data)
-          console.log(xhr)
-          return
-
-          chrome.tabs.query({
-            active: true,
-            currentWindow: true
-          }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              method: 'archiveDone',
-              data: xhr.getResponseHeader('Content-Location'),
-              imgId: request.imgId,
-              imgURI: request.imgURI,
-              callback: request.cb,
-              newTab: request.newTab
-            })
-          })
-
-          return
         })
+        return
       }
+      // NOTE THAT ARCHIVE.IS changed back from POST to GET but the below still returns a 404 for invalid URI
+      // maybe escape it?
+
+
 
       window.fetch(submissionURI).then(
         response => {
+          console.log('xxx')
+          console.log(request)
+          console.log(response)
           changeArchiveIcon(request, response)
         }
       )
