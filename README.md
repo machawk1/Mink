@@ -47,12 +47,12 @@ This project was originally presented at the ACM/IEEE Joint Conference on Digita
 
 ```bib
 @INPROCEEDINGS { kelly-dl2014-mink,
-    AUTHOR = { Mat Kelly, Michael L. Nelson, and Michele C. Weigle },
+    AUTHOR = { Mat Kelly and Michael L. Nelson and Michele C. Weigle },
     TITLE = { Mink: Integrating the Live and Archived Web Viewing Experience Using Web Browsers and Memento },
     BOOKTITLE = { Proceedings of the ACM/IEEE Joint Conference on Digital Libraries (JCDL) },
     YEAR = { 2014 },
-    MONTH = { September },
-    ADDRESS = { London, England },
+    MONTH = { 9 },
+    ADDRESS = { London, UK },
     PAGES = {469--470},
     DOI = {10.1109/JCDL.2014.6970229}
 }
