@@ -261,7 +261,16 @@ function saveAndCloseOptionsPanel () {
 function restoreDefaults () {
   clearIgnorelist()
   clearTimemapCache()
+  resetAggregatorSelection()
 }
+
+
+function resetAggregatorSelection () {
+  let dropdown = document.querySelector('#aggregator')
+  dropdown.selectedIndex = 0
+  saveAggregatorSource()
+}
+
 
 function removeSelectedURIFromTimeMapCache () {
   const oURI = $('#cachedTimemaps option:selected').text()
