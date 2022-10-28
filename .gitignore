@@ -11,5 +11,6 @@ package-lock.json
 !.jshintrc
 !.jshintignore
 !.travis.yml
+!.stylelintrc.json
 !.github/
 
