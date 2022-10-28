@@ -3,7 +3,7 @@
     "stylelint-use-logical"
   ],
   "rules": {
-    "csstools/use-logical": ["always", {"except": ['float']}]
+    "csstools/use-logical": ["always", {"except": ["float"]}]
   },
   "ignoreFiles": [
     "mink-plugin/css/select2.css"
