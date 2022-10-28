@@ -11,3 +11,5 @@ package-lock.json
 !.jshintrc
 !.jshintignore
 !.travis.yml
+!.github/
+
