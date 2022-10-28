@@ -14,4 +14,3 @@ jobs:
       - uses: actions-hub/stylelint@master
         env:
           PATTERN: "./mink-plugin/css/*.css"
-          #PATTERN: "./mink-plugin/css/*.css"
