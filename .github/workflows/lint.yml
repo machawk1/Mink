@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions-hub/stylelint@master
+        env:
+          PATTERN "mink_plugin/css/options.css"
       #- name: Lint CSS
       #  run: |
       #    npm install stylelint-use-logical --save-dev
