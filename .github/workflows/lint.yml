@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint the CSS
     steps:
-      - run: |
-        npm install stylelint-use-logical --save-dev
+      run: |
+         npm install stylelint-use-logical --save-dev
       - uses: actions/checkout@v3
       - uses: actions-hub/stylelint@master
         env:
