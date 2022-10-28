@@ -12,10 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions-hub/stylelint@master
-      - name: Lint JavaScript
-        run: |
-          npm install standard
-          node_modules/.bin/standard
       - name: Lint CSS
         run: |
           npm install stylelint-use-logical --save-dev
