@@ -13,4 +13,5 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions-hub/stylelint@master
         env:
-          PATTERN: "./mink-plugin/css/*.css"
+          PATTERN: "./mink-plugin/css/options.css"
+          #PATTERN: "./mink-plugin/css/*.css"
