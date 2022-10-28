@@ -8,7 +8,7 @@ jobs:
   lint:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
-    name: JS
+    name: Lint the CSS
     steps:
       - uses: actions/checkout@v3
       - uses: actions-hub/stylelint@master
