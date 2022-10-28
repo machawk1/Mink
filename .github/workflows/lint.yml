@@ -12,9 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions-hub/stylelint@master
-      - name: Lint CSS
-        run: |
-          npm install stylelint-use-logical --save-dev
-          node_modules/.bin/stylelint ./mink-plugin/css/options.css
-          # Ultimate check minkui.css, too, but for #348, just fix options.css
-          # node_modules/.bin/stylelint ./mink-plugin/css/minkui.css ./mink-plugin/css/options.css
+      #- name: Lint CSS
+      #  run: |
+      #    npm install stylelint-use-logical --save-dev
+      #    node_modules/.bin/stylelint ./mink-plugin/css/options.css
+      #    Ultimately check minkui.css, too, but for #348, just fix options.css
+      #     node_modules/.bin/stylelint ./mink-plugin/css/minkui.css ./mink-plugin/css/options.css
