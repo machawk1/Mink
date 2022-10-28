@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  lint:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    name: JS
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-hub/stylelint@master
+      - name: Lint JavaScript
+        run: |
+          npm install standard
+          node_modules/.bin/standard
+      - name: Lint CSS
+        run: |
+          npm install stylelint-use-logical --save-dev
+          node_modules/.bin/stylelint ./mink-plugin/css/options.css
+          # Ultimate check minkui.css, too, but for #348, just fix options.css
+          # node_modules/.bin/stylelint ./mink-plugin/css/minkui.css ./mink-plugin/css/options.css
