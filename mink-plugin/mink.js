@@ -258,7 +258,6 @@ function changeArchiveIcon (request, response) {
       newTab: request.newTab
     })
   })
-
 }
 
 function fetchTimeMap (uri, tabid) {
@@ -311,9 +310,9 @@ function setBadgeText (value, tabid) {
     badgeValue = maxBadgeDisplay
   }
 
-  let badgeColor = '#090'
+  let badgeColor = '#080'
   if (value === stillProcessingBadgeDisplay) {
-    badgeColor = '#900'
+    badgeColor = '#800'
   }
 
   if (!badgeValue) {

@@ -28,7 +28,7 @@ function restoreOptions () {
 
   chrome.storage.local.get('aggregators', function (ls) {
     let dropdownOptions = document.querySelector('#aggregator').options
-    for (let i=0; i< dropdownOptions.length; i++) {
+    for (let i = 0; i < dropdownOptions.length; i++) {
       if (dropdownOptions[i].value == ls.aggregators[0]) {
         document.querySelector('#aggregator').selectedIndex = i
         break
@@ -70,7 +70,7 @@ function saveAggregatorSource () {
   let dropdown = document.querySelector('#aggregator')
   let availableOptions = [dropdown.options[dropdown.selectedIndex].value]
 
-  for(let i = 0; i < dropdown.options.length; i++) {
+  for (let i = 0; i < dropdown.options.length; i++) {
     if (!dropdown.options[i].disabled && i != dropdown.selectedIndex) {
       availableOptions.push(dropdown.options[i].value)
     }
@@ -78,7 +78,7 @@ function saveAggregatorSource () {
   if (debug) {
     console.log(`Setting aggregator chain to ${availableOptions.join(',')}`)
   }
-  chrome.storage.local.set({'aggregators': availableOptions})
+  chrome.storage.local.set({ 'aggregators': availableOptions })
 }
 
 function updateSaveButtonStatus () {
@@ -261,7 +261,16 @@ function saveAndCloseOptionsPanel () {
 function restoreDefaults () {
   clearIgnorelist()
   clearTimemapCache()
+  resetAggregatorSelection()
 }
+
+
+function resetAggregatorSelection () {
+  let dropdown = document.querySelector('#aggregator')
+  dropdown.selectedIndex = 0
+  saveAggregatorSource()
+}
+
 
 function removeSelectedURIFromTimeMapCache () {
   const oURI = $('#cachedTimemaps option:selected').text()

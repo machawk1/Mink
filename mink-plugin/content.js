@@ -142,6 +142,7 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
     .then(setTimeout(() => { aborter.abort() }, timeout))
     .catch(error => {
       log(`${url} appears to be down, incrementing host counter`)
+      log(error)
       hostI += 1
     })
 }
