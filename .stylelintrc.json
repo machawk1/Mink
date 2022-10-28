@@ -4,5 +4,8 @@
   ],
   "rules": {
     "csstools/use-logical": ["always"]
-  }
+  },
+  "ignoreFiles": [
+    "mink-plugin/css/select2.css"
+  ]
 }
