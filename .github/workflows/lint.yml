@@ -14,6 +14,7 @@ jobs:
       - uses: actions-hub/stylelint@master
         env:
           PATTERN: "./mink-plugin/css/options.css"
+      name: Lint CSS
       run: |
           npm install stylelint-use-logical --save-dev
           node_modules/.bin/stylelint
