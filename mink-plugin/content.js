@@ -117,7 +117,7 @@ function normalDisplayUIBC (items) {
   } else { // Not a Memento, no TM in cache
     log('Not a memento, no TimeMap in cache')
 
-    log(`Checking is aggregator at ${memgatorHosts[hostI]} is alive`)
+    log(`Checking if aggregator at ${memgatorHosts[hostI]} is alive`)
     checkAggregatorHealthAndSet(hostI).then(_ => {
       log(`Getting URL ${document.URL} with aggregator ${memgatorHosts[hostI]}`)
       getMementos(document.URL)
