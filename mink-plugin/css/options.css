@@ -12,21 +12,21 @@ nav {
     background-color: #eeeeee;
     width: 25%;
     height: 100%;
-    padding-top: 5%;
+    padding-block-start: 5%;
     position: fixed;
-    top: 100px;
+    inset-block-start: 100px;
 }
 
 nav ul {
     list-style-type: none;
-    padding-left: 0;
-    text-align: right;
+    padding-inline-start: 1.0em;
+    text-align: start;
 }
 
 nav ul li {
     height: 15%;
-    padding-right: 5%;
-    margin-bottom: 1.0em;
+    padding-inline-end: 5%;
+    margin-block-end: 1.0em;
 }
 
 nav ul li a {
@@ -53,8 +53,8 @@ nav ul li p {
     width: 25%;
     text-align: center;
     position: fixed;
-    top: 10px;
-    left: 10px;
+    inset-block-start: 10px;
+    inset-inline-start: 10px;
     z-index: 2;
 }
 
@@ -63,7 +63,7 @@ nav ul li p {
 }
 
 main {
-    margin-left: 26%;
+    margin-inline-start: 26%;
 }
 
 h1, h3 {
@@ -82,21 +82,24 @@ p {
 }
 
 
-main {margin-bottom: 100.0em;}
+main {
+    margin-block-end: 100.0em;
+}
+
 main h3 {
-    margin-top: 1.0em;
+    margin-block-start: 1.0em;
 }
 
 main section > p {
     background-color: #f7f7f7;
     padding: 5px;
-    margin-top: 0;
+    margin-block-start: 0;
     border: 1px solid #f0f0f0;
-    margin-right: 1.0em;
+    margin-inline-end: 1.0em;
 }
 
 fieldset {
-    margin-right: 1.0em;
+    margin-inline-end: 1.0em;
 }
 
 .glyphicon-plus-sign {
@@ -107,15 +110,15 @@ fieldset {
     color: white;
     background-color: red;
     font-weight: bold;
-    margin-left: 1.0em;
+    margin-inline-start: 1.0em;
     width: 1.0em;
     height: 1.0em;
     border-radius: 15px;
 }
 
 ul {
-    margin-left: 0;
-    padding-left: 0;
+    margin-inline-start: 0;
+    padding-inline-start: 0;
     list-style-type: none;
 }
 
@@ -124,7 +127,7 @@ li {
 }
 
 button {
-    margin-right: 0.5em;
+    margin-inline-end: 0.5em;
 }
 
 .strike span {
@@ -141,11 +144,11 @@ button#save.disabled {
 }
 
 #add {
-    float: right;
+    float: inline-end;
 }
 span.note {
     color: #999;
     font-size: 0.8em;
-    padding-left: 1.0em;
+    padding-inline-start: 1.0em;
     font-style: italic;
 }

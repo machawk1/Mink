@@ -1,0 +1,16 @@
+name: Lint
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  lint:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    name: Lint the CSS
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-hub/stylelint@master
+        env:
+          PATTERN: "./mink-plugin/css/*.css"
