@@ -260,8 +260,10 @@ chrome.runtime.onMessage.addListener(
       }
 
       // TODO: XHR to fetch for MV3 implementation incomplete below
-      const resp = await fetch(submissionURI)
-      changeArchiveIcon(request, response)
+      (async function () {
+        const resp = await fetch(submissionURI)
+        changeArchiveIcon(request, response)
+      })
     } else {
       log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
