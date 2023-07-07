@@ -11,28 +11,28 @@ const browserActionTitleNoMementos = 'Mink - No Mementos Available'
 const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
 
 const badgeImagesDisabled = {
-  38: chrome.extension.getURL('images/minkLogo38_disabled.png'),
-  19: chrome.extension.getURL('images/minkLogo19_disabled.png')
+  38: chrome.runtime.getURL('images/minkLogo38_disabled.png'),
+  19: chrome.runtime.getURL('images/minkLogo19_disabled.png')
 }
 
 const badgeImagesIgnorelisted = {
-  38: chrome.extension.getURL('images/minkLogo38_ignorelisted.png'),
-  19: chrome.extension.getURL('images/minkLogo19_ignorelisted.png')
+  38: chrome.runtime.getURL('images/minkLogo38_ignorelisted.png'),
+  19: chrome.runtime.getURL('images/minkLogo19_ignorelisted.png')
 }
 
 const badgeImagesNoMementos = {
-  38: chrome.extension.getURL('images/minkLogo38_noMementos2.png'),
-  19: chrome.extension.getURL('images/minkLogo19_noMementos2.png')
+  38: chrome.runtime.getURL('images/minkLogo38_noMementos2.png'),
+  19: chrome.runtime.getURL('images/minkLogo19_noMementos2.png')
 }
 
 const badgeImagesMink = {
-  38: chrome.extension.getURL('images/minkLogo38.png'),
-  19: chrome.extension.getURL('images/minkLogo19.png')
+  38: chrome.runtime.getURL('images/minkLogo38.png'),
+  19: chrome.runtime.getURL('images/minkLogo19.png')
 }
 
 const badgeImagesIsAMemento = {
-  38: chrome.extension.getURL('images/mLogo38_isAMemento.png'),
-  19: chrome.extension.getURL('images/mLogo19_isAMemento.png')
+  38: chrome.runtime.getURL('images/mLogo38_isAMemento.png'),
+  19: chrome.runtime.getURL('images/mLogo19_isAMemento.png')
 }
 
 function log (...messages) {
@@ -48,7 +48,7 @@ function inDevelopmentMode () {
   return !('update_url' in chrome.runtime.getManifest())
 }
 
-chrome.browserAction.onClicked.addListener(function (tab) {
+chrome.action.onClicked.addListener(function (tab) {
   const scheme = (new window.URL(tab.url)).origin.substr(0, 4)
   if (scheme !== 'http') {
     log(`Invalid scheme for Mink: ${scheme}`)
@@ -95,9 +95,9 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
   // TODO: This should not rely on the badge count to detect zero mementos, as badges
   //  are no longer used for no mementos present.
   // - maybe rely on the title, since the icon's src path cannot be had.
-  chrome.browserAction.getBadgeText({ tabId: tabid }, function (result) {
+  chrome.action.getBadgeText({ tabId: tabid }, function (result) {
     if (!result.length && !Number.isInteger(result) && result !== maxBadgeDisplay) {
-      chrome.browserAction.getTitle({ tabId: tabid }, function (result) {
+      chrome.action.getTitle({ tabId: tabid }, function (result) {
         // Only set badge text if not viewing a memento
         if (result === browserActionTitleNoMementos) {
           displayMinkUI(tabid)
@@ -120,7 +120,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
       return // Badge has not yet been set
     }
 
-    chrome.browserAction.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
+    chrome.action.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
       if (currentBadgeText !== stillProcessingBadgeDisplay) {
         displayMinkUI(tabid)
       }
@@ -432,20 +432,22 @@ function stopWatchingRequestsIgnorelisted () {
   })
 }
 
-chrome.contextMenus.create({
-  id: 'mink_stopStartWatching',
-  title: 'Stop Watching Requests',
-  contexts: ['browser_action'],
+chrome.contextMenus.onClicked.addListener(stopWatchingRequests) /*{
+//  id: 'mink_stopStartWatching',
+//  title: 'Stop Watching Requests',
+//  contexts: ['browser_action'],
   onclick: stopWatchingRequests
 }, function (err) {
   if (err) { console.log('error creating second contextmenu') }
-})
+})*/
 
-chrome.contextMenus.create({
+chrome.contextMenus.onClicked.addListener (addToIgnoreList)
+/*create({
+  id: 'mink_addURLToIgnoreList',
   title: 'Add URL to Mink Ignore List',
   contexts: ['browser_action', 'all'],
   onclick: addToIgnoreList
-})
+})*/
 
 function addToIgnoreList () {
   chrome.tabs.query({

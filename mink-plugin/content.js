@@ -461,6 +461,8 @@ function animatePageActionIcon () {
     clearTimeout(animationTimer)
     return
   }
+  
+  // TOFIX: extension context invalidated
   chrome.runtime.sendMessage({
     method: 'setBadge',
     text: '',
