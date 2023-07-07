@@ -258,11 +258,10 @@ chrome.runtime.onMessage.addListener(
         method = 'POST'
         data = { coo: '', url: request.urir }
       }
-      window.fetch(submissionURI).then(
-        response => {
-          changeArchiveIcon(request, response)
-        }
-      )
+
+      // TODO: XHR to fetch for MV3 implementation incomplete below
+      const resp = await fetch(submissionURI)
+      changeArchiveIcon(request, response)
     } else {
       log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
@@ -344,22 +343,22 @@ function setBadgeText (value, tabid) {
     badgeValue = ''
   }
 
-  chrome.browserAction.setBadgeText({ text: badgeValue + '', tabId: tabid })
-  chrome.browserAction.setBadgeBackgroundColor({ color: badgeColor, tabId: tabid })
+  chrome.action.setBadgeText({ text: badgeValue + '', tabId: tabid })
+  chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId: tabid })
 }
 
 function setBadgeTitle (newTitle, tabid) {
   log('Setting badge title')
-  chrome.browserAction.setTitle({ title: newTitle, tabId: tabid })
+  chrome.action.setTitle({ title: newTitle, tabId: tabid })
 }
 
 function setBadgeIcon (icons, tabid) {
-  chrome.browserAction.setIcon({ tabId: tabid, path: icons })
+  chrome.action.setIcon({ tabId: tabid, path: icons })
 }
 
 function setBadge (value, icon, tabid) {
   if (value === '') {
-    chrome.browserAction.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
+    chrome.action.getBadgeText({ tabId: tabid }, function (currentBadgeText) {
       setBadgeText(currentBadgeText + '', tabid)
     })
   } else {
@@ -369,9 +368,9 @@ function setBadge (value, icon, tabid) {
   setBadgeIcon(icon, tabid)
 
   if (JSON.stringify(icon) === JSON.stringify(badgeImagesIsAMemento)) {
-    chrome.browserAction.setTitle({ title: browserActionTitleViewingMemento })
+    chrome.action.setTitle({ title: browserActionTitleViewingMemento })
   } else {
-    chrome.browserAction.setTitle({ title: browserActionTitleNormal })
+    chrome.action.setTitle({ title: browserActionTitleNormal })
   }
 }
 
@@ -741,3 +740,20 @@ function showInterfaceForZeroMementos (tabid) {
   setBadgeIcon(badgeImagesNoMementos, tabid)
   setBadgeTitle(browserActionTitleNoMementos, tabid)
 }
+
+chrome.action.onClicked.addListener(tab => {
+  console.log('MV3 SW activated')
+
+})
+
+// Save default API suggestions
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason === 'install') {
+    console.log('extension installed, reported via SW registration')
+    //chrome.storage.local.set({
+    //  apiSuggestions: ['tabs', 'storage', 'scripting']
+    //});
+  }
+});
+
+
