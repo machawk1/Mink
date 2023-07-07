@@ -146,11 +146,22 @@ function displayMinkUI (tabId) {
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.method === 'store') {
-      window.localStorage.setItem('minkURI', request.value)
-      window.localStorage.setItem('mementos', request.mementos)
-      window.localStorage.setItem('memento_datetime', request.memento_datetime)
+      chrome.storage.local.set({
+        'minkURI': request.value,
+        'mementos': request.memento,
+        'memento_datetime': request.memento_datetime
+      }).then(() => {
+        if (debug) {
+          console.log('sw local storage set')
+        }
 
-      sendResponse({ value: 'noise' })
+        sendResponse({ value: 'noise' })
+      })
+      // window.localStorage.setItem('minkURI', request.value)
+      // window.localStorage.setItem('mementos', request.mementos)
+      // window.localStorage.setItem('memento_datetime', request.memento_datetime)
+
+      //sendResponse({ value: 'noise' })
     } else if (request.method === 'findTMURI') {
       log('Got findTMURI')
       findTMURI(request.timegate, sender.tab.id)
@@ -163,11 +174,25 @@ chrome.runtime.onMessage.addListener(
       })
     } else if (request.method === 'retrieve') {
       log('Retrieving items from localStorage')
-      sendResponse({
-        value: window.localStorage.getItem('minkURI'),
-        mementos: window.localStorage.getItem('mementos'),
-        memento_datetime: window.localStorage.getItem('memento_datetime')
-      })
+      // See https://developer.chrome.com/docs/extensions/reference/storage/#property-local
+      const keysFromLS = ['minkURI', 'mementos', 'memento_datetime']
+
+      // MV3 is a good thing. MV3 is a good thing. MV3 is a good thing.
+      chrome.storage.local.get([keysFromLS[0], keysFromLS[1], keysFromLS[2]],
+          (valuesFromLS) => {
+            sendResponse({
+              value: valuesFromLS[keysFromLS[0]],
+              mementos: valuesFromLS[keysFromLS[1]],
+              memento_datetime: valuesFromLS[keysFromLS[2]]
+            })
+          }
+      )
+
+      // sendResponse({
+      //  value: window.localStorage.getItem('minkURI'),
+      //  mementos: window.localStorage.getItem('mementos'),
+      //  memento_datetime: window.localStorage.getItem('memento_datetime')
+      // })
     } else if (request.method === 'fetchTimeMap') {
       fetchTimeMap(request.value, sender.tab.id)
     } else if (request.method === 'notify') {
