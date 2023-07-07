@@ -286,9 +286,20 @@ function changeArchiveIcon (request, response) {
   })
 }
 
-function fetchTimeMap (uri, tabid) {
+async function fetchTimeMap (uri, tabid) {
   log(`Fetching TimeMap for ${uri} in tab ${tabid}`)
 
+  const resp = fetch(uri)
+  resp.then((response) => {
+    console.log('XXXXX')
+    console.log(response.body)
+    data = response.body
+    displaySecureSiteMementos(data.mementos.list, tabid)
+  })
+  console.log('done')
+
+  // TODO: re-impelement the below using fetch
+/*
   $.ajax({
     url: uri,
     type: 'GET'
@@ -327,6 +338,8 @@ function fetchTimeMap (uri, tabid) {
       method: 'stopAnimatingBrowserActionIcon'
     })
   })
+
+ */
 }
 
 function setBadgeText (value, tabid) {

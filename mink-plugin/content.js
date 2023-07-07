@@ -461,13 +461,13 @@ function animatePageActionIcon () {
     clearTimeout(animationTimer)
     return
   }
-  
+
   // TOFIX: extension context invalidated
-  chrome.runtime.sendMessage({
+  /*chrome.runtime.sendMessage({
     method: 'setBadge',
     text: '',
     iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] }
-  })
+  })*/
   iteration--
 
   if (iteration < 0) { iteration = clockIcons38.length - 1 }
