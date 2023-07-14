@@ -1,5 +1,5 @@
 <h2 align="center">
- <a href="https://github.com/machawk1/mink"><img src="https://github.com/machawk1/Mink/blob/main/meta/mink_marvel_300_noTrans.png" alt="Mink logo" /></a><br />Integrate the Live and Archived Web Viewing Experience</h2>
+ <a href="https://github.com/machawk1/mink"><img src="https://github.com/machawk1/Mink/blob/main/meta/mink_marvel_300_noTrans.png?raw=true" alt="Mink logo" /></a><br />Integrate the Live and Archived Web Viewing Experience</h2>
 
 <p align="center">
   <a href="http://standardjs.com/"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" /></a>
