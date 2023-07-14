@@ -20,7 +20,9 @@
   "icons": { 
     "16": "images/mink_marvel_16.png",
     "48": "images/mink_marvel_48.png",
-    "128": "images/mink_marvel_128.png"
+    "128": "images/mink_marvel_128.png",
+    "256": "images/mink_marvel_256.png",
+    "512": "images/mink_marvel_512.png"
   },
   "permissions": [
     "webRequest",
