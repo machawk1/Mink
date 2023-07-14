@@ -38,7 +38,7 @@
     {
       "js": [
         "js/jquery-3.4.1.min.js","js/select2/select2.min.js",
-        "jquery.miller.js/jquery.miller.js",
+        "jquery.miller.js/miller.js",
 
         "content.js","timemap.js"],
       "matches": ["http://*/*", "https://*/*"],
@@ -80,7 +80,7 @@
     
     "images/archives/dropdown_ia.png", "images/archives/dropdown_ais.png", "images/archives/dropdown_wc.png", "css/select2.css",   
   
-    "jquery.miller.js/jquery.miller.js","jquery.miller.js/jquery.miller.css",
+    "jquery.miller.js/miller.js","jquery.miller.js/jquery.miller.css",
     "font-awesome-4.0.3/css/font-awesome-modified.css",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.eot",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.svg",
