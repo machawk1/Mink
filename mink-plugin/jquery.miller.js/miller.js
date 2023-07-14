@@ -23,7 +23,7 @@
             'url': function (id) { return id },
             'tabindex': 0,
             'minWidth': 40,
-            'carroussel': false,
+            'carrousel': false,
             'toolbar': {
               'options': {}
             },
@@ -80,7 +80,7 @@
               case 38:
                 newCurrentLine = currentLine.prev()
 
-                if (!newCurrentLine.length && settings.carroussel) {
+                if (!newCurrentLine.length && settings.carrousel) {
                   newCurrentLine = currentLine.parent().find('li:last')
                   scrollTop = newCurrentLine.position().top
                 }
@@ -93,7 +93,7 @@
               case 40:
                 newCurrentLine = currentLine.next()
 
-                if (!newCurrentLine.length && settings.carroussel) {
+                if (!newCurrentLine.length && settings.carrousel) {
                   newCurrentLine = currentLine.parent().find('li:first')
                   scrollTop = 0
                 }
@@ -145,11 +145,7 @@
 
           child -= (child - (child / 2))
 
-          path
-            .scrollLeft(node.position().left)
-            .children()
-            .slice(child, -1)
-            .remove()
+          path.scrollLeft(node.position().left).children().slice(child, -1).remove()
         }
 
       let buildColumn = function (lines) {
