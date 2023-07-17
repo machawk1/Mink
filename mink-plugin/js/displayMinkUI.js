@@ -509,9 +509,11 @@ function buildDrilldownTime (year, month, date) {
       continue
     }
 
-    mementos[memento].time = addZ(mementoDatetime.getHours()) + ':' +
-      addZ(mementoDatetime.getMinutes()) + ':' +
-      addZ(mementoDatetime.getSeconds())
+    const paddedHours = addZ(mementoDatetime.getHours())
+    const paddedMinutes = addZ(mementoDatetime.getMinutes())
+    const paddedSeconds = addZ(mementoDatetime.getSeconds())
+    mementos[memento].time = `${paddedHours}:${paddedMinutes}:${paddedSeconds}`
+
     times.push(mementos[memento])
   }
 
@@ -647,7 +649,7 @@ function bindDrilldown () {
 
 function changeIconFor (id, src) {
   const shadow = document.getElementById('minkWrapper').shadowRoot
-  shadow.querySelector('#' + id).setAttribute('src', src)
+  shadow.querySelector(`#{id}`).setAttribute('src', src)
 }
 
 chrome.runtime.onMessage.addListener(
