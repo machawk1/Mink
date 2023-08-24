@@ -31,7 +31,7 @@ If no mementos exist in the archive, the extension will indicate this with a red
 
 ## Development
 
-Chrome supports debugging extensions by loading them from the local file system. To do this, go to `More Tools > Extensions`, enabled the `Developer mode` switch, click the `Load unpacked` button, and select the `mink-plugin` directory in the working directory clone of this repository.
+Chrome supports debugging extensions by loading them from the local file system. To do this, go to `Window > Extensions`, enabled the `Developer mode` switch, click the `Load unpacked` button, and select the `mink-plugin` directory in the working directory clone of this repository.
 
 For packaging the extension and releasing a new version, enter the `mink-plugin` directory, type
 
