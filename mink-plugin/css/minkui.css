@@ -7,8 +7,8 @@
 }
 
 #minkuiX {
-    width: 100%;
-    height: 80px;
+    inline-size: 100%;
+    block-size: 80px;
     background-color: #eef;
     margin: 0;
     inset-block-start: 0;
@@ -24,14 +24,14 @@
 }
 
 #minkuiX #minkLogo {
-    height: 100%;
+    block-size: 100%;
     float: left;
     z-index: 2;
     position: relative;
 }
 
 #minkuiX #minkStatus {
-    width: 100%;
+    inline-size: 100%;
     position: absolute;
     inset-block-end: 0;
     inset-inline-start: 0;
@@ -39,7 +39,7 @@
     padding: 0;
     background-color: #ccf;
     z-index: 1;
-    height: 1.2em;
+    block-size: 1.2em;
     border-block-start: 1px solid #bbf;
     border-block-end: 2px solid #aaf;
 }
@@ -48,11 +48,11 @@
     list-style-type: none;
     margin: 0;
     padding: 0;
-    width: 700px;
+    inline-size: 700px;
 }
 
 #minkuiX #minkStatus li {
-    width: 100px;
+    inline-size: 100px;
     float: left;
     text-align: center;
     vertical-align: middle;
@@ -88,7 +88,7 @@
     text-decoration: none;
 }
 #minkuiX #minkStatus li#stepsTitle {
-    width: 200px;
+    inline-size: 200px;
     text-align: end;
 }
 
@@ -102,16 +102,16 @@ h1 {
 }
 
 .archiveNowInterface {
-    width: 50px;
-    height: 50px;
+    inline-size: 50px;
+    block-size: 50px;
     vertical-align: top;
     position: relative;
     z-index: 5;
 }
 
 #goBackButton {
-    width: auto;
-    height: 1.75em;
+    inline-size: auto;
+    block-size: 1.75em;
     margin-inline-start: 3.0em;
 }
 
@@ -147,11 +147,11 @@ h1 {
 
 #drilldownBox ul {
     list-style-type: none;
-    width: 100px;
+    inline-size: 100px;
     float: left;
     padding: 0;
     background-color: white;
-    max-height: 500px;
+    max-block-size: 500px;
     overflow-x: hidden;
     overflow-y: auto;
     margin-block-start: 0;
@@ -162,7 +162,7 @@ h1 {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    width: 90px;
+    inline-size: 90px;
     text-decoration: none;
     color: inherit;
 }
