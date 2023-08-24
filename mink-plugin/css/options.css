@@ -10,8 +10,8 @@ body {
 nav {
     background: linear-gradient(180deg, #fff 0%, #eee 10%);
     background-color: #eeeeee;
-    width: 25%;
-    height: 100%;
+    inline-size: 25%;
+    block-size: 100%;
     padding-block-start: 5%;
     position: fixed;
     inset-block-start: 100px;
@@ -24,7 +24,7 @@ nav ul {
 }
 
 nav ul li {
-    height: 15%;
+    block-size: 15%;
     padding-inline-end: 5%;
     margin-block-end: 1.0em;
 }
@@ -50,7 +50,7 @@ nav ul li p {
 }
 
 #logo {
-    width: 25%;
+    inline-size: 25%;
     text-align: center;
     position: fixed;
     inset-block-start: 10px;
@@ -59,7 +59,7 @@ nav ul li p {
 }
 
 #logo img {
-    width: 128px;
+    inline-size: 128px;
 }
 
 main {
@@ -111,8 +111,8 @@ fieldset {
     background-color: red;
     font-weight: bold;
     margin-inline-start: 1.0em;
-    width: 1.0em;
-    height: 1.0em;
+    inline-size: 1.0em;
+    block-size: 1.0em;
     border-radius: 15px;
 }
 

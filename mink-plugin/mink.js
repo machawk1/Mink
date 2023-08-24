@@ -286,52 +286,63 @@ function changeArchiveIcon (request, response) {
   })
 }
 
+class InaccessibleAggregator extends Error {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+class ZeroMementos extends Error {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
 async function fetchTimeMap (uri, tabid) {
   log(`Fetching TimeMap for ${uri} in tab ${tabid}`)
 
-  const resp = fetch(uri)
-  resp.then((response) => {
-    console.log('XXXXX')
-    console.log(response.body)
-    data = response.body
-    displaySecureSiteMementos(data.mementos.list, tabid)
-  })
-  console.log('done')
+  fetch(uri)
+      .then(response => {
+        log('Fetching complete, proceeding')
+        const status_code = response.status
+        if (status_code == 404) {
+          throw new ZeroMementos(`No mementos for {uri}`)
+        } else if (status_code == 504) {
+          throw new InaccessibleAggregator(`Aggregator at {uri} reported a {status_code} status code`)
+        }
+        return console.log(status_code) || response
+      })
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        log(data)
+        if (!data.mementos) {
+          data = new Timemap(data)
+          // TODO: data.normalize()
+          const mems = data.mementos
+          delete data.mementos
+          data.mementos = { list: mems }
+          log(data)
+        }
+        displaySecureSiteMementos(data.mementos.list, tabid)
 
-  // TODO: re-impelement the below using fetch
+        data.original = data.original ? data.original : data.original_uri
+        setTimemapInStorage(data, data.original)
+      })
+      .catch(function(err) {
+        console.log(`Error fetching ${uri}`)
+        console.log(err.message)
+
+        if (err.name === 'ZeroMementos') {
+          showInterfaceForZeroMementos(tabid)
+        } else if (err.name === 'InaccessibleAggregator') {
+          log('TODO: swtich up the aggregator')
+        }
+      })
 /*
-  $.ajax({
-    url: uri,
-    type: 'GET'
-  }).done(function (data, textStatus, xhr, a, b) {
-    tmData = data
-    log(tmData)
-
-    if (!data.mementos) {
-      data = new Timemap(data)
-      // TODO: data.normalize()
-      const mems = data.mementos
-      delete data.mementos
-      data.mementos = { list: mems }
-      log(data)
-    }
-
-    displaySecureSiteMementos(data.mementos.list, tabid)
-    log('** ** displaySecureSiteMementos', data.mementos.list)
-
-    data.original = data.original ? data.original : data.original_uri
-
-    data.matstest = 'foo'
-    log('#204: foo', tmData, data.original, data)
-
-    tmData = data
-
     setTimemapInStorage(tmData, data.original)
-  }).fail(function (xhr, data, error) {
-    if (xhr.status === 404) {
-      log('querying secure FAILED, Display zero mementos interface')
-      showInterfaceForZeroMementos(tabid)
-    }
     log('Some error occurred with a secure site that was not a 404', xhr)
   }).always(function () {
     chrome.tabs.sendMessage(tabid, {

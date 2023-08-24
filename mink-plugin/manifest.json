@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Mink - Integrate Live & Archived Web +Memento",
   "short_name": "Mink",
-  "version": "2.5.5.2",
+  "version": "2.5.5.3",
   "description": "Integrating the Live and Archived Web Viewing Experience Using Memento",
   "homepage_url": "https://matkelly.com/mink",
   "author": "Mat Kelly <mink@matkelly.com>",
@@ -19,7 +19,9 @@
   "icons": { 
     "16": "images/mink_marvel_16.png",
     "48": "images/mink_marvel_48.png",
-    "128": "images/mink_marvel_128.png"
+    "128": "images/mink_marvel_128.png",
+    "256": "images/mink_marvel_256.png",
+    "512": "images/mink_marvel_512.png"
   },
   "permissions": [
     "webRequest",
@@ -37,7 +39,7 @@
     {
       "js": [
         "js/jquery-3.4.1.min.js","js/select2/select2.min.js",
-        "jquery.miller.js/jquery.miller.js",
+        "jquery.miller.js/miller.js",
 
         "content.js","timemap.js"],
       "matches": ["http://*/*", "https://*/*"],
@@ -77,10 +79,17 @@
     "js/select2/select2.min.js","js/select2/select2.min.css",
     "js/displayMinkUI.js", "minkui.html", "css/minkui.css", "images/minkLogo_300.png",
     "images/mink_marvel_80.png",
+<<<<<<< HEAD
 
     "images/archives/dropdown_ia.png", "images/archives/dropdown_ais.png", "images/archives/dropdown_wc.png", "css/select2.css",
 
     "jquery.miller.js/jquery.miller.js","jquery.miller.js/jquery.miller.css",
+=======
+    
+    "images/archives/dropdown_ia.png", "images/archives/dropdown_ais.png", "images/archives/dropdown_wc.png", "css/select2.css",   
+  
+    "jquery.miller.js/miller.js","jquery.miller.js/jquery.miller.css",
+>>>>>>> main
     "font-awesome-4.0.3/css/font-awesome-modified.css",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.eot",
     "font-awesome-4.0.3/fonts/fontawesome-webfont.svg",

@@ -222,7 +222,7 @@ function displayUIBasedOnContext () {
           log('Case 3: Link header and datetime', tm)
 
           chrome.runtime.sendMessage({
-            method: 'setTimemapInStorageAndCall', tm: tm, url: document.URL
+            method: 'setTimemapInStorageAndCall', tm, url: document.URL
           })
         } else {
           log('Case 3: Link header, datetime in cache')
