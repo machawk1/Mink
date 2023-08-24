@@ -147,11 +147,11 @@ h1 {
 
 #drilldownBox ul {
     list-style-type: none;
-    width: 100px;
+    inline-size: 100px;
     float: left;
     padding: 0;
     background-color: white;
-    max-height: 500px;
+    max-block-size: 500px;
     overflow-x: hidden;
     overflow-y: auto;
     margin-block-start: 0;
@@ -162,7 +162,7 @@ h1 {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    width: 90px;
+    inline-size: 90px;
     text-decoration: none;
     color: inherit;
 }

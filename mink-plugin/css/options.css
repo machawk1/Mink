@@ -111,8 +111,8 @@ fieldset {
     background-color: red;
     font-weight: bold;
     margin-inline-start: 1.0em;
-    width: 1.0em;
-    height: 1.0em;
+    inline-size: 1.0em;
+    block-size: 1.0em;
     border-radius: 15px;
 }
 
