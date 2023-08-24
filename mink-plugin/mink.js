@@ -49,7 +49,7 @@ function inDevelopmentMode () {
 }
 
 chrome.action.onClicked.addListener(function (tab) {
-  const scheme = (new window.URL(tab.url)).origin.substr(0, 4)
+  const scheme = (new URL(tab.url)).origin.substr(0, 4)
   if (scheme !== 'http') {
     log(`Invalid scheme for Mink: ${scheme}`)
     return
@@ -58,8 +58,8 @@ chrome.action.onClicked.addListener(function (tab) {
   // Check if isA Memento
   chrome.storage.local.get('timemaps', function (items) {
     if (items.timemaps && items.timemaps[tab.url]) {
-      log('Clicked button and we are viewing a memento')
-      displayMinkUI(tab.id)
+      log('Clicked button and we are viewing a XXX')
+      displayMinkUI(tab.id, items.timemaps[tab.url])
     } else {
       log(`No timemap stored in cache for ${tab.url}`)
       showMinkBadgeInfoBasedOnProcessingState(tab.id)
@@ -128,19 +128,19 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
   })
 }
 
-function displayMinkUI (tabId) {
+function displayMinkUI (tabId, tmData) {
   log('Injecting displayMinkUI.js')
-  chrome.tabs.executeScript(tabId, { code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';' },
-    function () {
-      chrome.tabs.executeScript(tabId, {
-        // TODO: Account for data: URIs like the "connection unavailable" page.
-        //   Currently, because this scheme format is not in the manifest, an exception is
-        //     thrown. Handle this more gracefully.
-        file: 'js/displayMinkUI.js'
-      }, function (res) {
-        log('Mink UI injected. res:', res)
-      })
+  chrome.scripting.executeScript({
+      target: {tabId: tabId},
+      files: ['js/displayMinkUI.js']
+  }, () => {
+    chrome.scripting.executeScript({
+      target: {tabId},
+      args: [tmData],
+      func: (...args) => echoTMDataForMV3(...args),
     })
+    //{ code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';' },
+  })
 }
 
 chrome.runtime.onMessage.addListener(
@@ -332,7 +332,7 @@ async function fetchTimeMap (uri, tabid) {
         setTimemapInStorage(data, data.original)
       })
       .catch(function(err) {
-        console.log(`Error fetching ${uri}`)
+        console.log(`Error fetching {uri}`)
         console.log(err.message)
 
         if (err.name === 'ZeroMementos') {

@@ -30,6 +30,7 @@
     "notifications",
     "contextMenus",
     "activeTab",
+    "scripting",
     "unlimitedStorage"
   ],
   "host_permissions": [
@@ -110,8 +111,9 @@
         "images/archives/dropdown_wc.png",
         "css/select2.css",
         "jquery.miller.js/jquery.miller.js",
-        "jquery.miller.js/jquery.miller.css"
+        "jquery.miller.js/jquery.miller.css",
+        "minkui.html"
       ],
-      "extension_ids": ["jemoalkmipibchioofomhkgimhofbbem"]
+      "extension_ids": ["jemoalkmipibchioofomhkgimhofbbem","hpnnbkkoebdldadkpdomjnofpckdfkkd"]
     }]
 }

@@ -19,7 +19,7 @@ function setupDrilldownInteractions () {
 }
 
 function appendHTMLToShadowDOM () {
-  $.ajax(chrome.runtime.getURL('minkui.html'))
+  $.ajax(chrome.runtime.getURL('minkui.html')) // There has to be a more native way to do this
     .done(function (data) {
     // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
 
@@ -817,6 +817,11 @@ function bindNavigationButtons () {
       window.location = event.target.getAttribute('data-uri')
     })
   })
+}
+
+function echoTMDataForMV3 (tmData) {
+  console.log('Echoing TM Data For MV3')
+  console.log(tmData)
 }
 
 if ($('#minkWrapper').length === 0) {
