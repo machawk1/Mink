@@ -377,7 +377,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       }, function (response) {
         log('We have a response!') // This will not occur due to async exec in mink.js
       })
-      return
     }
     return
   }
