@@ -124,6 +124,7 @@ function appendHTMLToShadowDOM () {
         appendCSSToShadowDOM(cb)
       })
     })
+    chrome.runtime.onMessage.removeListener(appendHTMLToShadowDOM)
 }
 
 // In some places, getting addZ has already been declared, thus var for now
@@ -825,7 +826,7 @@ function echoTMDataForMV3 (tmData) {
   console.log(tmData)
 }
 
-if (document.getElementById('minkWrapper') == null) {
+if (document.getElementById('minkWrapper') === null) {
   chrome.runtime.onMessage.addListener(appendHTMLToShadowDOM)
 } else {
   $('#minkWrapper').toggle()
