@@ -131,15 +131,13 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
 function displayMinkUI (tabId, tmData) {
   log('Injecting displayMinkUI.js')
   chrome.scripting.executeScript({
-      target: {tabId: tabId},
-      files: ['js/displayMinkUI.js']
+    target: { tabId: tabId },
+    files: ['js/displayMinkUI.js']
   }, () => {
-    chrome.scripting.executeScript({
-      target: {tabId},
-      args: [tmData],
-      func: (...args) => echoTMDataForMV3(...args),
+    log('done executing script, sending message')
+    chrome.tabs.sendMessage(tabId, {
+      tmData: tmData
     })
-    //{ code: 'var tmData = ' + JSON.stringify(tmData) + '; var tabId = ' + tabId + ';' },
   })
 }
 

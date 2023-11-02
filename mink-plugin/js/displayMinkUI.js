@@ -19,6 +19,7 @@ function setupDrilldownInteractions () {
 }
 
 function appendHTMLToShadowDOM () {
+  let tmData = arguments[0].tmData
   $.ajax(chrome.runtime.getURL('minkui.html')) // There has to be a more native way to do this
     .done(function (data) {
     // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
@@ -824,8 +825,8 @@ function echoTMDataForMV3 (tmData) {
   console.log(tmData)
 }
 
-if ($('#minkWrapper').length === 0) {
-  appendHTMLToShadowDOM()
+if (document.getElementById('minkWrapper') == null) {
+  chrome.runtime.onMessage.addListener(appendHTMLToShadowDOM)
 } else {
   $('#minkWrapper').toggle()
 }

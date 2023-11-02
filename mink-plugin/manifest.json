@@ -114,6 +114,6 @@
         "jquery.miller.js/jquery.miller.css",
         "minkui.html"
       ],
-      "extension_ids": ["jemoalkmipibchioofomhkgimhofbbem","hpnnbkkoebdldadkpdomjnofpckdfkkd"]
+      "matches": ["<all_urls>"]
     }]
 }
