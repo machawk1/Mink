@@ -40,6 +40,7 @@ function log (...messages) {
     for (const msg of messages) {
       console.log(msg)
     }
+    // console.log(new Error().stack)
   }
   // console.trace()
 }
@@ -342,8 +343,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.method === 'startTimer') {
-    log('Got startTimer')
-
     chrome.runtime.sendMessage({
       method: 'setBadge',
       text: '',
@@ -461,12 +460,11 @@ function animatePageActionIcon () {
     return
   }
 
-  // TOFIX: extension context invalidated
-  /*chrome.runtime.sendMessage({
+  chrome.runtime.sendMessage({
     method: 'setBadge',
     text: '',
     iconPath: { '38': clockIcons38[iteration], '19': clockIcons19[iteration] }
-  })*/
+  })
   iteration--
 
   if (iteration < 0) { iteration = clockIcons38.length - 1 }

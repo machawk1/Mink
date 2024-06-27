@@ -41,6 +41,7 @@ function log (...messages) {
       console.log(msg)
     }
   }
+  console.log(new Error().stack)
   // console.trace()
 }
 
@@ -155,11 +156,6 @@ chrome.runtime.onMessage.addListener(
 
         sendResponse({ value: 'noise' })
       })
-      // window.localStorage.setItem('minkURI', request.value)
-      // window.localStorage.setItem('mementos', request.mementos)
-      // window.localStorage.setItem('memento_datetime', request.memento_datetime)
-
-      //sendResponse({ value: 'noise' })
     } else if (request.method === 'findTMURI') {
       log('Got findTMURI')
       findTMURI(request.timegate, sender.tab.id)
@@ -619,6 +615,7 @@ function tmInList (tmURI, tms) {
 
 function findTMURI (uri, tabid) {
   log('Finding TimeMap URI', uri)
+
 
   $.ajax({
     url: uri
