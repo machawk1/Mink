@@ -62,7 +62,7 @@ To access these setting, right click on the Mink icon and select Options.
 
 # Contributing
 
-Contributions welcomed. Please see the (to-be-created) CONTRIBUTING.md file in this repository for more information.
+Contributions welcomed. Please see the CONTRIBUTING.md file in this repository for more information.
 
 ### Citing Project
 
