@@ -28,6 +28,11 @@ function restoreOptions () {
 
   chrome.storage.local.get('aggregators', function (ls) {
     let dropdownOptions = document.querySelector('#aggregator').options
+
+    if (!ls.aggregator) {
+      console.log('No aggregators listed in localStorage (yet)')
+      return
+    }
     for (let i = 0; i < dropdownOptions.length; i++) {
       if (dropdownOptions[i].value == ls.aggregators[0]) {
         document.querySelector('#aggregator').selectedIndex = i
