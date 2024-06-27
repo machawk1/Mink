@@ -9,9 +9,18 @@
 
 Mink is a Google Chrome extension that uses the [Memento protocol](https://tools.ietf.org/html/rfc7089) to indicate that a page a user is viewing on the live web has an archived copy and to give the user access to the copy. If no copies exist, the extension provides one-button access to preserve the page in various web archives and to easily view the page once it has been preserved.
 
-## Install
+## Features
 
-The extension is available for download from the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)!
+- Seemlessly see how well-archived a live web page is while browsing.
+- Using the interface, quickly navigate to past captures of the page and traverse available captures from multiple web archive.
+- No captures? No problem! With a single button click, Mink will submit the web page you are currently viewing to multiple web archives.
+- Too many captures? When the set gets large, Mink intutitively organizes the set of captures for easy, hierarchical, time-based selection.
+
+## Installation
+
+* Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)
+* Click "Add to Chrome" to install Mink.
+* Once installed, click the Mink icon in the Chrome toolbar to see how well-archived the current page is and navigate to the past.
 
 ## Usage
 
@@ -19,11 +28,11 @@ The extension works by querying the archives when you browse the web. For each p
 
 ### Selecting a Memento
 
-For web pages with few mementos, the dropdown menu is the most accessible way to view the memento in a web archive (e.g., [Internet Archive's Wayback Machine](http://web.archive.org/)). To do this, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button. When viewing a memento, selecting the icon again will return a different interface with a button to return to the live web.
+For web pages with few mementos, the dropdown menu is the most accessible way to view the memento in a web archive (e.g., [Internet Archive's Wayback Machine](http://web.archive.org/)). To do this, click the Mink button bar icon, select the date/time from the dropdown and click the "View" button. When viewing a memento, selecting the icon again will return an interface that allows you to navigate to other mementos or quickly return to the live web.
 
 ### No mementos? No problem!
 
-If no mementos exist in the archive, the extension will indicate this with a red "no mementos" icon and give the option to submit the URL to various archives for preservation.
+If no mementos exist in the archive, the extension will indicate this with a red "no mementos" icon and give the option to submit the URL to various web archives for preservation.
 
 ## Examples
 1. [A niche site with few mementos](https://github.com/machawk1/Mink/wiki/Examples#use-case-1-a-niche-site-with-few-mementos)
@@ -38,6 +47,16 @@ For packaging the extension and releasing a new version, enter the `mink-plugin`
 <blockquote>zip -r /where/to/store/resulting/mink.zip *</blockquote>
 
 ...access the [Chrome Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard/) and upload the `.zip` to the Mink entry.
+
+## Configuration
+
+Mink is configurable to a variety of Memento aggregators. To customize this and other options including TimeMap caching setting (for efficient querying), Ignore Lists (for sites where you don't want Mink to run), etc., right click on the Mink icon and select Options.
+
+<img src="https://github.com/machawk1/Mink/blob/main/meta/README/minksettings_2.5.5.3.png?raw=true">
+
+# Contributing
+
+Contributions welcomed. Please see the (to-be-created) CONTRIBUTING.md file in this repository for more information.
 
 ### Citing Project
 
