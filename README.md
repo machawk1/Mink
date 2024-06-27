@@ -50,7 +50,13 @@ For packaging the extension and releasing a new version, enter the `mink-plugin`
 
 ## Configuration
 
-Mink is configurable to a variety of Memento aggregators. To customize this and other options including TimeMap caching setting (for efficient querying), Ignore Lists (for sites where you don't want Mink to run), etc., right click on the Mink icon and select Options.
+Settings are available to customize Mink's functions and data retention including: 
+
+* Customizing the source of the Memento aggregator Memento aggregators.
+* Tailoring the TimeMap caching setting for efficient querying.
+* Defining Ignore Lists for sites where you don't want Mink to run.
+
+To access these setting, right click on the Mink icon and select Options.
 
 <img src="https://github.com/machawk1/Mink/blob/main/meta/README/minksettings_2.5.5.3.png?raw=true">
 
