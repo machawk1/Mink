@@ -139,7 +139,7 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
   const options = { mode: 'no-cors', signal }
 
   return window.fetch(url, options)
-    .then(setTimeout(() => { aborter.abort() }, timeout))
+    .then(setTimeout(() => { aborter.abort(`The request to ${url} timed out and has been aborted`) }, timeout))
     .catch(error => {
       log(`${url} appears to be down, incrementing host counter`)
       log(error)
