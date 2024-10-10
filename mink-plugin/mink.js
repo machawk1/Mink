@@ -326,13 +326,15 @@ async function fetchTimeMap (uri, tabid) {
         setTimemapInStorage(data, data.original)
       })
       .catch(function(err) {
-        console.log(`Error fetching {uri}`)
+        console.log(`Error fetching ${uri}`)
         console.log(err.message)
 
         if (err.name === 'ZeroMementos') {
           showInterfaceForZeroMementos(tabid)
         } else if (err.name === 'InaccessibleAggregator') {
-          log('TODO: swtich up the aggregator')
+          log('TODO: switch up the aggregator')
+        } else if (err instanceof SyntaxError) {
+          log("JSON parsing failed, switch up the aggregator")
         }
       })
 /*
@@ -521,6 +523,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
         log('******* Number of cached URL Headers:')
         const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
+        console.log('foo')
         const keyOfIndex = cachedTMKeys[indexToRemove]
         delete data[keyOfIndex]
       }
