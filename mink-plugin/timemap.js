@@ -86,6 +86,9 @@ function Timemap (fromString) {
     log('Link header exists, but we did not find a TimeMap, TimeGate or original value in the header.',
       'link header: ', this.str, linkHeaderEntries, linkHeaderEntries)
   }
+
+  // Rm raw data after parsing
+  delete this.str
 }
 
 function Memento (fromStr) {
