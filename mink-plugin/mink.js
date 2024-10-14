@@ -116,6 +116,7 @@ function setBadgeTextBasedOnBrowserActionState (tabid) {
 
         if (result !== browserActionTitleViewingMemento) {
           setBadgeText(stillProcessingBadgeDisplay, tabid)
+          // TODO: hide this badge after 5 seconds, #368
         } else {
           console.log('Show "Viewing Memento" Mink UI in page content.')
           displayMinkUI(tabid)
@@ -204,8 +205,9 @@ chrome.runtime.onMessage.addListener(
         })
     } else if (request.method === 'setBadgeText') {
       setBadgeText(request.value, sender.tab.id)
+      // The below does not appear to have any effect on the UI
       sendResponse({
-        value: 'stopAnimation'
+        value: 'stopAnimatingBrowserActionIcon'
       })
     } else if (request.method === 'setDropdownContents' || request.method === 'setTMData') {
       tmData = request.value
@@ -331,6 +333,8 @@ async function fetchTimeMap (uri, tabid, urir) {
 
         data.original = data.original ? data.original : data.original_uri
         setTimemapInStorage(data, data.original)
+        // stop the animation here
+        chrome.tabs.sendMessage(tabid, { method: 'stopAnimatingBrowserActionIcon' })
       })
       .catch(function(err) {
         logWithTrace(`Something with the response from ${uri} is not as expected...`)
@@ -348,16 +352,6 @@ async function fetchTimeMap (uri, tabid, urir) {
             uri: urir})
         }
       })
-/*
-    setTimemapInStorage(tmData, data.original)
-    log('Some error occurred with a secure site that was not a 404', xhr)
-  }).always(function () {
-    chrome.tabs.sendMessage(tabid, {
-      method: 'stopAnimatingBrowserActionIcon'
-    })
-  })
-
- */
 }
 
 

@@ -342,6 +342,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 
   if (request.method === 'stopAnimatingBrowserActionIcon') {
+    // Stopping the browser action icon animation
     clearTimeout(animationTimer)
     animateBrowserActionIcon = false
     return
@@ -366,12 +367,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     })
     animateBrowserActionIcon = true
     setTimeout(animatePageActionIcon, 500)
-  }
-
-  if (request.method === 'stopAnimatingBrowserActionIcon') {
-    clearTimeout(animationTimer)
-    animateBrowserActionIcon = false
-    return
   }
 
   if (request.method === 'showArchiveNowUI') {
