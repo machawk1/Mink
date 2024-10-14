@@ -41,8 +41,13 @@ function log (...messages) {
       console.log(msg)
     }
   }
+}
+
+function logWithTrace (...messages) {
+  log(messages)
+  console.log('Stack Trace:')
   console.log(new Error().stack)
-  // console.trace()
+  console.trace()
 }
 
 function inDevelopmentMode () {
@@ -326,8 +331,8 @@ async function fetchTimeMap (uri, tabid) {
         setTimemapInStorage(data, data.original)
       })
       .catch(function(err) {
-        console.log(`Error fetching ${uri}`)
-        console.log(err.message)
+        logWithTrace(`Error fetching ${uri}`)
+        // console.log(err.message)
 
         if (err.name === 'ZeroMementos') {
           showInterfaceForZeroMementos(tabid)
@@ -523,7 +528,6 @@ chrome.webRequest.onHeadersReceived.addListener(function (deets) {
       if (cachedTMKeys.length > 10) { // Keep the cache to a reasonable size through random deletion
         log('******* Number of cached URL Headers:')
         const indexToRemove = Math.floor(Math.random() * cachedTMKeys.length)
-        console.log('foo')
         const keyOfIndex = cachedTMKeys[indexToRemove]
         delete data[keyOfIndex]
       }
