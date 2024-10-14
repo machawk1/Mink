@@ -193,7 +193,7 @@ chrome.runtime.onMessage.addListener(
       //  memento_datetime: window.localStorage.getItem('memento_datetime')
       // })
     } else if (request.method === 'fetchTimeMap') {
-      fetchTimeMap(request.value, sender.tab.id)
+      fetchTimeMap(request.value, sender.tab.id, request.urir)
     } else if (request.method === 'notify') {
       chrome.notifications.create(
         'id1', {
@@ -298,7 +298,7 @@ class ZeroMementos extends Error {
     this.name = this.constructor.name
   }
 }
-async function fetchTimeMap (uri, tabid) {
+async function fetchTimeMap (uri, tabid, urir) {
   log(`Fetching TimeMap for ${uri} in tab ${tabid}`)
 
   fetch(uri)
@@ -342,10 +342,10 @@ async function fetchTimeMap (uri, tabid) {
         } else if (err instanceof SyntaxError) {
           logWithTrace("JSON parsing failed, switch up the aggregator")
           log(`Previous aggregator endpoint: ${uri}`)
+          // TODO: obtain URI-R here (don't parse it from URI-T) to send as a param
           chrome.tabs.sendMessage(tabid, {
             method: 'tryNextAggregator',
-            uri: uri
-          }, startAgainWithNewAggregatorTempFunctionName)
+            uri: urir})
         }
       })
 /*
@@ -360,9 +360,6 @@ async function fetchTimeMap (uri, tabid) {
  */
 }
 
-function startAgainWithNewAggregatorTempFunctionName () {
-  console.log('repeating query logic with a new aggregator')
-}
 
 function setBadgeText (value, tabid) {
   let badgeValue = value

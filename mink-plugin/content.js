@@ -440,10 +440,11 @@ function getMementos (uri) {
 
   setTimeout(animatePageActionIcon, 500)
 
-  log('in getMementos, sending "fetchTimeMap" message')
+  log(`in getMementos, sending "fetchTimeMap" message to service worker using ${timemapLocation}`)
   chrome.runtime.sendMessage({
     method: 'fetchTimeMap',
-    value: timemapLocation
+    value: timemapLocation,
+    urir: uri
   })
 }
 
