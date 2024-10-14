@@ -44,7 +44,7 @@ function log (...messages) {
 }
 
 function logWithTrace (...messages) {
-  log(messages)
+  log(...messages)
   console.log('Stack Trace:')
   console.log(new Error().stack)
   console.trace()
@@ -255,7 +255,7 @@ chrome.runtime.onMessage.addListener(
         // TODO: get value of submitid from AIS interface
         submissionURI = 'archive.is/submit/'
         method = 'POST'
-        data = { coo: '', url: request.urir }
+        data = {coo: '', url: request.urir}
       }
 
       // TODO: XHR to fetch for MV3 implementation incomplete below
@@ -263,6 +263,8 @@ chrome.runtime.onMessage.addListener(
         const resp = await fetch(submissionURI)
         changeArchiveIcon(request, response)
       })
+    } else if (request.method === 'tryNextAggregator') {
+      log('TODO: TRYING NEXT AGGREGATOR')
     } else {
       log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
@@ -303,14 +305,16 @@ async function fetchTimeMap (uri, tabid) {
 
   fetch(uri)
       .then(response => {
-        log('Fetching complete, proceeding')
+        log('Fetch responses received, proceeding')
         const status_code = response.status
         if (status_code == 404) {
           throw new ZeroMementos(`No mementos for {uri}`)
         } else if (status_code == 504) {
           throw new InaccessibleAggregator(`Aggregator at {uri} reported a {status_code} status code`)
+        } else {
+          log(`Status code: ${status_code}`)
         }
-        return console.log(status_code) || response
+        return response
       })
       .then(response => {
         return response.json()
@@ -331,15 +335,18 @@ async function fetchTimeMap (uri, tabid) {
         setTimemapInStorage(data, data.original)
       })
       .catch(function(err) {
-        logWithTrace(`Error fetching ${uri}`)
-        // console.log(err.message)
+        logWithTrace(`Something with the response from ${uri} is not as expected...`)
 
         if (err.name === 'ZeroMementos') {
           showInterfaceForZeroMementos(tabid)
         } else if (err.name === 'InaccessibleAggregator') {
-          log('TODO: switch up the aggregator')
+          logWithTrace('TODO: switch up the aggregator')
         } else if (err instanceof SyntaxError) {
-          log("JSON parsing failed, switch up the aggregator")
+          logWithTrace("JSON parsing failed, switch up the aggregator")
+          log(`Previous aggregator: {aggregator}`)
+          chrome.tabs.sendMessage(tabid, {
+            method: 'tryNextAggregator'
+          })
         }
       })
 /*

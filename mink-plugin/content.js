@@ -87,6 +87,7 @@ function setActiveBasedOnIgnorelistedProperty (cb) {
   })
 }
 
+// TODO: refine the acronym in this function's signature. Beware the axe murderer.
 function normalDisplayUIBC (items) {
   const hasATimeMapInCache = items.timemaps && items.timemaps[document.URL]
 
