@@ -54,7 +54,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "minimum_chrome_version": "88",
+  "minimum_chrome_version": "99",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true

@@ -263,8 +263,6 @@ chrome.runtime.onMessage.addListener(
         const resp = await fetch(submissionURI)
         changeArchiveIcon(request, response)
       })
-    } else if (request.method === 'tryNextAggregator') {
-      log('TODO: TRYING NEXT AGGREGATOR')
     } else {
       log(`Message sent using chrome.runtime not caught: ${request.method}`)
     }
@@ -343,10 +341,11 @@ async function fetchTimeMap (uri, tabid) {
           logWithTrace('TODO: switch up the aggregator')
         } else if (err instanceof SyntaxError) {
           logWithTrace("JSON parsing failed, switch up the aggregator")
-          log(`Previous aggregator: {aggregator}`)
+          log(`Previous aggregator endpoint: ${uri}`)
           chrome.tabs.sendMessage(tabid, {
-            method: 'tryNextAggregator'
-          })
+            method: 'tryNextAggregator',
+            uri: uri
+          }, startAgainWithNewAggregatorTempFunctionName)
         }
       })
 /*
@@ -359,6 +358,10 @@ async function fetchTimeMap (uri, tabid) {
   })
 
  */
+}
+
+function startAgainWithNewAggregatorTempFunctionName () {
+  console.log('repeating query logic with a new aggregator')
 }
 
 function setBadgeText (value, tabid) {

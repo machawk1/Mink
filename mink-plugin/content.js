@@ -140,6 +140,8 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
 
   const options = { mode: 'no-cors', signal }
 
+  console.log(`Checking the health of aggregator #${aggregatorIndex} at ${memgatorHosts[aggregatorIndex]}`)
+
   return window.fetch(url, options)
     .then(setTimeout(() => { aborter.abort(`The request to ${url} timed out and has been aborted`) }, timeout))
     .catch(error => {
@@ -325,6 +327,14 @@ function addToIgnorelist (currentIgnorelist, uriIn) {
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   log(`in listener with ${request.method}`)
+
+  if (request.method === 'tryNextAggregator') {
+    ++hostI
+    checkAggregatorHealthAndSet(hostI)
+    console.log(`trying again with aggregator ${hostI}`)
+    getMementos(request.uri)
+    return
+  }
 
   if (request.method === 'addToIgnorelist') {
     getIgnorelist(addToIgnorelist, request.uri) // And add uri
