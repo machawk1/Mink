@@ -144,11 +144,27 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
 
   return window.fetch(url, options)
     .then(setTimeout(() => { aborter.abort(`The request to ${url} timed out and has been aborted`) }, timeout))
+    .then(() => {
+      log(`Aggregator at ${memgatorHosts[aggregatorIndex]} was accessible\nSet as default`)
+      // TODO: set as default in the options
+      setDefaultAggregator(aggregatorIndex)
+     })
     .catch(error => {
       log(`${url} appears to be down, incrementing host counter`)
       log(error)
       hostI += 1
     })
+}
+
+function setDefaultAggregator (indexOfNewDefault) {
+  chrome.storage.local.get('aggregators', function (ls) {
+    log(ls)
+    let aggregatorsArray = ls.aggregators
+    const newDefault = ls[indexOfNewDefault]
+    aggregatorsArray.splice(indexOfNewDefault, 1)
+    aggregatorsArray.unshift(newDefault)
+    chrome.storage.local.set({ 'aggregators': aggregatorsArray })
+  })
 }
 
 function displayUIBasedOnContext () {
