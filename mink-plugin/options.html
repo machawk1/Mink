@@ -42,7 +42,7 @@
             sources.</p>
 
         <fieldset class="hidden">
-            <legend>Memento Aggregator</legend>
+            <legend><label for="aggregator">Memento Aggregator</label></legend>
             <select id="aggregator">
                 <option>https://memgator.cs.odu.edu</option>
                 <option>https://aggregator.matkelly.com</option>
@@ -52,8 +52,8 @@
         </fieldset>
 
         <fieldset disabled class="hidden">
-            <legend>Additional Archives</legend>
-            <select>
+            <legend><label for="additionalArchives">Additional Archives</label></legend>
+            <select id="additionalArchives">
                 <option>localhost via WAIL</option>
             </select>
             <span class="note">Not yet implemented</span>
@@ -67,7 +67,7 @@
             provide. Mink retains these TimeMaps until enough newer TimeMaps are received or the cache is cleared. This
             section allows you to manipulate the cache.</p>
         <fieldset>
-            <legend>Cached TimeMaps</legend>
+            <legend><label for="cachedTimeMaps">Cached TimeMaps</label></legend>
             <select id="cachedTimemaps"></select>
             <button id="removeSelectedTMFromCache">Remove</button>
             <!--<button id="removeSelectedTMFromCacheAndIgnorelist">... & Ignore list</button>-->
