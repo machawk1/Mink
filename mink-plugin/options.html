@@ -3,6 +3,7 @@
 <head>
     <title>Mink options</title>
     <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="options.js" defer></script>
     <link rel="stylesheet" href="css/options.css">
 </head>
 <body>
@@ -44,8 +45,8 @@
         <fieldset class="hidden">
             <legend><label for="aggregator">Memento Aggregator</label></legend>
             <select id="aggregator">
-                <option>https://memgator.cs.odu.edu</option>
-                <option>https://aggregator.matkelly.com</option>
+                <!--<option>https://memgator.cs.odu.edu</option>
+                <option>https://aggregator.matkelly.com</option>-->
                 <option disabled>https://mementoweb.org</option>
                 <option disabled>localhost (MemGator via WAIL)</option>
             </select>
@@ -101,8 +102,6 @@
             <button id="restoreDefaultsButton">Restore Defaults</button>
             <button id="doneButton">Done</button>
         </div>
-
-        <script src="options.js"></script>
     </section>
 </main>
 </body>
