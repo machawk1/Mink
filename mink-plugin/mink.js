@@ -10,6 +10,11 @@ const browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
 const browserActionTitleNoMementos = 'Mink - No Mementos Available'
 const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
 
+const defaultAggregators = [
+  'https://memgator.cs.odu.edu',
+  'https://aggregator.matkelly.com'
+]
+
 const badgeImagesDisabled = {
   38: chrome.runtime.getURL('images/minkLogo38_disabled.png'),
   19: chrome.runtime.getURL('images/minkLogo19_disabled.png')
@@ -781,10 +786,10 @@ chrome.action.onClicked.addListener(tab => {
 chrome.runtime.onInstalled.addListener(({ reason }) => {
   if (reason === 'install') {
     console.log('extension installed, reported via SW registration')
+    console.log('setting default aggregators')
+    chrome.storage.local.set({'aggregators': defaultAggregators})
     //chrome.storage.local.set({
     //  apiSuggestions: ['tabs', 'storage', 'scripting']
     //});
   }
-});
-
-
+})

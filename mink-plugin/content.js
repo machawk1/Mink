@@ -430,6 +430,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       chrome.storage.local.set(storedHeaders, displayUIBasedOnContext)
     })
   }
+
+  if (request.method === 'setDefaultAggregators') {
+    console.log('TODO: set default aggregators from content.js')
+  }
 })
 
 function getMementos (uri) {

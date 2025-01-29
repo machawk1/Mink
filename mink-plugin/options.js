@@ -5,10 +5,7 @@ var debug = true
 const tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
 const tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
 
-const defaultAggregators = [
-  'https://memgator.cs.odu.edu',
-  'https://aggregator.matkelly.com'
-]
+import {MinkDefaults} from './MinkDefaults.js'
 
 function restoreOptions () {
   chrome.storage.local.get('ignorelist').then(function (items) {
@@ -295,7 +292,7 @@ function clearAggregatorListInLocalStorage () {
 }
 
 function resetDefaultAggregators () {
-  chrome.storage.local.set({'aggregators': defaultAggregators})
+  chrome.storage.local.set({'aggregators': MinkDefaults.defaultAggregators})
 }
 
 function updateAggregatorsUIBasedOnLocalStorage () {
