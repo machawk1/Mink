@@ -338,6 +338,11 @@ function setAggregatorsInStorage (arrayOfAggregatorHostnames, cb) {
   return chrome.storage.local.set({ 'aggregators': arrayOfAggregatorHostnames }).then(getAggregatorsFromStorage)
 }
 
+function test_writeToLocalStorageAndReload () {
+  let testAggregators = ['https://memento.example.com', 'https://aggregator.somehostname.net']
+  setAggregatorsInStorage(testAggregators)
+}
+
 
 document.addEventListener('DOMContentLoaded', restoreOptions)
 document.addEventListener('DOMContentLoaded', createAddURIBinder)
@@ -359,4 +364,6 @@ document.querySelector('#saveIgnorelist').addEventListener('click', saveIgnoreli
 document.querySelector('#clearIgnorelist').addEventListener('click', clearIgnorelist)
 document.querySelector('#doneButton').addEventListener('click', saveAndCloseOptionsPanel)
 document.querySelector('#restoreDefaultsButton').addEventListener('click', restoreDefaults)
+
+document.querySelector('#test_writeToLS').addEventListener('click', test_writeToLocalStorageAndReload)
 
