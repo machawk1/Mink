@@ -57,9 +57,7 @@ function setDropdownToAggregator (i) {
 }
 
 function getAggregatorsFromStorage (cb) {
-  return chrome.storage.local.get('aggregators').then(cb, () => {
-    setAggregatorsInStorage(defaultAggregators)
-  })
+  return chrome.storage.local.get('aggregators').then(cb)
 }
 
 function getListItemHTML (uri, classIn, buttonText) {
@@ -262,7 +260,7 @@ function removeTMFromCache (originalURI) {
 }
 
 function clearTimemapCache () {
-  chrome.storage.local.set({ timemaps: {} },
+  chrome.storage.local.set({ 'timemaps': {} },
     function () {
       console.log('Remove all cached TMs')
       $('#cachedTimemaps').empty()
@@ -286,9 +284,27 @@ function saveAndCloseOptionsPanel () {
 function restoreDefaults () {
   clearIgnorelist()
   clearTimemapCache()
+  clearAggregatorListInLocalStorage()
+  resetDefaultAggregators()
   resetAggregatorSelection()
 }
 
+
+function clearAggregatorListInLocalStorage () {
+  chrome.storage.local.set({'aggregators': []})
+}
+
+function resetDefaultAggregators () {
+  chrome.storage.local.set({'aggregators': defaultAggregators})
+}
+
+function updateAggregatorsUIBasedOnLocalStorage () {
+  // get list from localstorage
+  getAggregatorsFromStorage((aggrs) => {
+    console.log("aggregators in storage:")
+    console.log(aggrs)})
+  console.log('TODO: Updating aggregators UI based on localstorage')
+}
 
 function resetAggregatorSelection () {
   let dropdown = document.querySelector('#aggregator')
@@ -335,12 +351,16 @@ function populateDropdownWithAggregatorsInStorage (arrayOfAggregators) {
 
 function setAggregatorsInStorage (arrayOfAggregatorHostnames, cb) {
   // Returns a promise
-  return chrome.storage.local.set({ 'aggregators': arrayOfAggregatorHostnames }).then(getAggregatorsFromStorage)
+  return chrome.storage.local.set({ 'aggregators': arrayOfAggregatorHostnames }).then(() => {
+    console.log('Attempting to invoke the callback')
+    console.log(cb)
+    cb()
+  })
 }
 
 function test_writeToLocalStorageAndReload () {
   let testAggregators = ['https://memento.example.com', 'https://aggregator.somehostname.net']
-  setAggregatorsInStorage(testAggregators)
+  setAggregatorsInStorage(testAggregators, window.location.reload)
 }
 
 
