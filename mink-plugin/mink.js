@@ -10,7 +10,7 @@ const browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
 const browserActionTitleNoMementos = 'Mink - No Mementos Available'
 const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
 
-const defaultAggregators = [
+const defaultAggregators = [ // TODO: pull this in from the MinkDefaults module
   'https://memgator.cs.odu.edu',
   'https://aggregator.matkelly.com'
 ]
