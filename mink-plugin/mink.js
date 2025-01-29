@@ -2,9 +2,6 @@
 
 import {defaultAggregators} from './MinkDefaults.js'
 
-console.log(defaultAggregators)
-
-
 const debug = false
 let tmData
 const maxBadgeDisplay = '> 1k'
