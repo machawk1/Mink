@@ -5,7 +5,7 @@ var debug = true
 const tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
 const tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
 
-import {MinkDefaults} from './MinkDefaults.js'
+import {defaultAggregators} from './MinkDefaults.js'
 
 function restoreOptions () {
   chrome.storage.local.get('ignorelist').then(function (items) {
@@ -292,7 +292,7 @@ function clearAggregatorListInLocalStorage () {
 }
 
 function resetDefaultAggregators () {
-  chrome.storage.local.set({'aggregators': MinkDefaults.defaultAggregators})
+  chrome.storage.local.set({'aggregators': defaultAggregators})
 }
 
 function updateAggregatorsUIBasedOnLocalStorage () {
@@ -349,15 +349,18 @@ function populateDropdownWithAggregatorsInStorage (arrayOfAggregators) {
 function setAggregatorsInStorage (arrayOfAggregatorHostnames, cb) {
   // Returns a promise
   return chrome.storage.local.set({ 'aggregators': arrayOfAggregatorHostnames }).then(() => {
-    console.log('Attempting to invoke the callback')
+    console.log('Attempting to invoke the callback, this is failing w/ reload')
     console.log(cb)
     cb()
+  }, function writeFailed () {
+    console.log("Failed to write to localstorage")
+    console.log(arrayOfAggregatorHostnames)
   })
 }
 
 function test_writeToLocalStorageAndReload () {
   let testAggregators = ['https://memento.example.com', 'https://aggregator.somehostname.net']
-  setAggregatorsInStorage(testAggregators, window.location.reload)
+  setAggregatorsInStorage(defaultAggregators)//, window.location.reload)
 }
 
 

@@ -1,5 +1,10 @@
 /* global chrome, $, Timemap */
 
+import {defaultAggregators} from './MinkDefaults.js'
+
+console.log(defaultAggregators)
+
+
 const debug = false
 let tmData
 const maxBadgeDisplay = '> 1k'
@@ -9,11 +14,6 @@ const browserActionTitleViewingMemento = 'Mink - Viewing Memento'
 const browserActionTitleNormal = 'Mink - Integrating the Live and Archived Web'
 const browserActionTitleNoMementos = 'Mink - No Mementos Available'
 const browserActionTitleIgnorelisted = 'Mink - Viewing Ignored Site'
-
-const defaultAggregators = [ // TODO: pull this in from the MinkDefaults module
-  'https://memgator.cs.odu.edu',
-  'https://aggregator.matkelly.com'
-]
 
 const badgeImagesDisabled = {
   38: chrome.runtime.getURL('images/minkLogo38_disabled.png'),
@@ -787,6 +787,7 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
   if (reason === 'install') {
     console.log('extension installed, reported via SW registration')
     console.log('setting default aggregators')
+    console.log(defaultAggregators)
     chrome.storage.local.set({'aggregators': defaultAggregators})
     //chrome.storage.local.set({
     //  apiSuggestions: ['tabs', 'storage', 'scripting']

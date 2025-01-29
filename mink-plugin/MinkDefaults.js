@@ -1,10 +1,7 @@
 
-function MinkDefaults () {
-  this.defaultAggregators = [
+const defaultAggregators = [
     'https://memgator.cs.odu.edu',
     'https://aggregator.matkelly.com'
   ]
 
-}
-
-export {MinkDefaults}
+export {defaultAggregators}
