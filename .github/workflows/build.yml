@@ -23,8 +23,8 @@ jobs:
           echo PATH=$PATH >> $GITHUB_ENV
       - name: Install screenshot utility
         run: python3 -m pip install screenshot
-#      - name: Launch Chrome
-#        run: chrome
+      - name: Launch Chrome
+        run: Chromium
       - name: Take screenshot of Chrome
         run: screenshot Chromium --filename chrome.png --shadow
       - name: Upload screenshot
