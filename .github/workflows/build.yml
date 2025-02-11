@@ -8,10 +8,19 @@ jobs:
     runs-on: macos-latest
     name: Setup Chrome
     steps:
+      - name: Get latest Mink source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - uses: browser-actions/setup-chrome@v1
       - run: Chromium --version
       - name: Report Python version
         run: file `which python3`
+      - name: Create venv to isolate Python dependencies
+        run: |
+          python3 -m venv mink
+          source mink/bin/activate
+          echo PATH=$PATH >> $GITHUB_ENV
       - name: Install screenshot utility
         run: python3 -m pip install screenshot
 #      - name: Launch Chrome
