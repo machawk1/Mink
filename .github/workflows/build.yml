@@ -26,7 +26,7 @@ jobs:
 #      - name: Launch Chrome
 #        run: chrome
       - name: Take screenshot of Chrome
-        run: screenshot chrome --filename chrome.png --shadow
+        run: screenshot Chromium --filename chrome.png --shadow
       - name: Upload screenshot
         uses: actions/upload-artifact@v4
         with:
