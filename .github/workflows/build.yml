@@ -1,32 +1,30 @@
 name: Screenshot GUI
 
 on:
-  push:
-    branches:
-      - '*'
+  - push
 
 jobs:
-  build-image:
+  build:
     runs-on: ubuntu-latest
     name: Setup Chrome
     steps:
       - uses: browser-actions/setup-chrome@v1
       - run: chrome --version
-    - name: Report Python version
-      run: file `which python3`
-    - name: Install screenshot utility
-      run: python3 -m pip install screenshot
-    - name: Launch Chrome
-      run: chrome
-    - name: Take screenshot of Chrome
-      run: screenshot chrome --filename chrome.png --shadow
-    - name: Upload screenshot
-      uses: actions/upload-artifact@v4
-      with:
-        name: chrome.png
-        path: chrome*.pjng
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: chrome
+      - name: Report Python version
+        run: file `which python3`
+      - name: Install screenshot utility
+        run: python3 -m pip install screenshot
+      - name: Launch Chrome
+        run: chrome
+      - name: Take screenshot of Chrome
+        run: screenshot chrome --filename chrome.png --shadow
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome.png
+          path: chrome*.pjng
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome
     
