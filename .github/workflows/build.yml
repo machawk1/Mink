@@ -13,8 +13,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
       - uses: browser-actions/setup-chrome@v1
-      - run: |
-        Chromium --version
+      - run: Chromium --version
       - name: Report Python version
         run: file `which python3`
       - name: Create venv to isolate Python dependencies
