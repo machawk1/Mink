@@ -14,7 +14,7 @@ jobs:
           ref: ${{ github.ref }}
       - uses: browser-actions/setup-chrome@v1
       - run: |
-        ${{ steps.setup-chrome.outputs.chrome-path }} --version
+        Chromium --version
       - name: Report Python version
         run: file `which python3`
       - name: Create venv to isolate Python dependencies
@@ -25,7 +25,7 @@ jobs:
       - name: Install screenshot utility
         run: python3 -m pip install screenshot
       - name: Launch Chrome
-        run: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: Chromium
       - name: Take screenshot of Chrome
         run: screenshot Chromium --filename chrome.png --shadow
       - name: Upload screenshot
