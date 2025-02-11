@@ -1,3 +1,14 @@
-steps:
-  - uses: browser-actions/setup-chrome@v1
-  - run: chrome --version
+name: Screenshot GUI
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    name: Setup Chrome
+    steps:
+      - uses: browser-actions/setup-chrome@v1
+      - run: chrome --version
