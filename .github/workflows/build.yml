@@ -14,8 +14,8 @@ jobs:
         run: file `which python3`
       - name: Install screenshot utility
         run: python3 -m pip install screenshot
-      - name: Launch Chrome
-        run: chrome
+#      - name: Launch Chrome
+#        run: chrome
       - name: Take screenshot of Chrome
         run: screenshot chrome --filename chrome.png --shadow
       - name: Upload screenshot
