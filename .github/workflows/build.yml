@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     name: Setup Chrome
     steps:
       - uses: browser-actions/setup-chrome@v1
