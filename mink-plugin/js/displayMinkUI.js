@@ -1,6 +1,7 @@
 /* global chrome, $, Timemap, tmData */
 
 var MAX_MEMENTOS_IN_DROPDOWN = 500
+var tmData
 
 function createShadowDOM (cb) {
   const selector = '#minkuiX'
@@ -19,7 +20,7 @@ function setupDrilldownInteractions () {
 }
 
 function appendHTMLToShadowDOM () {
-  let tmData = arguments[0].tmData
+  tmData = arguments[0].tmData
   $.ajax(chrome.runtime.getURL('minkui.html')) // There has to be a more native way to do this
     .done(function (data) {
     // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
