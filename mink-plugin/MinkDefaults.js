@@ -1,6 +1,6 @@
 
 const defaultAggregators = [
-    'https://memgator.cs.odu.edu',
+    //'https://memgator.cs.odu.edu',
     'https://aggregator.matkelly.com'
   ]
 
