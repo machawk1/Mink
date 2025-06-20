@@ -1,6 +1,7 @@
 /* global chrome, $, Timemap, tmData */
 
 var MAX_MEMENTOS_IN_DROPDOWN = 500
+var tmData
 
 function createShadowDOM (cb) {
   const selector = '#minkuiX'
@@ -19,7 +20,8 @@ function setupDrilldownInteractions () {
 }
 
 function appendHTMLToShadowDOM () {
-  $.ajax(chrome.extension.getURL('minkui.html'))
+  tmData = arguments[0].tmData
+  $.ajax(chrome.runtime.getURL('minkui.html')) // There has to be a more native way to do this
     .done(function (data) {
     // TODO: before invoking any further, check to verify that some mementos exist (the aggregator query has returned).
 
@@ -123,6 +125,7 @@ function appendHTMLToShadowDOM () {
         appendCSSToShadowDOM(cb)
       })
     })
+    chrome.runtime.onMessage.removeListener(appendHTMLToShadowDOM)
 }
 
 // In some places, getting addZ has already been declared, thus var for now
@@ -157,7 +160,7 @@ function switchToArchiveNowInterface () {
 }
 
 function appendCSSToShadowDOM (cb) {
-  $.ajax(chrome.extension.getURL('css/minkui.css'))
+  $.ajax(chrome.runtime.getURL('css/minkui.css'))
     .done(function (data) {
       const styleElement = `<style type="text/css">\n${data}\n</style>\n`
       $('#minkuiX').prepend(styleElement)
@@ -567,11 +570,11 @@ function setupUI () {
 }
 
 function replaceContentScriptImagesWithChromeExtensionImages () {
-  document.getElementById('minkLogo').src = chrome.extension.getURL('images/mink_marvel_80.png')
+  document.getElementById('minkLogo').src = chrome.runtime.getURL('images/mink_marvel_80.png')
 
-  document.getElementById('archivelogo_ia').src = chrome.extension.getURL('images/archives/iaLogo.png')
-  document.getElementById('archivelogo_ais').src = chrome.extension.getURL('images/archives/archiveisLogo.png')
-  document.getElementById('archivelogo_ala').src = chrome.extension.getURL('images/archives/allListedArchives.png')
+  document.getElementById('archivelogo_ia').src = chrome.runtime.getURL('images/archives/iaLogo.png')
+  document.getElementById('archivelogo_ais').src = chrome.runtime.getURL('images/archives/archiveisLogo.png')
+  document.getElementById('archivelogo_ala').src = chrome.runtime.getURL('images/archives/allListedArchives.png')
 }
 
 function bindSteps () {
@@ -750,7 +753,7 @@ function bindArchiveLogos () {
 
     const that = this
     const newSrc = $(this).attr('src').replace('.png', '_success.png')
-    $(this).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+    $(this).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
 
     const archiveLogoID = $(this).attr('id')
 
@@ -782,8 +785,8 @@ function bindArchiveLogos () {
         changeArchiveAllIconWhenComplete(alaLogo)
       }
 
-      $(iaLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
-      $(aisLogo).attr('src', chrome.extension.getURL('./images/spinner.gif'))
+      $(iaLogo).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
+      $(aisLogo).attr('src', chrome.runtime.getURL('./images/spinner.gif'))
 
       openInNewTab = true
       archiveURIArchiveOrg(iaCb, openInNewTab)
@@ -797,7 +800,7 @@ var archivesFinished = 0 /* TOFIX This is doubly declared if 'let' */
 function changeArchiveAllIconWhenComplete (iconObj) {
   archivesFinished++
   if (archivesFinished >= 2) {
-    $(iconObj).attr('src', chrome.extension.getURL('./images/archives/allListedArchives_success.png'))
+    $(iconObj).attr('src', chrome.runtime.getURL('./images/archives/allListedArchives_success.png'))
     $(iconObj).unbind()
     $(iconObj).removeClass('archiveLogo')
   }
@@ -819,8 +822,13 @@ function bindNavigationButtons () {
   })
 }
 
-if ($('#minkWrapper').length === 0) {
-  appendHTMLToShadowDOM()
+function echoTMDataForMV3 (tmData) {
+  console.log('Echoing TM Data For MV3')
+  console.log(tmData)
+}
+
+if (document.getElementById('minkWrapper') === null) {
+  chrome.runtime.onMessage.addListener(appendHTMLToShadowDOM)
 } else {
   $('#minkWrapper').toggle()
 }

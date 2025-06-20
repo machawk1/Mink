@@ -3,6 +3,7 @@
 <head>
     <title>Mink options</title>
     <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="options.js" type="module" defer></script>
     <link rel="stylesheet" href="css/options.css">
 </head>
 <body>
@@ -42,18 +43,20 @@
             sources.</p>
 
         <fieldset class="hidden">
-            <legend>Memento Aggregator</legend>
+            <legend><label for="aggregator">Memento Aggregator</label></legend>
             <select id="aggregator">
-                <option>https://memgator.cs.odu.edu</option>
+                <!--<option>https://memgator.cs.odu.edu</option>
                 <option>https://aggregator.matkelly.com</option>
-                <option disabled>https://mementoweb.org</option>
-                <option disabled>localhost (MemGator via WAIL)</option>
+                <option disabled>https://example.com</option>
+                <option disabled>localhost (MemGator via WAIL)</option>-->
             </select>
+            <!-- Below is useful for restoring default in testing but shouldn't be enabled in the releases -->
+            <!--<button id="test_writeToLS">Test: write aggregators to LocalStorage and reload</button> -->
         </fieldset>
 
         <fieldset disabled class="hidden">
-            <legend>Additional Archives</legend>
-            <select>
+            <legend><label for="additionalArchives">Additional Archives</label></legend>
+            <select id="additionalArchives">
                 <option>localhost via WAIL</option>
             </select>
             <span class="note">Not yet implemented</span>
@@ -67,8 +70,8 @@
             provide. Mink retains these TimeMaps until enough newer TimeMaps are received or the cache is cleared. This
             section allows you to manipulate the cache.</p>
         <fieldset>
-            <legend>Cached TimeMaps</legend>
-            <select id="cachedTimemaps"></select>
+            <legend><label for="cachedTimeMaps">Cached TimeMaps</label></legend>
+            <select id="cachedTimeMaps"></select>
             <button id="removeSelectedTMFromCache">Remove</button>
             <!--<button id="removeSelectedTMFromCacheAndIgnorelist">... & Ignore list</button>-->
             <p id="mementoCount"></p>
@@ -101,8 +104,6 @@
             <button id="restoreDefaultsButton">Restore Defaults</button>
             <button id="doneButton">Done</button>
         </div>
-
-        <script src="options.js"></script>
     </section>
 </main>
 </body>

@@ -5,8 +5,10 @@ var debug = true
 const tmDropdownString = '<option>&nbsp;&nbsp;&darr; Mink has TimeMaps for... &darr;</option>'
 const tmDropdownNoTimemapsString = '<option>--- No TimeMaps available ---</option>'
 
+import {defaultAggregators} from './MinkDefaults.js'
+
 function restoreOptions () {
-  chrome.storage.local.get('ignorelist', function (items) {
+  chrome.storage.local.get('ignorelist').then(function (items) {
     $(items.ignorelist).each(function (i, v) {
       $('#options').append(getListItemHTML(v, 'glyphicon-remove'))
     })
@@ -24,17 +26,35 @@ function restoreOptions () {
       updateSaveButtonStatus()
       updateRemoveAllIgnorelistButtonStatus()
     })
-  })
-
-  chrome.storage.local.get('aggregators', function (ls) {
-    let dropdownOptions = document.querySelector('#aggregator').options
-    for (let i = 0; i < dropdownOptions.length; i++) {
-      if (dropdownOptions[i].value == ls.aggregators[0]) {
-        document.querySelector('#aggregator').selectedIndex = i
-        break
-      }
+  }, () => {
+    // TODO: handle localstorage get failed, now a promise instead of a callback
     }
+
+  )
+
+  getAggregatorsFromStorage(function (ls) {
+    if (!ls.aggregator) {
+      console.log('No aggregators listed in localStorage (yet)')
+      return
+    }
+
+    setDropdownToAggregator(1) // placeholder magic 1
   })
+}
+
+function setDropdownToAggregator (i) {
+  let dropdownOptions = document.querySelector('#aggregator').options
+
+  for (let i = 0; i < dropdownOptions.length; i++) {
+    if (dropdownOptions[i].value == ls.aggregators[0]) {
+      document.querySelector('#aggregator').selectedIndex = i
+      break
+    }
+  }
+}
+
+function getAggregatorsFromStorage (cb) {
+  return chrome.storage.local.get('aggregators').then(cb)
 }
 
 function getListItemHTML (uri, classIn, buttonText) {
@@ -237,7 +257,7 @@ function removeTMFromCache (originalURI) {
 }
 
 function clearTimemapCache () {
-  chrome.storage.local.set({ timemaps: {} },
+  chrome.storage.local.set({ 'timemaps': {} },
     function () {
       console.log('Remove all cached TMs')
       $('#cachedTimemaps').empty()
@@ -261,9 +281,27 @@ function saveAndCloseOptionsPanel () {
 function restoreDefaults () {
   clearIgnorelist()
   clearTimemapCache()
+  clearAggregatorListInLocalStorage()
+  resetDefaultAggregators()
   resetAggregatorSelection()
 }
 
+
+function clearAggregatorListInLocalStorage () {
+  chrome.storage.local.set({'aggregators': []})
+}
+
+function resetDefaultAggregators () {
+  chrome.storage.local.set({'aggregators': defaultAggregators})
+}
+
+function updateAggregatorsUIBasedOnLocalStorage () {
+  // get list from localstorage
+  getAggregatorsFromStorage((aggrs) => {
+    console.log("aggregators in storage:")
+    console.log(aggrs)})
+  console.log('TODO: Updating aggregators UI based on localstorage')
+}
 
 function resetAggregatorSelection () {
   let dropdown = document.querySelector('#aggregator')
@@ -281,6 +319,50 @@ function addSelectedURIToIgnorelist () {
   const oURI = $('#cachedTimemaps option:selected').text()
   $('#options').append(`<li class="strike"><span>${oURI}</span>></li>`)
 }
+
+getAggregatorsFromStorage(function (ls) {
+  console.log(ls)
+  if (!ls.aggregators) {
+    console.log('There are no aggregators in localStorage, set the default here if it is a new install')
+    console.log('DONT OVERWRITE THE USERS BLANK DROPDOWN!')
+    setAggregatorsInStorage(defaultAggregators, getAggregatorsFromStorage)
+  } else if(ls.aggregators[0] === null) {
+    console.log('aggregators in storage are null, repair this')
+    setAggregatorsInStorage(defaultAggregators)
+  } else {
+    console.log('Aggregators in storage:')
+    console.log(ls.aggregators)
+    populateDropdownWithAggregatorsInStorage(ls.aggregators)
+  }
+})
+
+function populateDropdownWithAggregatorsInStorage (arrayOfAggregators) {
+  let dropdownOptions = document.querySelector('#aggregator') //.options
+
+  for (let i = 0; i < arrayOfAggregators.length; i++) {
+    let newAggregatorOption = document.createElement('option')
+    newAggregatorOption.appendChild(document.createTextNode(arrayOfAggregators[i]))
+    dropdownOptions.appendChild(newAggregatorOption)
+  }
+}
+
+function setAggregatorsInStorage (arrayOfAggregatorHostnames, cb) {
+  // Returns a promise
+  return chrome.storage.local.set({ 'aggregators': arrayOfAggregatorHostnames }).then(() => {
+    console.log('Attempting to invoke the callback, this is failing w/ reload')
+    console.log(cb)
+    cb()
+  }, function writeFailed () {
+    console.log("Failed to write to localstorage")
+    console.log(arrayOfAggregatorHostnames)
+  })
+}
+
+function test_writeToLocalStorageAndReload () {
+  let testAggregators = ['https://memento.example.com', 'https://aggregator.somehostname.net']
+  setAggregatorsInStorage(defaultAggregators)//, window.location.reload)
+}
+
 
 document.addEventListener('DOMContentLoaded', restoreOptions)
 document.addEventListener('DOMContentLoaded', createAddURIBinder)
@@ -302,3 +384,6 @@ document.querySelector('#saveIgnorelist').addEventListener('click', saveIgnoreli
 document.querySelector('#clearIgnorelist').addEventListener('click', clearIgnorelist)
 document.querySelector('#doneButton').addEventListener('click', saveAndCloseOptionsPanel)
 document.querySelector('#restoreDefaultsButton').addEventListener('click', restoreDefaults)
+
+document.querySelector('#test_writeToLS').addEventListener('click', test_writeToLocalStorageAndReload)
+
