@@ -20,7 +20,7 @@ Mink is a Google Chrome extension that uses the [Memento protocol](https://tools
 
 * Go to the [Chrome Web Store](https://chrome.google.com/webstore/detail/mink/jemoalkmipibchioofomhkgimhofbbem)
 * Click "Add to Chrome" to install Mink.
-* Once installed, click the Mink icon in the Chrome toolbar to see how well-archived the current page is and navigate to the past.
+* Once installed, click the Mink icon in the Chrome toolbar to see how well-archived the current page is, and navigate to the past.
 
 ## Usage
 
@@ -62,7 +62,7 @@ To access these settings, right click on the Mink icon and select Options.
 
 # Contributing
 
-Contributions welcomed. Please see the CONTRIBUTING.md file in this repository for more information.
+Contributions are welcome. Please see the CONTRIBUTING.md file in this repository for more information.
 
 ### Citing Project
 
