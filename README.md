@@ -40,7 +40,7 @@ If no mementos exist in the archive, the extension will indicate this with a red
 
 ## Development
 
-Chrome supports debugging extensions by loading them from the local file system. To do this, go to `Window > Extensions`, enabled the `Developer mode` switch, click the `Load unpacked` button, and select the `mink-plugin` directory in the working directory clone of this repository.
+Chrome supports debugging extensions by loading them from the local file system. To do this, go to `Window > Extensions`, enable the `Developer mode` switch, click the `Load unpacked` button, and select the `mink-plugin` directory in the working directory clone of this repository.
 
 For packaging the extension and releasing a new version, enter the `mink-plugin` directory, type
 
@@ -52,11 +52,11 @@ For packaging the extension and releasing a new version, enter the `mink-plugin`
 
 Settings are available to customize Mink's functions and data retention including: 
 
-* Customizing the source of the Memento aggregator Memento aggregators.
+* Customizing the source of the Memento aggregator.
 * Tailoring the TimeMap caching setting for efficient querying.
 * Defining Ignore Lists for sites where you don't want Mink to run.
 
-To access these setting, right click on the Mink icon and select Options.
+To access these settings, right click on the Mink icon and select Options.
 
 <img src="https://github.com/machawk1/Mink/blob/main/meta/README/minksettings_2.5.5.3.png?raw=true">
 
