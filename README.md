@@ -11,10 +11,10 @@ Mink is a Google Chrome extension that uses the [Memento protocol](https://tools
 
 ## Features
 
-- Seemlessly see how well-archived a live web page is while browsing.
+- Seamlessly see how well-archived a live web page is while browsing.
 - Using the interface, quickly navigate to past captures of the page and traverse available captures from multiple web archive.
 - No captures? No problem! With a single button click, Mink will submit the web page you are currently viewing to multiple web archives.
-- Too many captures? When the set gets large, Mink intutitively organizes the set of captures for easy, hierarchical, time-based selection.
+- Too many captures? When the set gets large, Mink intuitively organizes the set of captures for easy, hierarchical, time-based selection.
 
 ## Installation
 
