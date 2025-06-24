@@ -1,6 +1,6 @@
 /* global chrome, $, Timemap */
 
-import {defaultAggregators} from './MinkDefaults.js'
+import { defaultAggregators } from './MinkDefaults.js'
 
 const debug = false
 let tmData
@@ -181,13 +181,13 @@ chrome.runtime.onMessage.addListener(
 
       // MV3 is a good thing. MV3 is a good thing. MV3 is a good thing.
       chrome.storage.local.get([keysFromLS[0], keysFromLS[1], keysFromLS[2]],
-          (valuesFromLS) => {
-            sendResponse({
-              value: valuesFromLS[keysFromLS[0]],
-              mementos: valuesFromLS[keysFromLS[1]],
-              memento_datetime: valuesFromLS[keysFromLS[2]]
-            })
-          }
+        (valuesFromLS) => {
+          sendResponse({
+            value: valuesFromLS[keysFromLS[0]],
+            mementos: valuesFromLS[keysFromLS[1]],
+            memento_datetime: valuesFromLS[keysFromLS[2]]
+          })
+        }
       )
 
       // sendResponse({
@@ -306,54 +306,54 @@ async function fetchTimeMap (uri, tabid, urir) {
   log(`Fetching TimeMap for ${uri} in tab ${tabid}`)
 
   fetch(uri)
-      .then(response => {
-        log('Fetch responses received, proceeding')
-        const status_code = response.status
-        if (status_code == 404) {
-          throw new ZeroMementos(`No mementos for {uri}`)
-        } else if (status_code == 504) {
-          throw new InaccessibleAggregator(`Aggregator at {uri} reported a {status_code} status code`)
-        } else {
-          log(`Status code: ${status_code}`)
-        }
-        return response
-      })
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
+    .then(response => {
+      log('Fetch responses received, proceeding')
+      const status_code = response.status
+      if (status_code == 404) {
+        throw new ZeroMementos(`No mementos for {uri}`)
+      } else if (status_code == 504) {
+        throw new InaccessibleAggregator(`Aggregator at {uri} reported a {status_code} status code`)
+      } else {
+        log(`Status code: ${status_code}`)
+      }
+      return response
+    })
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      log(data)
+      if (!data.mementos) {
+        data = new Timemap(data)
+        // TODO: data.normalize()
+        const mems = data.mementos
+        delete data.mementos
+        data.mementos = { list: mems }
         log(data)
-        if (!data.mementos) {
-          data = new Timemap(data)
-          // TODO: data.normalize()
-          const mems = data.mementos
-          delete data.mementos
-          data.mementos = { list: mems }
-          log(data)
-        }
-        displaySecureSiteMementos(data.mementos.list, tabid)
+      }
+      displaySecureSiteMementos(data.mementos.list, tabid)
 
-        data.original = data.original ? data.original : data.original_uri
-        setTimemapInStorage(data, data.original)
-        // stop the animation here
-        chrome.tabs.sendMessage(tabid, { method: 'stopAnimatingBrowserActionIcon' })
-      })
-      .catch(function(err) {
-        logWithTrace(`Something with the response from ${uri} is not as expected...`)
+      data.original = data.original ? data.original : data.original_uri
+      setTimemapInStorage(data, data.original)
+      // stop the animation here
+      chrome.tabs.sendMessage(tabid, { method: 'stopAnimatingBrowserActionIcon' })
+    })
+    .catch(function(err) {
+      logWithTrace(`Something with the response from ${uri} is not as expected...`)
 
-        if (err.name === 'ZeroMementos') {
-          showInterfaceForZeroMementos(tabid)
-        } else if (err.name === 'InaccessibleAggregator') {
-          logWithTrace('TODO: switch up the aggregator')
-        } else if (err instanceof SyntaxError) {
-          logWithTrace("JSON parsing failed, switch up the aggregator")
-          log(`Previous aggregator endpoint: ${uri}`)
-          // TODO: obtain URI-R here (don't parse it from URI-T) to send as a param
-          chrome.tabs.sendMessage(tabid, {
-            method: 'tryNextAggregator',
-            uri: urir})
-        }
-      })
+      if (err.name === 'ZeroMementos') {
+        showInterfaceForZeroMementos(tabid)
+      } else if (err.name === 'InaccessibleAggregator') {
+        logWithTrace('TODO: switch up the aggregator')
+      } else if (err instanceof SyntaxError) {
+        logWithTrace("JSON parsing failed, switch up the aggregator")
+        log(`Previous aggregator endpoint: ${uri}`)
+        // TODO: obtain URI-R here (don't parse it from URI-T) to send as a param
+        chrome.tabs.sendMessage(tabid, {
+          method: 'tryNextAggregator',
+          uri: urir})
+      }
+    })
 }
 
 

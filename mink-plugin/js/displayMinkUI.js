@@ -150,7 +150,7 @@ function buildDropDown (mementos) {
 }
 
 function switchToArchiveNowInterface () {
-  const showElements = ['#mementosDropdown', '#drilldownBox', '#viewMementoButton','#minkStatus #steps', '#archiveNow']
+  const showElements = ['#mementosDropdown', '#drilldownBox', '#viewMementoButton', '#minkStatus #steps', '#archiveNow']
   showElements.forEach(element => {
     document.querySelector(element).classList.add('noMementos')
   })

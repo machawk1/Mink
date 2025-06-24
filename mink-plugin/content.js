@@ -148,7 +148,7 @@ function checkAggregatorHealthAndSet (aggregatorIndex) {
       log(`Aggregator at ${memgatorHosts[aggregatorIndex]} was accessible\nSet as default`)
       // TODO: set as default in the options
       setDefaultAggregator(aggregatorIndex)
-     })
+    })
     .catch(error => {
       log(`${url} appears to be down, incrementing host counter`)
       log(error)
