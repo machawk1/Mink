@@ -29,7 +29,7 @@ function appendHTMLToShadowDOM () {
       setupUI()
 
       let mementos
-      if (tmData && tmData.mementos) {
+      if (tmData && tmData.mementos && tmData.mementos.list) {
         mementos = tmData.mementos.list // e.g. mementos[15].uri and mementos[15].datetime
       } else {
         mementos = []
@@ -39,6 +39,7 @@ function appendHTMLToShadowDOM () {
         let cb = function () {
           createShadowDOM(setupDrilldownInteractions)
         }
+
         let mCount = mementos.length
         const minkuiRoot = document.querySelector('#minkuiX')
         const viewingMemento = items.timemaps && items.timemaps[document.URL] &&
