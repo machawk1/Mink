@@ -211,6 +211,9 @@ chrome.runtime.onMessage.addListener(
       sendResponse({
         value: 'stopAnimatingBrowserActionIcon'
       })
+      if (request.value === '0') {
+        showInterfaceForZeroMementos(sender.tab.id)
+      }
     } else if (request.method === 'setDropdownContents' || request.method === 'setTMData') {
       tmData = request.value
     } else if (request.method === 'setBadge') {
