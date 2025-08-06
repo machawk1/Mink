@@ -1,13 +1,15 @@
 {
-  "esversion": 5,
+  "esversion": 8,
   "debug" : true,
   "loopfunc" : true,
   "latedef" : false,
   "curly" : true,
   "nonstandard" : true,
+  "asi" : true,
   "jquery" : true,
   "devel" : true,
   "browser" : true,
+  "iterator": true,
   "globals" : {
     "chrome" : true
   }
