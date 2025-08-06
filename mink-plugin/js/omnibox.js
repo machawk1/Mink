@@ -17,7 +17,7 @@ chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
 });
 
 chrome.omnibox.onInputEntered.addListener(function(text, disposition) {
- console.log('Mink value from omnibox: ' + text)
+ console.log(`Mink value from omnibox: ${text}`)
  console.log('Disposition: ')
  console.log(disposition)
 });
