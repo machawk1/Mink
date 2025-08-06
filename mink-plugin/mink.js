@@ -792,3 +792,31 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
     //});
   }
 })
+
+chrome.omnibox.onInputStarted.addListener(function cb() {
+  console.log('The user is utilizing the omnibox')
+  omnibox.resetOmniboxToDefault()
+});
+
+chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
+  console.log(`TODO: check if ${text} is a valid URL. Transpose if not and display via the "suggest" callback`)
+  if(text === '') {
+    omnibox.resetOmniboxToDefault()
+    return
+  }  
+  
+  omnibox.clearOmniboxDefault()
+  const url = omnibox.convertStringToURL(text)
+  
+  suggest([{'content': `mink://${text}`, 'description': `Fetch mementos for  ${url}?`}])
+})
+
+chrome.omnibox.onInputEntered.addListener(function(text, disposition) {
+ console.log(`Mink value from omnibox: ${text}`)
+ console.log('Disposition: ')
+ console.log(disposition)
+})
+
+chrome.omnibox.onInputCancelled.addListener(function cb() {
+  console.log('TODO: stop UI animation/changes, reset to pre-omnibox entry state.')
+})
