@@ -346,12 +346,12 @@ function populateDropdownWithAggregatorsInStorage (arrayOfAggregators) {
   }
 }
 
-function setAggregatorsInStorage (arrayOfAggregatorHostnames, cb = {}) {
+function setAggregatorsInStorage (arrayOfAggregatorHostnames, cb = () => {}) {
   // Returns a promise
   return chrome.storage.local.set({ 'aggregators': arrayOfAggregatorHostnames }).then(() => {
     console.log('Attempting to invoke the callback, this is failing w/ reload')
     console.log(cb)
-    cb()
+    if (typeof cb === 'function') cb()
   }, function writeFailed () {
     console.log("Failed to write to localstorage")
     console.log(arrayOfAggregatorHostnames)
